@@ -16,6 +16,7 @@ import {
   Result,
   Select,
   Spin,
+  Steps,
   Switch,
   Table,
   TableColumn,
@@ -101,11 +102,7 @@ function handleReset() {
         : (handleReset(), modalApi.close())
     "
   >
-    <a-steps :current="currentStep" class="mb-6">
-      <a-step title="Select File" />
-      <a-step title="Confirm" />
-      <a-step title="Result" />
-    </a-steps>
+    <Steps :current="currentStep" :items="[{ title: 'Select File' }, { title: 'Confirm' }, { title: 'Result' }]" class="mb-6" />
 
     <div v-if="currentStep === 0">
       <UploadDragger

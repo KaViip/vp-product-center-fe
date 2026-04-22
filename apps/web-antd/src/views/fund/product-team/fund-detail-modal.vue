@@ -11,6 +11,7 @@ import {
   DescriptionsItem,
   Divider,
   Spin,
+  Table,
   TabPane,
   Tabs,
 } from 'antdv-next';
@@ -175,7 +176,7 @@ const opTeamColumns = [
                 <template #label><span class="font-semibold">Share Classes ({{ shareClassList.length }})</span></template>
               </DescriptionsItem>
             </Descriptions>
-            <a-table
+            <Table
               :columns="opTeamColumns"
               :data-source="shareClassList"
               :row-key="(record: ShareClass) => record.id ?? record.vpfsClassId"
