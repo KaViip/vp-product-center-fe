@@ -589,7 +589,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
   background-color: rgba(0, 0, 0, 0.08);
 }
 :deep(.ant-anchor-link) {
-  font-size: 13px;
+  font-size: 14px;
 }
 :deep(.ant-anchor-link-title-active) {
   font-weight: 500;
