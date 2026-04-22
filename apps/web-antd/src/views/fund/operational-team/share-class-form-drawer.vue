@@ -222,7 +222,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
   <Drawer :title="title" :class="'w-[85%]'" :footer="true">
     <Spin :spinning="loading" class="h-full">
       <div class="flex h-full gap-4">
-        <div class="flex-1 overflow-y-auto pr-2">
+        <div class="flex-1 pr-[176px]">
           <Form
             ref="formRef"
             :model="formData"
@@ -581,7 +581,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
           </Form>
         </div>
 
-        <div class="w-[160px] shrink-0 sticky top-0">
+        <div class="w-[160px] shrink-0 sticky top-0 self-start">
           <Anchor :items="anchorItems" :offset-top="16" :target-offset="60" :affix="false" @click="handleAnchorClick" />
         </div>
       </div>
