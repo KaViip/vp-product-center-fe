@@ -7,8 +7,8 @@ import { computed, ref } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 
-import { DownOutlined, RightOutlined, Space } from 'antdv-next';
-import { Select, Table, Tooltip } from 'antdv-next';
+import { DownOutlined, RightOutlined } from '@antdv-next/icons';
+import { Select, Space, Table, Tooltip } from 'antdv-next';
 
 import { fundDocumentList } from '#/api/product-center';
 
@@ -191,6 +191,15 @@ function onDownload(doc: FundDocument) {
     window.open(doc.filePath, '_blank');
   }
 }
+
+const paginationConfig = computed(() => ({
+  current: pagination.value.current,
+  pageSize: pagination.value.pageSize,
+  total: pagination.value.total,
+  showSizeChanger: true,
+  showTotal: (total: number) => `Total ${total} funds`,
+  onChange: (page: number) => loadData(page),
+}));
 </script>
 
 <template>
@@ -239,14 +248,7 @@ function onDownload(doc: FundDocument) {
           :columns="columns"
           :data-source="fundRows"
           :loading="loading"
-          :pagination="{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            showSizeChanger: true,
-            showTotal: (total: number) => `Total ${total} funds`,
-            onChange: (page: number) => loadData(page,
-          }"
+          :pagination="paginationConfig"
           row-key="fundCode"
           size="small"
           bordered
