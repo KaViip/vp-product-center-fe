@@ -44,6 +44,7 @@ const isCopy = ref(false);
 const loading = ref(false);
 const formRef = ref();
 const activeCollapseKeys = ref<string[]>(['core', 'parties', 'strategy', 'registration']);
+const scrollContainerRef = ref<HTMLElement | null>(null);
 
 const title = computed(() => {
   if (isCopy.value) return 'Copy Fund';
@@ -172,6 +173,17 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     await nextTick();
     drawerApi.drawerLoading(false);
+
+    // Resolve scroll container for Anchor scroll-spy
+    await nextTick();
+    const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"]');
+    for (let i = dialogs.length - 1; i >= 0; i--) {
+      const sc = dialogs[i]!.querySelector<HTMLElement>('.overflow-y-auto');
+      if (sc && sc.scrollHeight > 0) {
+        scrollContainerRef.value = sc;
+        break;
+      }
+    }
   },
 });
 
@@ -579,7 +591,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
         </div>
 
         <div class="w-[160px] shrink-0 sticky top-0 self-start">
-          <Anchor :items="anchorItems" :offset-top="16" :target-offset="60" :affix="false" @click="handleAnchorClick" />
+          <Anchor :items="anchorItems" :offset-top="16" :target-offset="60" :affix="false" :get-container="() => scrollContainerRef || window" @click="handleAnchorClick" />
         </div>
       </div>
     </Spin>
