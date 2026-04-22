@@ -106,7 +106,7 @@ function handleReset() {
     title="Import Fund Data"
     class="w-[600px]"
   >
-    <Steps :current="currentStep" :items="[{ title: 'Select File' }, { title: 'Confirm' }, { title: 'Result' }]" class="mb-8" />
+    <Steps :current="currentStep" :items="[{ title: 'Select File' }, { title: 'Confirm' }, { title: 'Result' }]" style="margin-bottom: 24px" />
 
     <div v-if="currentStep === 0">
       <UploadDragger

@@ -241,7 +241,7 @@ const failedColumns = [
     title="Upload Documents"
     class="w-[800px]"
   >
-    <Steps :current="currentStep" :items="[{ title: 'Select Mode' }, { title: 'Upload Files' }, { title: 'Result' }]" class="mb-8" />
+    <Steps :current="currentStep" :items="[{ title: 'Select Mode' }, { title: 'Upload Files' }, { title: 'Result' }]" style="margin-bottom: 24px" />
 
     <!-- Step 0: Select Upload Mode -->
     <div v-if="currentStep === 0" class="space-y-4">
