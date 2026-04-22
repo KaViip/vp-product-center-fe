@@ -65,8 +65,8 @@ const rules = {
   vpfsClassId: [{ required: true, message: 'VPFS Class ID is required' }],
 };
 
-const labelCol = { span: 8 };
-const wrapperCol = { span: 16 };
+const labelCol = { span: 10 };
+const wrapperCol = { span: 14 };
 
 const classListColumns = [
   { title: 'VPFS Class ID', dataIndex: 'vpfsClassId', key: 'vpfsClassId', width: 140 },
@@ -237,6 +237,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             :label-col="labelCol"
             :wrapper-col="wrapperCol"
             layout="horizontal"
+            label-wrap
           >
             <Collapse v-model:activeKey="activeCollapseKeys" :bordered="false">
             <CollapsePanel id="section-fund-info" key="fund-info" header="Fund Info">

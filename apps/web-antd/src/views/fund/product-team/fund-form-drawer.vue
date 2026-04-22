@@ -127,8 +127,8 @@ const rules = {
   assetAllocationTable: [{ required: true, message: 'Asset Allocation is required' }],
 };
 
-const labelCol = { span: 8 };
-const wrapperCol = { span: 16 };
+const labelCol = { span: 10 };
+const wrapperCol = { span: 14 };
 
 function getAutocompleteProps(field: string) {
   return {
@@ -253,6 +253,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             :label-col="labelCol"
             :wrapper-col="wrapperCol"
             layout="horizontal"
+            label-wrap
           >
             <Collapse v-model:activeKey="activeCollapseKeys" :bordered="false">
             <CollapsePanel id="section-core" key="core" header="Core Fund Identity">
