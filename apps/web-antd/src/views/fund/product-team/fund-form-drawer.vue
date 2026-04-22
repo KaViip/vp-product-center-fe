@@ -606,3 +606,16 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
     </template>
   </Drawer>
 </template>
+
+<style scoped>
+:deep(.ant-collapse-header) {
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+:deep(.ant-collapse-header:hover) {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+:deep(.ant-collapse-header:active) {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+</style>
