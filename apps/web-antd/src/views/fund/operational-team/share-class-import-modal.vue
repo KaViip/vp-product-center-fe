@@ -73,6 +73,15 @@ async function handleConfirm() {
   modalApi.close();
 }
 
+function handleCancel() {
+  if (currentStep.value > 0 && currentStep.value < 2) {
+    currentStep.value--;
+    return;
+  }
+  handleReset();
+  modalApi.close();
+}
+
 function handleReset() {
   currentStep.value = 0;
   fileList.value = [];
@@ -90,11 +99,7 @@ function handleReset() {
     :footer="true"
     title="Import Share Class Data"
     class="w-[600px]"
-    @cancel="
-      currentStep > 0 && currentStep < 2
-        ? (currentStep--, undefined)
-        : (handleReset(), modalApi.close())
-    "
+    @cancel="handleCancel"
   >
     <Steps :current="currentStep" :items="[{ title: 'Select File' }, { title: 'Confirm' }, { title: 'Result' }]" class="mb-6" />
 

@@ -155,6 +155,15 @@ function handleConfirm() {
   modalApi.close();
 }
 
+function handleCancel() {
+  if (currentStep.value > 0 && currentStep.value < 2) {
+    currentStep.value--;
+    return;
+  }
+  handleReset();
+  modalApi.close();
+}
+
 function handleReset() {
   currentStep.value = 0;
   fileList.value = [];
@@ -231,11 +240,7 @@ const failedColumns = [
     title="Upload Documents"
     class="w-[800px]"
     @confirm="handleConfirm"
-    @cancel="
-      currentStep > 0 && currentStep < 2
-        ? (currentStep--, undefined)
-        : (handleReset(), modalApi.close())
-    "
+    @cancel="handleCancel"
   >
     <Steps :current="currentStep" :items="[{ title: 'Select Mode' }, { title: 'Upload Files' }, { title: 'Result' }]" class="mb-6" />
 
