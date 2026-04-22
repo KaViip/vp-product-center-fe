@@ -579,11 +579,19 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
 :deep(.ant-collapse-header) {
   border-radius: 6px;
   transition: background-color 0.2s ease;
+  font-weight: 600;
+  font-size: 15px;
 }
 :deep(.ant-collapse-header:hover) {
   background-color: rgba(0, 0, 0, 0.04);
 }
 :deep(.ant-collapse-header:active) {
   background-color: rgba(0, 0, 0, 0.08);
+}
+:deep(.ant-anchor-link) {
+  font-size: 13px;
+}
+:deep(.ant-anchor-link-title-active) {
+  font-weight: 500;
 }
 </style>
