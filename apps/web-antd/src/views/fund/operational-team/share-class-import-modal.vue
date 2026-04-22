@@ -13,8 +13,6 @@ import {
   RadioGroup,
   Result,
   Spin,
-  Step,
-  Steps,
   Switch,
   UploadDragger,
 } from 'antdv-next';
@@ -97,11 +95,11 @@ function handleReset() {
         : (handleReset(), modalApi.close())
     "
   >
-    <Steps :current="currentStep" class="mb-6">
-      <Step title="Select File" />
-      <Step title="Confirm" />
-      <Step title="Result" />
-    </Steps>
+    <a-steps :current="currentStep" class="mb-6">
+      <a-step title="Select File" />
+      <a-step title="Confirm" />
+      <a-step title="Result" />
+    </a-steps>
 
     <div v-if="currentStep === 0">
       <UploadDragger

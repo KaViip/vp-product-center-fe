@@ -16,8 +16,6 @@ import {
   Result,
   Select,
   Spin,
-  Step,
-  Steps,
   Table,
   Tooltip,
   UploadDragger,
@@ -238,11 +236,11 @@ const failedColumns = [
         : (handleReset(), modalApi.close())
     "
   >
-    <Steps :current="currentStep" class="mb-6">
-      <Step title="Select Mode" />
-      <Step title="Upload Files" />
-      <Step title="Result" />
-    </Steps>
+    <a-steps :current="currentStep" class="mb-6">
+      <a-step title="Select Mode" />
+      <a-step title="Upload Files" />
+      <a-step title="Result" />
+    </a-steps>
 
     <!-- Step 0: Select Upload Mode -->
     <div v-if="currentStep === 0" class="space-y-4">
