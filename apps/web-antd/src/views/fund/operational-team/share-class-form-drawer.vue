@@ -8,10 +8,10 @@ import { cloneDeep } from '@vben/utils';
 
 import {
   Anchor,
-  Card,
+  Collapse,
+  CollapsePanel,
   Col,
   DatePicker,
-  Divider,
   Form,
   FormItem,
   Input,
@@ -40,6 +40,7 @@ const isUpdate = ref(false);
 const isCopy = ref(false);
 const loading = ref(false);
 const formRef = ref();
+const activeCollapseKeys = ref<string[]>(['fund-info', 'class-list', 'class-info', 'dealing']);
 const classListData = ref<ShareClass[]>([]);
 const selectedClassRow = ref<ShareClass | null>(null);
 
@@ -197,9 +198,15 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
   const targetId = href.substring(1);
   const target = document.getElementById(targetId);
   if (!target) return;
-  // Find the scrollable container inside the *visible* dialog. When multiple drawers
-  // are open simultaneously, only the last [role="dialog"] with non-zero scrollHeight
-  // is the active one.
+
+  // Ensure the target's collapse panel is expanded
+  const panel = target.closest('[data-key]') || target;
+  const panelKey = panel?.getAttribute('data-key');
+  if (panelKey && !activeCollapseKeys.value.includes(panelKey)) {
+    activeCollapseKeys.value = [...activeCollapseKeys.value, panelKey];
+  }
+
+  // Find the scrollable container inside the *visible* dialog.
   const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"]');
   let container: HTMLElement | null = null;
   for (let i = dialogs.length - 1; i >= 0; i--) {
@@ -231,8 +238,8 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             :wrapper-col="wrapperCol"
             layout="horizontal"
           >
-            <!-- Section 1: Fund Info -->
-            <Card id="section-fund-info" title="Fund Info" class="mb-4" size="small">
+            <Collapse v-model:activeKey="activeCollapseKeys" :bordered="false">
+            <CollapsePanel id="section-fund-info" key="fund-info" header="Fund Info">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Code" name="fundCode">
@@ -276,12 +283,9 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-            </Card>
+            </CollapsePanel>
 
-            <Divider />
-
-            <!-- Section 2: Class List -->
-            <Card id="section-class-list" title="Class List" class="mb-4" size="small">
+            <CollapsePanel id="section-class-list" key="class-list" header="Class List">
               <div class="mb-2 text-gray-500 text-xs">
                 Enter a Fund Code above to load existing share classes. Select a row and click "Copy" to fill the form below.
               </div>
@@ -294,12 +298,9 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 :pagination="false"
                 :scroll="{ y: 200 }"
               />
-            </Card>
+            </CollapsePanel>
 
-            <Divider />
-
-            <!-- Section 3: Class Info -->
-            <Card id="section-class-info" title="Class Info" class="mb-4" size="small">
+            <CollapsePanel id="section-class-info" key="class-info" header="Class Info">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Share Class Name (EN)" name="shareClassNameEn">
@@ -420,12 +421,9 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-            </Card>
+            </CollapsePanel>
 
-            <Divider />
-
-            <!-- Section 4: Dealing & Valuation -->
-            <Card id="section-dealing" title="Dealing & Valuation" class="mb-4" size="small">
+            <CollapsePanel id="section-dealing" key="dealing" header="Dealing & Valuation">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Dealing Frequency">
@@ -577,7 +575,8 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-            </Card>
+            </CollapsePanel>
+            </Collapse>
           </Form>
         </div>
 

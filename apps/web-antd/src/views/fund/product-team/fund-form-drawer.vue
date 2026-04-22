@@ -8,10 +8,10 @@ import { cloneDeep } from '@vben/utils';
 
 import {
   Anchor,
-  Card,
+  Collapse,
+  CollapsePanel,
   Col,
   DatePicker,
-  Divider,
   Form,
   FormItem,
   Input,
@@ -43,6 +43,7 @@ const isUpdate = ref(false);
 const isCopy = ref(false);
 const loading = ref(false);
 const formRef = ref();
+const activeCollapseKeys = ref<string[]>(['core', 'parties', 'strategy', 'registration']);
 
 const title = computed(() => {
   if (isCopy.value) return 'Copy Fund';
@@ -213,9 +214,15 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
   const targetId = href.substring(1);
   const target = document.getElementById(targetId);
   if (!target) return;
-  // Find the scrollable container inside the *visible* dialog. When multiple drawers
-  // are open simultaneously, only the last [role="dialog"] with non-zero scrollHeight
-  // is the active one.
+
+  // Ensure the target's collapse panel is expanded
+  const panel = target.closest('[data-key]') || target;
+  const panelKey = panel?.getAttribute('data-key');
+  if (panelKey && !activeCollapseKeys.value.includes(panelKey)) {
+    activeCollapseKeys.value = [...activeCollapseKeys.value, panelKey];
+  }
+
+  // Find the scrollable container inside the *visible* dialog.
   const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"]');
   let container: HTMLElement | null = null;
   for (let i = dialogs.length - 1; i >= 0; i--) {
@@ -247,7 +254,8 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             :wrapper-col="wrapperCol"
             layout="horizontal"
           >
-            <Card id="section-core" title="Core Fund Identity" class="mb-4" size="small">
+            <Collapse v-model:activeKey="activeCollapseKeys" :bordered="false">
+            <CollapsePanel id="section-core" key="core" header="Core Fund Identity">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Code" name="fundCode">
@@ -401,11 +409,9 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-            </Card>
+            </CollapsePanel>
 
-            <Divider />
-
-            <Card id="section-parties" title="Key Parties" class="mb-4" size="small">
+            <CollapsePanel id="section-parties" key="parties" header="Key Parties">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Manager" name="fundManager">
@@ -461,11 +467,9 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-            </Card>
+            </CollapsePanel>
 
-            <Divider />
-
-            <Card id="section-strategy" title="Investment Strategy" class="mb-4" size="small">
+            <CollapsePanel id="section-strategy" key="strategy" header="Investment Strategy">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Instrument Type" name="primaryInstrumentType">
@@ -564,11 +568,9 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-            </Card>
+            </CollapsePanel>
 
-            <Divider />
-
-            <Card id="section-registration" title="Foreign Registration Status" class="mb-4" size="small">
+            <CollapsePanel id="section-registration" key="registration" header="Foreign Registration Status">
               <Row :gutter="[16, 8]">
                 <Col v-for="country in REGISTRATION_COUNTRIES" :key="country.key" :span="8">
                   <FormItem :label="country.label" :label-col="{ span: 16 }" :wrapper-col="{ span: 8 }">
@@ -576,7 +578,8 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-            </Card>
+            </CollapsePanel>
+            </Collapse>
           </Form>
         </div>
 
