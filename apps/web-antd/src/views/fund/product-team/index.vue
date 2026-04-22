@@ -77,10 +77,6 @@ function handleCellDblclick({ row }: { row: FundProduct }) {
   handleDetail(row);
 }
 
-function handleCellDblclick({ row }: { row: FundProduct }) {
-  handleDetail(row);
-}
-
 const [BasicTable, tableApi] = useVbenVxeGrid({
   formOptions,
   gridOptions,
