@@ -65,41 +65,6 @@ const rules = {
   vpfsClassId: [{ required: true, message: 'VPFS Class ID is required' }],
 };
 
-const labelCol = { span: 10 };
-const wrapperCol = { span: 14 };
-
-const classListColumns = [
-  { title: 'VPFS Class ID', dataIndex: 'vpfsClassId', key: 'vpfsClassId', width: 140 },
-  { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEn', key: 'shareClassNameEn', width: 250 },
-  { title: 'Class Currency', dataIndex: 'classCurrency', key: 'classCurrency', width: 120 },
-  { title: 'Class Status', dataIndex: 'classStatus', key: 'classStatus', width: 120 },
-  { title: 'Launch Date', dataIndex: 'launchDate', key: 'launchDate', width: 120 },
-];
-
-const classListRowSelection = computed(() => ({
-  type: 'radio' as const,
-  selectedRowKeys: selectedClassRow.value ? [selectedClassRow.value.id] : [],
-  onChange: (_selectedRowKeys: string[], selectedRows: ShareClass[]) => {
-    selectedClassRow.value = selectedRows[0] || null;
-  },
-}));
-
-watch(
-  () => formData.value.fundCode,
-  async (newFundCode) => {
-    if (newFundCode && newFundCode.length >= 1) {
-      try {
-        classListData.value = await getClassListByFundCode(newFundCode);
-      } catch {
-        classListData.value = [];
-      }
-    } else {
-      classListData.value = [];
-    }
-    selectedClassRow.value = null;
-  },
-);
-
 function handleCopyFromClassList() {
   if (!selectedClassRow.value) return;
   const source = cloneDeep(selectedClassRow.value);
@@ -234,10 +199,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             ref="formRef"
             :model="formData"
             :rules="rules"
-            :label-col="labelCol"
-            :wrapper-col="wrapperCol"
-            layout="horizontal"
-            label-wrap
+            layout="vertical"
           >
             <Collapse v-model:activeKey="activeCollapseKeys" :bordered="false">
             <CollapsePanel id="section-fund-info" key="fund-info" header="Fund Info">

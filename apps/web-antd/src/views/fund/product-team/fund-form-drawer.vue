@@ -127,9 +127,6 @@ const rules = {
   assetAllocationTable: [{ required: true, message: 'Asset Allocation is required' }],
 };
 
-const labelCol = { span: 10 };
-const wrapperCol = { span: 14 };
-
 function getAutocompleteProps(field: string) {
   return {
     filterOption: false,
@@ -250,10 +247,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             ref="formRef"
             :model="formData"
             :rules="rules"
-            :label-col="labelCol"
-            :wrapper-col="wrapperCol"
-            layout="horizontal"
-            label-wrap
+            layout="vertical"
           >
             <Collapse v-model:activeKey="activeCollapseKeys" :bordered="false">
             <CollapsePanel id="section-core" key="core" header="Core Fund Identity">
@@ -398,14 +392,14 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="24">
-                  <FormItem label="Investor Nationality Restriction" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+                  <FormItem label="Investor Nationality Restriction">
                     <Input v-model:value="formData.restrictionInvestorNationality" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="24">
-                  <FormItem label="Investor Residency Restriction" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+                  <FormItem label="Investor Residency Restriction">
                     <Input v-model:value="formData.restrictionInvestorResidency" />
                   </FormItem>
                 </Col>
@@ -497,21 +491,21 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="24">
-                  <FormItem label="Investment Objective" name="investmentObjective" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+                  <FormItem label="Investment Objective" name="investmentObjective">
                     <Input v-model:value="formData.investmentObjective" type="textarea" :rows="3" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="24">
-                  <FormItem label="Investment Strategy" name="investmentStrategy" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+                  <FormItem label="Investment Strategy" name="investmentStrategy">
                     <Input v-model:value="formData.investmentStrategy" type="textarea" :rows="3" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="24">
-                  <FormItem label="Asset Allocation" name="assetAllocationTable" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+                  <FormItem label="Asset Allocation" name="assetAllocationTable">
                     <Input v-model:value="formData.assetAllocationTable" type="textarea" :rows="3" />
                   </FormItem>
                 </Col>
@@ -542,29 +536,29 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="8">
-                  <FormItem label="Max Leverage" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                   <FormItem label="Max Leverage">
                     <Input v-model:value="formData.leverageRatioMax" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                  <FormItem label="Max Derivatives" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                   <FormItem label="Max Derivatives">
                     <Input v-model:value="formData.derivativesRatioMax" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                  <FormItem label="Borrowing Limit" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                   <FormItem label="Borrowing Limit">
                     <Input v-model:value="formData.borrowingLimit" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="8">
-                  <FormItem label="Stop Loss Limit" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                   <FormItem label="Stop Loss Limit">
                     <Input v-model:value="formData.stopLossLimit" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                  <FormItem label="Stop Loss Alert" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                   <FormItem label="Stop Loss Alert">
                     <Input v-model:value="formData.stopLossAlert" />
                   </FormItem>
                 </Col>
@@ -574,7 +568,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             <CollapsePanel id="section-registration" key="registration" header="Foreign Registration Status">
               <Row :gutter="[16, 8]">
                 <Col v-for="country in REGISTRATION_COUNTRIES" :key="country.key" :span="8">
-                  <FormItem :label="country.label" :label-col="{ span: 16 }" :wrapper-col="{ span: 8 }">
+                   <FormItem :label="country.label">
                     <DatePicker v-model:value="formData[country.key]" class="w-full" value-format="YYYY-MM-DD" size="small" />
                   </FormItem>
                 </Col>
