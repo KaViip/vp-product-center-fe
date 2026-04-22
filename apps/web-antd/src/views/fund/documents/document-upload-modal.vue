@@ -35,7 +35,8 @@ import { validateDocumentName, validateFileSize } from './document-validator';
 const emit = defineEmits<{ reload: [] }>();
 
 const [BasicModal, modalApi] = useVbenModal({
-  onCancel: handleReset,
+  onConfirm: handleConfirm,
+  onCancel: handleCancel,
 });
 
 const currentStep = ref(0);
@@ -239,8 +240,6 @@ const failedColumns = [
     :ok-button-props="{ disabled: currentStep === 1 && !canUpload }"
     title="Upload Documents"
     class="w-[800px]"
-    @confirm="handleConfirm"
-    @cancel="handleCancel"
   >
     <Steps :current="currentStep" :items="[{ title: 'Select Mode' }, { title: 'Upload Files' }, { title: 'Result' }]" class="mb-6" />
 

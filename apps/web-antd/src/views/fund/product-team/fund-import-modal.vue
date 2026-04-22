@@ -34,7 +34,7 @@ const emit = defineEmits<{ reload: [] }>();
 
 const [BasicModal, modalApi] = useVbenModal({
   onConfirm: handleConfirm,
-  onCancel: handleReset,
+  onCancel: handleCancel,
 });
 
 const currentStep = ref(0);
@@ -105,7 +105,6 @@ function handleReset() {
     :footer="true"
     title="Import Fund Data"
     class="w-[600px]"
-    @cancel="handleCancel"
   >
     <Steps :current="currentStep" :items="[{ title: 'Select File' }, { title: 'Confirm' }, { title: 'Result' }]" class="mb-6" />
 
