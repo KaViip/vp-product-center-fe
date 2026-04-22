@@ -7,6 +7,7 @@ import { useVbenDrawer } from '@vben/common-ui';
 import { cloneDeep } from '@vben/utils';
 
 import {
+  Anchor,
   Card,
   Col,
   DatePicker,
@@ -39,7 +40,6 @@ const isUpdate = ref(false);
 const isCopy = ref(false);
 const loading = ref(false);
 const formRef = ref();
-const scrollContainerRef = ref<HTMLElement>();
 const classListData = ref<ShareClass[]>([]);
 const selectedClassRow = ref<ShareClass | null>(null);
 
@@ -190,8 +190,31 @@ const anchorItems = [
   { href: '#section-dealing', title: 'Dealing & Valuation' },
 ];
 
-function getContainer() {
-  return scrollContainerRef.value || window;
+function handleAnchorClick(e: Event, link: { href: string; title: string }) {
+  e.preventDefault();
+  const href = link.href;
+  if (!href?.startsWith('#')) return;
+  const targetId = href.substring(1);
+  const target = document.getElementById(targetId);
+  if (!target) return;
+  // Find the scrollable container inside the *visible* dialog. When multiple drawers
+  // are open simultaneously, only the last [role="dialog"] with non-zero scrollHeight
+  // is the active one.
+  const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"]');
+  let container: HTMLElement | null = null;
+  for (let i = dialogs.length - 1; i >= 0; i--) {
+    const sc = dialogs[i]!.querySelector<HTMLElement>('.overflow-y-auto');
+    if (sc && sc.scrollHeight > 0) {
+      container = sc;
+      break;
+    }
+  }
+  if (container) {
+    container.scrollTo({
+      top: target.offsetTop - 60,
+      behavior: 'smooth',
+    });
+  }
 }
 </script>
 
@@ -199,7 +222,7 @@ function getContainer() {
   <Drawer :title="title" :class="'w-[85%]'" :footer="true">
     <Spin :spinning="loading" class="h-full">
       <div class="flex h-full gap-4">
-        <div ref="scrollContainerRef" class="flex-1 overflow-y-auto pr-2" style="max-height: calc(100vh - 200px)">
+        <div class="flex-1 overflow-y-auto pr-2">
           <Form
             ref="formRef"
             :model="formData"
@@ -558,10 +581,8 @@ function getContainer() {
           </Form>
         </div>
 
-        <div class="w-[140px] shrink-0">
-          <a-anchor :get-container="getContainer" :offset-top="16" :target-offset="60">
-            <a-anchor-link v-for="item in anchorItems" :key="item.href" :href="item.href" :title="item.title" />
-          </a-anchor>
+        <div class="w-[160px] shrink-0 sticky top-0">
+          <Anchor :items="anchorItems" :offset-top="16" :target-offset="60" :affix="false" @click="handleAnchorClick" />
         </div>
       </div>
     </Spin>
