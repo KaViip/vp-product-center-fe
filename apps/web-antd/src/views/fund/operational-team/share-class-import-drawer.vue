@@ -6,6 +6,7 @@ import { ref } from 'vue';
 import { useVbenDrawer } from '@vben/common-ui';
 
 import { InboxOutlined } from '@antdv-next/icons';
+import * as XLSX from 'xlsx';
 import {
   Button,
   Result,
@@ -49,21 +50,29 @@ async function handleExport() {
   exportBlob({ data: {}, fileName: 'Share_Class_Template.xlsx' });
 }
 
-async function parseExcelPreview(_file: File) {
-  // TODO: Replace with real Excel parsing when backend is ready.
-  previewData.value = [
-    { _row: 1, fundCode: 'VPAF', shareClassNameEn: 'Class A (HKD)', classCurrency: 'HKD', classStatus: 'Active', vpfsClassId: 'VPAF-A', isinCode: 'HK0000123456' },
-    { _row: 2, fundCode: 'VPAF', shareClassNameEn: 'Class B (USD)', classCurrency: 'USD', classStatus: 'Active', vpfsClassId: 'VPAF-B', isinCode: 'HK0000123457' },
-  ];
-  previewColumns.value = [
-    { title: '#', dataIndex: '_row', key: '_row', width: 50 },
-    { title: 'Fund Code', dataIndex: 'fundCode', key: 'fundCode', width: 120 },
-    { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEn', key: 'shareClassNameEn', width: 220 },
-    { title: 'Currency', dataIndex: 'classCurrency', key: 'classCurrency', width: 100 },
-    { title: 'Status', dataIndex: 'classStatus', key: 'classStatus', width: 100 },
-    { title: 'VPFS Class ID', dataIndex: 'vpfsClassId', key: 'vpfsClassId', width: 120 },
-    { title: 'ISIN', dataIndex: 'isinCode', key: 'isinCode', width: 150 },
-  ];
+async function parseExcelPreview(file: File) {
+  const buffer = await file.arrayBuffer();
+  const workbook = XLSX.read(buffer, { type: 'array' });
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+  const json: Record<string, any>[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+  if (json.length === 0) {
+    previewData.value = [];
+    previewColumns.value = [];
+    return;
+  }
+
+  const keys = Object.keys(json[0]);
+  previewColumns.value = keys.map((k) => ({
+    title: k,
+    dataIndex: k,
+    key: k,
+    width: 150,
+    ellipsis: true,
+  }));
+  previewData.value = json.map((row, i) => ({ _row: i + 1, ...row }));
+  previewColumns.value.unshift({ title: '#', dataIndex: '_row', key: '_row', width: 50, fixed: 'left' });
 }
 
 async function handleConfirm() {
@@ -172,7 +181,7 @@ function handleReset() {
         :columns="previewColumns"
         :data-source="previewData"
         :pagination="false"
-        :scroll="{ x: 900, y: 400 }"
+        :scroll="{ x: previewColumns.length * 150, y: 400 }"
         size="small"
         bordered
       />

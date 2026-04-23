@@ -6,6 +6,7 @@ import { ref } from 'vue';
 import { useVbenDrawer } from '@vben/common-ui';
 
 import { InboxOutlined } from '@antdv-next/icons';
+import * as XLSX from 'xlsx';
 import {
   Button,
   Result,
@@ -50,20 +51,29 @@ async function handleExport() {
   exportBlob({ data: {}, fileName: 'Fund_Product_Template.xlsx' });
 }
 
-async function parseExcelPreview(_file: File) {
-  // TODO: Replace with real Excel parsing when backend is ready.
-  previewData.value = [
-    { _row: 1, fundCode: 'VPAF', fundNameEn: 'Value Partners Advantage Fund', fundType: 'SFC Authorized Fund（UT）', domicileJurisdiction: 'Hong Kong', baseCurrency: 'HKD' },
-    { _row: 2, fundCode: 'VPVF', fundNameEn: 'Value Partners Vision Fund', fundType: 'SFC Authorized Fund（UT）', domicileJurisdiction: 'Hong Kong', baseCurrency: 'USD' },
-  ];
-  previewColumns.value = [
-    { title: '#', dataIndex: '_row', key: '_row', width: 50 },
-    { title: 'Fund Code', dataIndex: 'fundCode', key: 'fundCode', width: 120 },
-    { title: 'Fund Name (EN)', dataIndex: 'fundNameEn', key: 'fundNameEn', width: 240 },
-    { title: 'Fund Type', dataIndex: 'fundType', key: 'fundType', width: 200 },
-    { title: 'Domicile', dataIndex: 'domicileJurisdiction', key: 'domicileJurisdiction', width: 120 },
-    { title: 'Currency', dataIndex: 'baseCurrency', key: 'baseCurrency', width: 100 },
-  ];
+async function parseExcelPreview(file: File) {
+  const buffer = await file.arrayBuffer();
+  const workbook = XLSX.read(buffer, { type: 'array' });
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+  const json: Record<string, any>[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+  if (json.length === 0) {
+    previewData.value = [];
+    previewColumns.value = [];
+    return;
+  }
+
+  const keys = Object.keys(json[0]);
+  previewColumns.value = keys.map((k) => ({
+    title: k,
+    dataIndex: k,
+    key: k,
+    width: 150,
+    ellipsis: true,
+  }));
+  previewData.value = json.map((row, i) => ({ _row: i + 1, ...row }));
+  previewColumns.value.unshift({ title: '#', dataIndex: '_row', key: '_row', width: 50, fixed: 'left' });
 }
 
 async function handleConfirm() {
@@ -172,7 +182,7 @@ function handleReset() {
         :columns="previewColumns"
         :data-source="previewData"
         :pagination="false"
-        :scroll="{ x: 800, y: 400 }"
+        :scroll="{ x: previewColumns.length * 150, y: 400 }"
         size="small"
         bordered
       />

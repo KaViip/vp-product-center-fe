@@ -60,7 +60,8 @@
     "unplugin-vue-components": "catalog:",
     "version-polling": "catalog:",
     "vue": "catalog:",
-    "vue-router": "catalog:"
+    "vue-router": "catalog:",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/lodash-es": "catalog:"
