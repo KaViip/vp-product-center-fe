@@ -1,26 +1,17 @@
 <script setup lang="ts">
 import type { UploadFile } from 'antdv-next';
 
-import { h, ref } from 'vue';
+import { ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
 
+import { InboxOutlined } from '@antdv-next/icons';
 import {
-  InboxOutlined,
-  StepForwardOutlined,
-} from '@antdv-next/icons';
-import {
-  Progress,
-  RadioButton,
-  RadioGroup,
   Result,
   Select,
   Spin,
   Steps,
-  Switch,
   Table,
-  TableColumn,
-  Upload,
   UploadDragger,
 } from 'antdv-next';
 
@@ -40,9 +31,16 @@ const [BasicModal, modalApi] = useVbenModal({
 const currentStep = ref(0);
 const fileList = ref<UploadFile[]>([]);
 const importMode = ref('add data');
-const updateSupport = ref(false);
 const importing = ref(false);
 const importResult = ref<{ code: number; msg: string } | null>(null);
+const previewData = ref<Record<string, any>[]>([]);
+const previewColumns = ref<{ title: string; dataIndex: string; key: string; ellipsis?: boolean }[]>([]);
+
+const importModeOptions = [
+  { label: 'Add Data', value: 'add data' },
+  { label: 'Update Data', value: 'update data' },
+  { label: 'Add and Update Data', value: 'add and update data' },
+];
 
 const { exportBlob, exportLoading } = useBlobExport(fundProductDownloadTemplate);
 
@@ -50,9 +48,25 @@ async function handleExport() {
   exportBlob({ data: {}, fileName: 'Fund_Product_Template.xlsx' });
 }
 
+async function parseExcelPreview(file: File) {
+  // TODO: Replace with real Excel parsing (e.g. xlsx library) when backend is ready.
+  // For now, generate mock preview data from the file name.
+  previewData.value = [
+    { _row: 1, fundCode: '(preview)', fundNameEn: '(data from Excel)', fundType: '...' },
+    { _row: 2, fundCode: '(preview)', fundNameEn: '(data from Excel)', fundType: '...' },
+  ];
+  previewColumns.value = [
+    { title: '#', dataIndex: '_row', key: '_row', width: 50 },
+    { title: 'Fund Code', dataIndex: 'fundCode', key: 'fundCode', ellipsis: true },
+    { title: 'Fund Name (EN)', dataIndex: 'fundNameEn', key: 'fundNameEn', ellipsis: true },
+    { title: 'Fund Type', dataIndex: 'fundType', key: 'fundType', ellipsis: true },
+  ];
+}
+
 async function handleConfirm() {
   if (currentStep.value === 0) {
     if (fileList.value.length !== 1) return;
+    await parseExcelPreview(fileList.value[0]!.originFileObj as File);
     currentStep.value = 1;
     return;
   }
@@ -63,7 +77,7 @@ async function handleConfirm() {
     try {
       const data = new FormData();
       data.append('file', fileList.value[0]!.originFileObj as Blob);
-      data.append('updateSupport', String(updateSupport.value));
+      data.append('importMode', importMode.value);
       const result = await fundProductImport(data);
       importResult.value = result as any;
       emit('reload');
@@ -91,24 +105,35 @@ function handleCancel() {
 function handleReset() {
   currentStep.value = 0;
   fileList.value = [];
-  updateSupport.value = false;
+  importMode.value = 'add data';
   importResult.value = null;
   importing.value = false;
+  previewData.value = [];
+  previewColumns.value = [];
 }
 </script>
 
 <template>
   <BasicModal
     :close-on-click-modal="false"
-    :confirm-text="currentStep === 2 ? 'Done' : 'Next'"
+    :confirm-text="currentStep === 2 ? 'Done' : currentStep === 1 ? 'Import' : 'Next'"
     :cancel-text="currentStep > 0 && currentStep < 2 ? 'Previous' : 'Cancel'"
     :footer="true"
     title="Import Fund Data"
     class="w-[600px]"
   >
-    <Steps :current="currentStep" :items="[{ title: 'Select File' }, { title: 'Confirm' }, { title: 'Result' }]" style="margin-bottom: 24px" />
+    <Steps
+      :current="currentStep"
+      :items="[{ title: 'Select Excel' }, { title: 'Browse Data' }, { title: 'Import Result' }]"
+      style="margin-bottom: 24px"
+    />
 
-    <div v-if="currentStep === 0">
+    <!-- Step 0: Select Excel -->
+    <div v-if="currentStep === 0" class="space-y-4">
+      <div class="flex items-center gap-3">
+        <span class="shrink-0">Import Mode:</span>
+        <Select v-model:value="importMode" :options="importModeOptions" class="w-52" />
+      </div>
       <UploadDragger
         v-model:file-list="fileList"
         :before-upload="() => false"
@@ -121,7 +146,7 @@ function handleReset() {
         </p>
         <p>Click or drag Excel file here to upload</p>
       </UploadDragger>
-      <div class="mt-3 flex items-center justify-between">
+      <div class="mt-1 flex items-center justify-between">
         <span class="text-gray-500">Accepts .xlsx, .xls files</span>
         <a-button
           type="link"
@@ -134,6 +159,7 @@ function handleReset() {
       </div>
     </div>
 
+    <!-- Step 1: Browse Data -->
     <div v-if="currentStep === 1" class="space-y-4">
       <div class="flex items-center gap-3">
         <span>File:</span>
@@ -141,20 +167,22 @@ function handleReset() {
       </div>
       <div class="flex items-center gap-3">
         <span>Import Mode:</span>
-        <RadioGroup v-model:value="importMode" button-style="solid" size="small">
-          <RadioButton value="add data">Add</RadioButton>
-          <RadioButton value="update data">Update</RadioButton>
-          <RadioButton value="add and update data">Add & Update</RadioButton>
-        </RadioGroup>
+        <span class="font-medium">{{ importMode }}</span>
       </div>
-      <div class="flex items-center gap-3">
-        <span :class="{ 'text-red-500': updateSupport }">
-          Overwrite existing data
-        </span>
-        <Switch v-model:checked="updateSupport" />
-      </div>
+      <Table
+        :columns="previewColumns"
+        :data-source="previewData"
+        :pagination="false"
+        :scroll="{ y: 240 }"
+        size="small"
+        bordered
+      />
+      <p class="text-xs text-gray-400">
+        Showing preview of uploaded data. Actual columns may vary.
+      </p>
     </div>
 
+    <!-- Step 2: Import Result -->
     <div v-if="currentStep === 2">
       <Spin :spinning="importing" tip="Importing...">
         <Result
