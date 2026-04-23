@@ -23,6 +23,7 @@ import {
 import {
   fundProductAdd,
   fundProductAutocomplete,
+  fundProductCheckUnique,
   fundProductGet,
   fundProductUpdate,
 } from '#/api/product-center';
@@ -196,6 +197,23 @@ async function handleConfirm() {
     if (valid?.errorFields) {
       return;
     }
+
+    const excludeId = isUpdate.value ? formData.value.id : undefined;
+    const uniqueFields = [
+      { field: 'fundCode', label: 'Fund Code', value: formData.value.fundCode },
+      { field: 'fundNameEn', label: 'Fund Name (EN)', value: formData.value.fundNameEn },
+      { field: 'fundNameTc', label: 'Fund Name (TC)', value: formData.value.fundNameTc },
+      { field: 'fundNameSc', label: 'Fund Name (SC)', value: formData.value.fundNameSc },
+    ];
+    for (const { field, label, value } of uniqueFields) {
+      if (!value) continue;
+      const conflict = await fundProductCheckUnique(field, value, excludeId);
+      if (conflict) {
+        window.message.error(`${label} must be unique!`);
+        return;
+      }
+    }
+
     const submitData = cloneDeep(formData.value);
     if (isUpdate.value) {
       await fundProductUpdate(submitData);

@@ -55,3 +55,23 @@ export function shareClassDownloadTemplate() {
 export function getClassListByFundCode(fundCode: string) {
   return alovaInstance.get<ShareClass[]>(`${Api.classList}/${fundCode}`);
 }
+
+/**
+ * Mock: Check composite uniqueness (Fund Code + Share Class Name EN + VPFS Class ID).
+ * TODO: Replace with real API when backend is ready.
+ */
+export async function shareClassCheckUnique(
+  fundCode: string,
+  shareClassNameEn: string,
+  vpfsClassId: string,
+  excludeId?: number,
+): Promise<boolean> {
+  try {
+    const result = await shareClassList({ pageNum: 1, pageSize: 1, fundCode, shareClassNameEn, vpfsClassId });
+    const rows = result.rows || [];
+    const match = rows.find((r: any) => r.id !== excludeId);
+    return !match;
+  } catch {
+    return true;
+  }
+}

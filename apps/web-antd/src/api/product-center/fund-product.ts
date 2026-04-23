@@ -56,3 +56,25 @@ export function fundProductAutocomplete(field: string, keyword: string) {
     params: { field, keyword },
   });
 }
+
+/**
+ * Mock: Check uniqueness for Fund Code / Fund Name fields.
+ * TODO: Replace with real API endpoint when backend is ready.
+ * Returns the field name that conflicts, or null if unique.
+ */
+export async function fundProductCheckUnique(
+  field: string,
+  value: string,
+  excludeId?: number,
+): Promise<string | null> {
+  // Mock implementation: query list and check
+  // In production, this should be a dedicated API: GET /product-center/fund/product/check-unique?field=xxx&value=xxx&excludeId=xxx
+  try {
+    const result = await fundProductList({ pageNum: 1, pageSize: 1, [field]: value });
+    const rows = result.rows || [];
+    const match = rows.find((r: any) => r[field] === value && r.id !== excludeId);
+    return match ? field : null;
+  } catch {
+    return null;
+  }
+}

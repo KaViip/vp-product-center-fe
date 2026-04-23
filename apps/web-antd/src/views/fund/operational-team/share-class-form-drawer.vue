@@ -25,6 +25,7 @@ import {
 import {
   getClassListByFundCode,
   shareClassAdd,
+  shareClassCheckUnique,
   shareClassGet,
   shareClassUpdate,
 } from '#/api/product-center';
@@ -146,6 +147,19 @@ async function handleConfirm() {
     if (valid?.errorFields) {
       return;
     }
+
+    const excludeId = isUpdate.value ? formData.value.id : undefined;
+    const isUnique = await shareClassCheckUnique(
+      formData.value.fundCode,
+      formData.value.shareClassNameEn,
+      formData.value.vpfsClassId,
+      excludeId,
+    );
+    if (!isUnique) {
+      window.message.error('Fund Code + Share Class Name (EN) + VPFS Class ID must be unique!');
+      return;
+    }
+
     const submitData = cloneDeep(formData.value);
     if (isUpdate.value) {
       await shareClassUpdate(submitData);

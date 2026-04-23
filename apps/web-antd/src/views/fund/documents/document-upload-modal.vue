@@ -235,6 +235,31 @@ const failedColumns = [
   { title: 'Failure Reason', dataIndex: 'failureReason', key: 'failureReason', ellipsis: true },
   { title: 'Operation', key: 'operation', width: 100 },
 ];
+
+function handleReuploadAllFailed() {
+  window.message.info('Re-uploading all failed files... (mock)');
+  // TODO: Implement real re-upload logic when backend API is ready
+}
+
+function handleReuploadSingle(record: { fileName: string; failureReason: string }) {
+  window.message.info(`Re-uploading ${record.fileName}... (mock)`);
+  // TODO: Implement real single file re-upload logic when backend API is ready
+}
+
+function handleDownloadFailureList() {
+  const header = 'File Name,Failure Reason';
+  const rows = failedFiles.value.map((f) => `"${f.fileName}","${f.failureReason}"`);
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  const now = new Date();
+  const ts = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
+  link.download = `Import failure details_Documents_${ts}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 </script>
 
 <template>
@@ -394,20 +419,32 @@ const failedColumns = [
             status="success"
             title="Upload Successful"
             :sub-title="`All ${uploadResult.total} file(s) uploaded successfully.`"
-          />
+          >
+            <template #extra>
+              <a-button @click="handleReset">Continue Uploading</a-button>
+            </template>
+          </Result>
           <Result
             v-else
             status="warning"
-            title="Upload Completed with Errors"
+            title="File upload result."
           >
             <template #subTitle>
               <span>
-                Total <strong>{{ uploadResult.total }}</strong> files.
-                <strong class="text-green-500">{{ uploadResult.success }}</strong> succeeded,
-                <strong class="text-red-500">{{ uploadResult.failed }}</strong> failed.
+                A total of <strong>{{ uploadResult.total }}</strong> files were uploaded this time.
+                <strong class="text-green-600">{{ uploadResult.success }}</strong> were uploaded successfully,
+                and <strong class="text-red-500">{{ uploadResult.failed }}</strong> failed.
               </span>
             </template>
             <template #extra>
+              <div class="flex gap-2 mb-4">
+                <a-button :disabled="failedFiles.length === 0" @click="handleReuploadAllFailed">
+                  Re-upload all failed files
+                </a-button>
+                <a-button :disabled="failedFiles.length === 0" @click="handleDownloadFailureList">
+                  Download failed file list
+                </a-button>
+              </div>
               <Table
                 v-if="failedFiles.length > 0"
                 :columns="failedColumns"
@@ -420,7 +457,7 @@ const failedColumns = [
               >
                 <template #bodyCell="{ column, record }">
                   <template v-if="column.key === 'operation'">
-                    <a class="text-blue-500">Re-upload</a>
+                    <a class="cursor-pointer text-blue-500" @click="handleReuploadSingle(record)">Re-upload</a>
                   </template>
                 </template>
               </Table>
