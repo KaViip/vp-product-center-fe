@@ -196,9 +196,14 @@ const paginationConfig = computed(() => ({
   current: pagination.value.current,
   pageSize: pagination.value.pageSize,
   total: pagination.value.total,
+  pageSizeOptions: ['10', '20', '50', '100'],
   showSizeChanger: true,
   showTotal: (total: number) => `Total ${total} funds`,
   onChange: (page: number) => loadData(page),
+  onShowSizeChange: (_current: number, size: number) => {
+    pagination.value.pageSize = size;
+    loadData(1);
+  },
 }));
 </script>
 

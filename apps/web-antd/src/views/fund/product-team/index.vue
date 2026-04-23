@@ -48,7 +48,10 @@ const gridOptions: VxeGridProps = {
   columns,
   height: 'auto',
   keepSource: true,
-  pagerConfig: {},
+  pagerConfig: {
+    pageSize: 10,
+    pageSizes: [10, 20, 50, 100],
+  },
   proxyConfig: {
     ajax: {
       query: async ({ page }, formValues = {}) => {
@@ -142,7 +145,7 @@ const { exportBlob, exportLoading, buildExportFileName } =
 
 async function handleExport() {
   const formValues = await tableApi.formApi.getValues();
-  const fileName = buildExportFileName('Fund_Product_Team');
+    const fileName = buildExportFileName('FundInfo');
   exportBlob({ data: formValues, fileName });
 }
 

@@ -103,6 +103,12 @@ function validateFile(file: File): UploadFileItem {
 }
 
 function handleFileAdded(file: File) {
+  if (file.size > 30 * 1024 * 1024) {
+    window.message.warning(
+      `The file "${file.name}" exceeds the 30MB limit and was not added.`,
+    );
+    return false;
+  }
   const item = validateFile(file);
   fileList.value.push(item);
   return false;

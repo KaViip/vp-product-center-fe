@@ -149,8 +149,10 @@ async function handleConfirm() {
     const submitData = cloneDeep(formData.value);
     if (isUpdate.value) {
       await shareClassUpdate(submitData);
+      window.message.success('Updated successfully');
     } else {
       await shareClassAdd(submitData);
+      window.message.success('Added successfully');
     }
     emit('reload');
     drawerApi.close();

@@ -95,6 +95,10 @@ export const columns: VxeGridProps['columns'] = [
     field: 'launchDate',
     title: 'Launch Date',
     minWidth: 120,
+    formatter: ({ cellValue }: any) => {
+      if (!cellValue) return '';
+      return String(cellValue).replace(/-/g, '/');
+    },
   },
   {
     field: 'isinCode',

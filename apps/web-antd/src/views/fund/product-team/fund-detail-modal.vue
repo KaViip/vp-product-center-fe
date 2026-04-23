@@ -102,7 +102,7 @@ const opTeamColumns = [
 
 <template>
   <BasicModal
-    :footer="false"
+    :footer="true"
     :fullscreen-button="true"
     title="Fund Details"
     class="w-[70%]"

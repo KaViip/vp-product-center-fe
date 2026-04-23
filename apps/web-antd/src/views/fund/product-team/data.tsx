@@ -61,6 +61,11 @@ export const querySchema: FormSchemaGetter = () => [
     fieldName: 'primaryInstrumentType',
     label: 'Instrument Type',
   },
+  {
+    component: 'Input',
+    fieldName: 'umbrellaOfcName',
+    label: 'Umbrella / OFC Name',
+  },
 ];
 
 export const columns: VxeGridProps['columns'] = [
@@ -88,6 +93,16 @@ export const columns: VxeGridProps['columns'] = [
   {
     field: 'fundType',
     title: 'Fund Type',
+    minWidth: 140,
+  },
+  {
+    field: 'umbrellaOfcName',
+    title: 'Umbrella / OFC Name',
+    minWidth: 160,
+  },
+  {
+    field: 'domicileJurisdiction',
+    title: 'Domicile / Jurisdiction',
     minWidth: 140,
   },
   {

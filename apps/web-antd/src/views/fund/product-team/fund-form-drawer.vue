@@ -91,16 +91,21 @@ const REGISTRATION_COUNTRIES = [
 ];
 
 const autocompleteCache = ref<Record<string, string[]>>({});
+const autocompleteOptions = ref<Record<string, { label: string; value: string }[]>>({});
 
 async function handleAutocomplete(field: string, keyword: string) {
-  if (!keyword || keyword.length < 1) return [];
+  if (!keyword || keyword.length < 1) {
+    autocompleteOptions.value[field] = [];
+    return;
+  }
   const cacheKey = `${field}:${keyword}`;
   if (autocompleteCache.value[cacheKey]) {
-    return autocompleteCache.value[cacheKey];
+    autocompleteOptions.value[field] = autocompleteCache.value[cacheKey].map((r) => ({ label: r, value: r }));
+    return;
   }
   const results = await fundProductAutocomplete(field, keyword);
   autocompleteCache.value[cacheKey] = results;
-  return results;
+  autocompleteOptions.value[field] = results.map((r) => ({ label: r, value: r }));
 }
 
 const AUTOCOMPLETE_FIELDS = [
@@ -134,11 +139,8 @@ function getAutocompleteProps(field: string) {
     showSearch: true,
     allowClear: true,
     placeholder: 'Type to search...',
-    options: [],
-    onSearch: async (value: string) => {
-      const results = await handleAutocomplete(field, value);
-      return results.map((r) => ({ label: r, value: r }));
-    },
+    options: computed(() => autocompleteOptions.value[field] || []),
+    onSearch: (value: string) => handleAutocomplete(field, value),
   };
 }
 
@@ -197,8 +199,10 @@ async function handleConfirm() {
     const submitData = cloneDeep(formData.value);
     if (isUpdate.value) {
       await fundProductUpdate(submitData);
+      window.message.success('Updated successfully');
     } else {
       await fundProductAdd(submitData);
+      window.message.success('Added successfully');
     }
     emit('reload');
     drawerApi.close();
@@ -424,11 +428,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   <FormItem label="Fund Manager" name="fundManager">
                     <Select
                       v-model:value="formData.fundManager"
-                      show-search
-                      allow-clear
-                      :filter-option="false"
-                      placeholder="Type to search..."
-                      :options="[]"
+                      v-bind="getAutocompleteProps('fundManager')"
                     />
                   </FormItem>
                 </Col>
@@ -446,19 +446,19 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem label="Investment Advisor">
-                    <Input v-model:value="formData.investmentAdvisor" />
+                    <Select v-model:value="formData.investmentAdvisor" v-bind="getAutocompleteProps('investmentAdvisor')" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Trustee/Administrator">
-                    <Input v-model:value="formData.trusteeAdministrator" />
+                    <Select v-model:value="formData.trusteeAdministrator" v-bind="getAutocompleteProps('trusteeAdministrator')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
                   <FormItem label="Custodian/Prime Broker">
-                    <Input v-model:value="formData.custodianPrimeBroker" />
+                    <Select v-model:value="formData.custodianPrimeBroker" v-bind="getAutocompleteProps('custodianPrimeBroker')" />
                   </FormItem>
                 </Col>
               </Row>
@@ -470,7 +470,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem label="Auditor">
-                    <Input v-model:value="formData.auditor" />
+                    <Select v-model:value="formData.auditor" v-bind="getAutocompleteProps('auditor')" />
                   </FormItem>
                 </Col>
               </Row>
@@ -530,7 +530,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem label="Benchmark">
-                    <Input v-model:value="formData.benchmark" />
+                    <Select v-model:value="formData.benchmark" v-bind="getAutocompleteProps('benchmark')" />
                   </FormItem>
                 </Col>
               </Row>
