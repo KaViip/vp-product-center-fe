@@ -60,11 +60,81 @@ const classStatusOptions = enumToOptions(ClassStatusEnum);
 const currencyOptions = enumToOptions(CurrencyEnum);
 const yesNoOptions = enumToOptions(YesNoEnum);
 
+// ISIN: 2 letters + 10 alphanumeric (12 chars total)
+const isinValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^[A-Z]{2}[A-Z0-9]{10}$/.test(value))
+    return Promise.reject('ISIN must be 2 letters + 10 alphanumeric (e.g. HK0000123456)');
+  return Promise.resolve();
+};
+
+// Stock Code (HK): 5 digits
+const stockCodeValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^\d{1,5}$/.test(value))
+    return Promise.reject('Stock Code must be 1-5 digits');
+  return Promise.resolve();
+};
+
+// SEDOL: 7 alphanumeric
+const sedolValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^[A-Z0-9]{7}$/.test(value))
+    return Promise.reject('SEDOL must be 7 alphanumeric characters');
+  return Promise.resolve();
+};
+
+// CUSIP: 9 alphanumeric
+const cusipValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^[A-Z0-9]{9}$/.test(value))
+    return Promise.reject('CUSIP must be 9 alphanumeric characters');
+  return Promise.resolve();
+};
+
+// Integer string validator
+const integerValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^\d+$/.test(value))
+    return Promise.reject('Must be a whole number');
+  return Promise.resolve();
+};
+
+// Numeric string validator (supports decimals)
+const numericValidator = (label: string) => (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^\d+(\.\d+)?$/.test(value))
+    return Promise.reject(`${label} must be a number`);
+  return Promise.resolve();
+};
+
 const rules = {
-  fundCode: [{ required: true, message: 'Fund Code is required' }],
-  shareClassNameEn: [{ required: true, message: 'Share Class Name (EN) is required' }],
+  fundCode: [
+    { required: true, message: 'Fund Code is required' },
+    { max: 20, message: 'Fund Code must be at most 20 characters' },
+  ],
+  shareClassNameEn: [
+    { required: true, message: 'Share Class Name (EN) is required' },
+    { max: 200, message: 'Must be at most 200 characters' },
+  ],
+  shareClassNameTc: [{ max: 200, message: 'Must be at most 200 characters' }],
+  shareClassNameSc: [{ max: 200, message: 'Must be at most 200 characters' }],
   classCurrency: [{ required: true, message: 'Class Currency is required' }],
-  vpfsClassId: [{ required: true, message: 'VPFS Class ID is required' }],
+  vpfsClassId: [
+    { required: true, message: 'VPFS Class ID is required' },
+    { max: 20, message: 'VPFS Class ID must be at most 20 characters' },
+  ],
+  isinCode: [{ validator: isinValidator }],
+  stockCode: [{ validator: stockCodeValidator }],
+  sedol: [{ validator: sedolValidator }],
+  cusip: [{ validator: cusipValidator }],
+  unitPrecision: [{ validator: integerValidator }],
+  navPrecision: [{ validator: integerValidator }],
+  minimumInitialSubscription: [{ validator: numericValidator('Min Initial Subscription') }],
+  minimumSubsequentSubscription: [{ validator: numericValidator('Min Subsequent Subscription') }],
+  minimumRedemption: [{ validator: numericValidator('Minimum Redemption') }],
+  minimumHolding: [{ validator: numericValidator('Minimum Holding') }],
+  redemptionCharge: [{ validator: numericValidator('Redemption Charge') }],
 };
 
 function handleCopyFromClassList() {
@@ -294,13 +364,13 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             <CollapsePanel id="section-class-info" key="class-info" header="Class Info">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Share Class Name (EN)" name="shareClassNameEn">
-                    <Input v-model:value="formData.shareClassNameEn" />
+                  <FormItem label="Share Class Name (TC)" name="shareClassNameTc">
+                    <Input v-model:value="formData.shareClassNameTc" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Share Class Name (TC)">
-                    <Input v-model:value="formData.shareClassNameTc" />
+                  <FormItem label="Share Class Name (SC)" name="shareClassNameSc">
+                    <Input v-model:value="formData.shareClassNameSc" />
                   </FormItem>
                 </Col>
               </Row>
@@ -342,12 +412,12 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Stock Code">
+                  <FormItem label="Stock Code" name="stockCode">
                     <Input v-model:value="formData.stockCode" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="ISIN Code">
+                  <FormItem label="ISIN Code" name="isinCode">
                     <Input v-model:value="formData.isinCode" />
                   </FormItem>
                 </Col>
@@ -402,7 +472,38 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="SEDOL">
+                  <FormItem label="CUSIP" name="cusip">
+                    <Input v-model:value="formData.cusip" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Valor Code">
+                    <Input v-model:value="formData.valorCode" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Lipper Code">
+                    <Input v-model:value="formData.lipperCode" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Bloomberg Ticker">
+                    <Input v-model:value="formData.bloombergTicker" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="BBG ID Equity">
+                    <Input v-model:value="formData.bbgIdEquity" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="SEDOL" name="sedol">
                     <Input v-model:value="formData.sedol" />
                   </FormItem>
                 </Col>
@@ -429,7 +530,14 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="NAV Precision">
+                  <FormItem label="Unit Precision" name="unitPrecision">
+                    <Input v-model:value="formData.unitPrecision" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="NAV Precision" name="navPrecision">
                     <Input v-model:value="formData.navPrecision" />
                   </FormItem>
                 </Col>
@@ -465,31 +573,31 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Min Initial Subscription">
+                  <FormItem label="Min Initial Subscription" name="minimumInitialSubscription">
                     <Input v-model:value="formData.minimumInitialSubscription" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Min Subsequent Sub.">
+                  <FormItem label="Min Subsequent Sub." name="minimumSubsequentSubscription">
                     <Input v-model:value="formData.minimumSubsequentSubscription" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Minimum Redemption">
+                  <FormItem label="Minimum Redemption" name="minimumRedemption">
                     <Input v-model:value="formData.minimumRedemption" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Minimum Holding">
+                  <FormItem label="Minimum Holding" name="minimumHolding">
                     <Input v-model:value="formData.minimumHolding" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Redemption Charge">
+                  <FormItem label="Redemption Charge" name="redemptionCharge">
                     <Input v-model:value="formData.redemptionCharge" />
                   </FormItem>
                 </Col>

@@ -118,20 +118,87 @@ const AUTOCOMPLETE_FIELDS = [
   'benchmark',
 ];
 
+// LEI: 20 alphanumeric characters
+const leiValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^[A-Z0-9]{20}$/.test(value))
+    return Promise.reject('LEI must be 20 alphanumeric characters');
+  return Promise.resolve();
+};
+
+// GIIN: XXXXXX.XXXXX.XXX.XX (19 chars, alphanumeric + dots)
+const giinValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^[A-Z0-9]{6}\.[A-Z0-9]{5}\.[A-Z0-9]{2}\.[A-Z0-9]{2}$/.test(value))
+    return Promise.reject('GIIN format: XXXXXX.XXXXX.XX.XX');
+  return Promise.resolve();
+};
+
+// ISO 4217 currency code: 3 uppercase letters
+const currencyValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^[A-Z]{3}$/.test(value))
+    return Promise.reject('Must be a 3-letter currency code (e.g. HKD, USD)');
+  return Promise.resolve();
+};
+
+// Percentage string: e.g. "10%", "25.5%"
+const percentValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^\d+(\.\d+)?%?$/.test(value))
+    return Promise.reject('Must be a number (e.g. 10 or 10%)');
+  return Promise.resolve();
+};
+
 const rules = {
-  fundCode: [{ required: true, message: 'Fund Code is required' }],
-  fundNameEn: [{ required: true, message: 'Fund Name (EN) is required' }],
-  fundNameTc: [{ required: true, message: 'Fund Name (TC) is required' }],
-  fundNameSc: [{ required: true, message: 'Fund Name (SC) is required' }],
+  fundCode: [
+    { required: true, message: 'Fund Code is required' },
+    { max: 20, message: 'Fund Code must be at most 20 characters' },
+  ],
+  fundNameEn: [
+    { required: true, message: 'Fund Name (EN) is required' },
+    { max: 200, message: 'Must be at most 200 characters' },
+  ],
+  fundNameTc: [
+    { required: true, message: 'Fund Name (TC) is required' },
+    { max: 200, message: 'Must be at most 200 characters' },
+  ],
+  fundNameSc: [
+    { required: true, message: 'Fund Name (SC) is required' },
+    { max: 200, message: 'Must be at most 200 characters' },
+  ],
   fundType: [{ required: true, message: 'Fund Type is required' }],
   launchDate: [{ required: true, message: 'Launch Date is required' }],
   fundManager: [{ required: true, message: 'Fund Manager is required' }],
-  fundManagerLei: [{ required: true, message: 'Fund Manager LEI is required' }],
+  fundManagerLei: [
+    { required: true, message: 'Fund Manager LEI is required' },
+    { validator: leiValidator },
+  ],
+  baseCurrency: [{ validator: currencyValidator }],
+  domicileJurisdiction: [
+    { max: 10, message: 'Must be at most 10 characters' },
+  ],
   primaryInstrumentType: [{ required: true, message: 'Instrument Type is required' }],
   investmentMarketFocus: [{ required: true, message: 'Market Focus is required' }],
-  investmentObjective: [{ required: true, message: 'Investment Objective is required' }],
-  investmentStrategy: [{ required: true, message: 'Investment Strategy is required' }],
-  assetAllocationTable: [{ required: true, message: 'Asset Allocation is required' }],
+  investmentObjective: [
+    { required: true, message: 'Investment Objective is required' },
+    { max: 2000, message: 'Must be at most 2000 characters' },
+  ],
+  investmentStrategy: [
+    { required: true, message: 'Investment Strategy is required' },
+    { max: 2000, message: 'Must be at most 2000 characters' },
+  ],
+  assetAllocationTable: [
+    { required: true, message: 'Asset Allocation is required' },
+    { max: 4000, message: 'Must be at most 4000 characters' },
+  ],
+  giinNumber: [{ validator: giinValidator }],
+  leiNumber: [{ validator: leiValidator }],
+  leverageRatioMax: [{ validator: percentValidator }],
+  derivativesRatioMax: [{ validator: percentValidator }],
+  borrowingLimit: [{ validator: percentValidator }],
+  stopLossLimit: [{ validator: percentValidator }],
+  stopLossAlert: [{ validator: percentValidator }],
 };
 
 function getAutocompleteProps(field: string) {
@@ -335,7 +402,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Domicile">
+                  <FormItem label="Domicile" name="domicileJurisdiction">
                     <Input v-model:value="formData.domicileJurisdiction" placeholder="e.g. HK" />
                   </FormItem>
                 </Col>
@@ -347,7 +414,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Base Currency">
+                  <FormItem label="Base Currency" name="baseCurrency">
                     <Input v-model:value="formData.baseCurrency" placeholder="e.g. HKD, USD" />
                   </FormItem>
                 </Col>
@@ -407,12 +474,12 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="GIIN Number">
+                  <FormItem label="GIIN Number" name="giinNumber">
                     <Input v-model:value="formData.giinNumber" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="LEI Number">
+                  <FormItem label="LEI Number" name="leiNumber">
                     <Input v-model:value="formData.leiNumber" />
                   </FormItem>
                 </Col>
@@ -566,29 +633,29 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="8">
-                   <FormItem label="Max Leverage">
+                   <FormItem label="Max Leverage" name="leverageRatioMax">
                     <Input v-model:value="formData.leverageRatioMax" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                   <FormItem label="Max Derivatives">
+                   <FormItem label="Max Derivatives" name="derivativesRatioMax">
                     <Input v-model:value="formData.derivativesRatioMax" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                   <FormItem label="Borrowing Limit">
+                   <FormItem label="Borrowing Limit" name="borrowingLimit">
                     <Input v-model:value="formData.borrowingLimit" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="8">
-                   <FormItem label="Stop Loss Limit">
+                   <FormItem label="Stop Loss Limit" name="stopLossLimit">
                     <Input v-model:value="formData.stopLossLimit" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                   <FormItem label="Stop Loss Alert">
+                   <FormItem label="Stop Loss Alert" name="stopLossAlert">
                     <Input v-model:value="formData.stopLossAlert" />
                   </FormItem>
                 </Col>
