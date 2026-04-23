@@ -3,12 +3,14 @@ import type { UploadFile } from 'antdv-next';
 
 import { ref } from 'vue';
 
-import { useVbenModal } from '@vben/common-ui';
+import { useVbenDrawer } from '@vben/common-ui';
 
 import { InboxOutlined } from '@antdv-next/icons';
 import {
+  Button,
   Result,
   Select,
+  Space,
   Spin,
   Steps,
   Table,
@@ -16,17 +18,12 @@ import {
 } from 'antdv-next';
 
 import {
-  shareClassDownloadTemplate,
-  shareClassImport,
+  fundProductDownloadTemplate,
+  fundProductImport,
 } from '#/api/product-center';
 import { useBlobExport } from '#/utils/file/export';
 
 const emit = defineEmits<{ reload: [] }>();
-
-const [BasicModal, modalApi] = useVbenModal({
-  onConfirm: handleConfirm,
-  onCancel: handleCancel,
-});
 
 const currentStep = ref(0);
 const fileList = ref<UploadFile[]>([]);
@@ -42,23 +39,30 @@ const importModeOptions = [
   { label: 'Add and Update Data', value: 'add and update data' },
 ];
 
-const { exportBlob, exportLoading } = useBlobExport(shareClassDownloadTemplate);
+const [Drawer, drawerApi] = useVbenDrawer({
+  onConfirm: handleConfirm,
+  onCancel: handleCancel,
+});
+
+const { exportBlob, exportLoading } = useBlobExport(fundProductDownloadTemplate);
 
 async function handleExport() {
-  exportBlob({ data: {}, fileName: 'Share_Class_Template.xlsx' });
+  exportBlob({ data: {}, fileName: 'Fund_Product_Template.xlsx' });
 }
 
-async function parseExcelPreview(file: File) {
-  // TODO: Replace with real Excel parsing (e.g. xlsx library) when backend is ready.
+async function parseExcelPreview(_file: File) {
+  // TODO: Replace with real Excel parsing when backend is ready.
   previewData.value = [
-    { _row: 1, fundCode: '(preview)', shareClassNameEn: '(data from Excel)', classCurrency: '...' },
-    { _row: 2, fundCode: '(preview)', shareClassNameEn: '(data from Excel)', classCurrency: '...' },
+    { _row: 1, fundCode: 'VPAF', fundNameEn: 'Value Partners Advantage Fund', fundType: 'SFC Authorized Fund（UT）', domicileJurisdiction: 'Hong Kong', baseCurrency: 'HKD' },
+    { _row: 2, fundCode: 'VPVF', fundNameEn: 'Value Partners Vision Fund', fundType: 'SFC Authorized Fund（UT）', domicileJurisdiction: 'Hong Kong', baseCurrency: 'USD' },
   ];
   previewColumns.value = [
     { title: '#', dataIndex: '_row', key: '_row', width: 50 },
-    { title: 'Fund Code', dataIndex: 'fundCode', key: 'fundCode', ellipsis: true },
-    { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEn', key: 'shareClassNameEn', ellipsis: true },
-    { title: 'Class Currency', dataIndex: 'classCurrency', key: 'classCurrency', ellipsis: true },
+    { title: 'Fund Code', dataIndex: 'fundCode', key: 'fundCode', width: 120 },
+    { title: 'Fund Name (EN)', dataIndex: 'fundNameEn', key: 'fundNameEn', width: 240 },
+    { title: 'Fund Type', dataIndex: 'fundType', key: 'fundType', width: 200 },
+    { title: 'Domicile', dataIndex: 'domicileJurisdiction', key: 'domicileJurisdiction', width: 120 },
+    { title: 'Currency', dataIndex: 'baseCurrency', key: 'baseCurrency', width: 100 },
   ];
 }
 
@@ -77,7 +81,7 @@ async function handleConfirm() {
       const data = new FormData();
       data.append('file', fileList.value[0]!.originFileObj as Blob);
       data.append('importMode', importMode.value);
-      const result = await shareClassImport(data);
+      const result = await fundProductImport(data);
       importResult.value = result as any;
       emit('reload');
     } catch (error: any) {
@@ -89,7 +93,7 @@ async function handleConfirm() {
   }
 
   handleReset();
-  modalApi.close();
+  drawerApi.close();
 }
 
 function handleCancel() {
@@ -98,7 +102,7 @@ function handleCancel() {
     return;
   }
   handleReset();
-  modalApi.close();
+  drawerApi.close();
 }
 
 function handleReset() {
@@ -113,13 +117,12 @@ function handleReset() {
 </script>
 
 <template>
-  <BasicModal
-    :close-on-click-modal="false"
+  <Drawer
+    :title="'Import Fund Data'"
+    :class="'w-[70%]'"
+    :footer="true"
     :confirm-text="currentStep === 2 ? 'Done' : currentStep === 1 ? 'Import' : 'Next'"
     :cancel-text="currentStep > 0 && currentStep < 2 ? 'Previous' : 'Cancel'"
-    :footer="true"
-    title="Import Share Class Data"
-    class="w-[600px]"
   >
     <Steps
       :current="currentStep"
@@ -130,8 +133,8 @@ function handleReset() {
     <!-- Step 0: Select Excel -->
     <div v-if="currentStep === 0" class="space-y-4">
       <div class="flex items-center gap-3">
-        <span class="shrink-0">Import Mode:</span>
-        <Select v-model:value="importMode" :options="importModeOptions" class="w-52" />
+        <span class="shrink-0 font-medium">Import Mode:</span>
+        <Select v-model:value="importMode" :options="importModeOptions" class="w-56" />
       </div>
       <UploadDragger
         v-model:file-list="fileList"
@@ -147,37 +150,34 @@ function handleReset() {
       </UploadDragger>
       <div class="mt-1 flex items-center justify-between">
         <span class="text-gray-500">Accepts .xlsx, .xls files</span>
-        <a-button
+        <Button
           type="link"
           :loading="exportLoading"
           :disabled="exportLoading"
           @click="handleExport"
         >
           Download Template
-        </a-button>
+        </Button>
       </div>
     </div>
 
     <!-- Step 1: Browse Data -->
     <div v-if="currentStep === 1" class="space-y-4">
-      <div class="flex items-center gap-3">
-        <span>File:</span>
-        <span class="font-medium">{{ fileList[0]?.name }}</span>
-      </div>
-      <div class="flex items-center gap-3">
-        <span>Import Mode:</span>
-        <span class="font-medium">{{ importMode }}</span>
+      <div class="flex items-center gap-6 text-sm">
+        <span>File: <strong>{{ fileList[0]?.name }}</strong></span>
+        <span>Mode: <strong>{{ importMode }}</strong></span>
+        <span>Rows: <strong>{{ previewData.length }}</strong></span>
       </div>
       <Table
         :columns="previewColumns"
         :data-source="previewData"
         :pagination="false"
-        :scroll="{ y: 240 }"
+        :scroll="{ x: 800, y: 400 }"
         size="small"
         bordered
       />
       <p class="text-xs text-gray-400">
-        Showing preview of uploaded data. Actual columns may vary.
+        Preview of uploaded data. Click "Import" to proceed.
       </p>
     </div>
 
@@ -191,12 +191,12 @@ function handleReset() {
         >
           <template #extra>
             <div
-              class="max-h-[200px] overflow-y-auto text-left text-sm"
+              class="max-h-[300px] overflow-y-auto text-left text-sm"
               v-html="importResult.msg"
             />
           </template>
         </Result>
       </Spin>
     </div>
-  </BasicModal>
+  </Drawer>
 </template>

@@ -19,7 +19,7 @@ import { useBlobExport } from '#/utils/file/export';
 import { columns, querySchema } from './data';
 import fundDetailModal from './fund-detail-modal.vue';
 import fundFormDrawer from './fund-form-drawer.vue';
-import fundImportModal from './fund-import-modal.vue';
+import fundImportDrawer from './fund-import-drawer.vue';
 
 const formOptions: VbenFormProps = {
   schema: querySchema(),
@@ -93,8 +93,8 @@ const [FundDetailModal, fundDetailModalApi] = useVbenModal({
   connectedComponent: fundDetailModal,
 });
 
-const [FundImportModal, fundImportModalApi] = useVbenModal({
-  connectedComponent: fundImportModal,
+const [FundImportDrawer, fundImportDrawerApi] = useVbenDrawer({
+  connectedComponent: fundImportDrawer,
 });
 
 function handleAdd() {
@@ -137,7 +137,7 @@ function handleDetail(row: FundProduct) {
 }
 
 function handleImport() {
-  fundImportModalApi.open();
+  fundImportDrawerApi.open();
 }
 
 const { exportBlob, exportLoading, buildExportFileName } =
@@ -215,6 +215,6 @@ const statusColorMap: Record<string, string> = {
     </BasicTable>
     <FundFormDrawer @reload="tableApi.query()" />
     <FundDetailModal />
-    <FundImportModal @reload="tableApi.query()" />
+    <FundImportDrawer @reload="tableApi.query()" />
   </Page>
 </template>

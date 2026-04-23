@@ -19,7 +19,7 @@ import { useBlobExport } from '#/utils/file/export';
 import { columns, querySchema } from './data';
 import shareClassDetailModal from './share-class-detail-modal.vue';
 import shareClassFormDrawer from './share-class-form-drawer.vue';
-import shareClassImportModal from './share-class-import-modal.vue';
+import shareClassImportDrawer from './share-class-import-drawer.vue';
 
 const formOptions: VbenFormProps = {
   schema: querySchema(),
@@ -93,8 +93,8 @@ const [ShareClassDetailModal, shareClassDetailModalApi] = useVbenModal({
   connectedComponent: shareClassDetailModal,
 });
 
-const [ShareClassImportModal, shareClassImportModalApi] = useVbenModal({
-  connectedComponent: shareClassImportModal,
+const [ShareClassImportDrawer, shareClassImportDrawerApi] = useVbenDrawer({
+  connectedComponent: shareClassImportDrawer,
 });
 
 function handleAdd() {
@@ -137,7 +137,7 @@ function handleDetail(row: ShareClass) {
 }
 
 function handleImport() {
-  shareClassImportModalApi.open();
+  shareClassImportDrawerApi.open();
 }
 
 const { exportBlob, exportLoading, buildExportFileName } =
@@ -214,6 +214,6 @@ const statusColorMap: Record<string, string> = {
     </BasicTable>
     <ShareClassFormDrawer @reload="tableApi.query()" />
     <ShareClassDetailModal />
-    <ShareClassImportModal @reload="tableApi.query()" />
+    <ShareClassImportDrawer @reload="tableApi.query()" />
   </Page>
 </template>
