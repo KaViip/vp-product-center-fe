@@ -60,3 +60,4 @@ apps/web-antd/types/components.d.ts
 .claude
 .codex
 skills-lock.json
+test-data/

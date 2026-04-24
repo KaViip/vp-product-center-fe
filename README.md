@@ -1,5 +1,77 @@
 [![license](https://img.shields.io/github/license/anncwb/vue-vben-admin.svg)](LICENSE)
 
+## Product Center 产品中心
+
+基于 ruoyi-plus-vben5 框架的产品中心前端模块，包含 3 个功能模块：Product Team、Operational Team、Documents。
+
+### 快速开始
+
+```bash
+# 安装依赖
+pnpm install
+
+# 启动开发服务器（端口 5666）
+pnpm dev
+
+# 构建生产包
+pnpm build
+```
+
+登录账号：admin / admin123
+
+### 项目结构
+
+```
+apps/web-antd/src/
+├── api/product-center/              # API 接口层
+│   ├── fund-product.ts              # Product Team CRUD + 唯一性校验
+│   ├── fund-operational.ts          # Operational Team CRUD + 唯一性校验
+│   ├── fund-documents.ts            # Documents 上传/查询
+│   └── model/                       # 数据模型 & 枚举定义
+│
+├── views/fund/
+│   ├── components/
+│   │   └── fund-detail-modal.vue    # 共享详情弹窗（Product Team + Operational Team 双 Tab）
+│   ├── product-team/                # 产品团队管理
+│   │   ├── index.vue                # 列表页
+│   │   ├── data.tsx                 # 列表列 & 查询条件
+│   │   ├── fund-form-drawer.vue     # 新增/编辑表单（Anchor 导航 + 4 分区）
+│   │   └── fund-import-drawer.vue   # 数据导入（3 步嚮導，支持多 Sheet）
+│   ├── operational-team/            # 运营团队管理
+│   │   ├── index.vue                # 列表页
+│   │   ├── data.tsx
+│   │   ├── share-class-form-drawer.vue
+│   │   └── share-class-import-drawer.vue
+│   └── documents/                   # 文档管理
+│       ├── index.vue                # 列表页（Fund/Class 树形展开）
+│       ├── document-upload-modal.vue # 文件上传（3 步嚮導，3 种上传模式）
+│       ├── document-detail-modal.vue # 文档详情（Latest/Historical 双 Tab）
+│       └── document-validator.ts    # 文件名格式校验
+│
+└── __tests__/fund/                  # 单元测试
+```
+
+### 后端联调
+
+所有 Mock 接口标记了 `TODO` 注释，搜索 `TODO` 即可定位。需替换的接口：
+
+| 函数 | 文件 | 建议接口格式 |
+|------|------|------------|
+| `fundProductCheckUnique` | `fund-product.ts` | `GET /product-center/fund/product/check-unique?field=xxx&value=xxx&excludeId=xxx` |
+| `shareClassCheckUnique` | `fund-operational.ts` | `GET /product-center/fund/operational/check-unique?fundCode=xxx&shareClassNameEn=xxx&vpfsClassId=xxx` |
+
+CRUD 接口路径：
+
+| 模块 | 前缀 |
+|------|------|
+| Product Team | `/product-center/fund/product` |
+| Operational Team | `/product-center/fund/operational` |
+| Documents | `/product-center/fund/documents` |
+
+其他：后端数据库需移除「系统工具」下重复的「基金信息」菜单项。
+
+---
+
 ## 置顶说明
 
 使用`antdv-next`已经作为主分支进行更新
