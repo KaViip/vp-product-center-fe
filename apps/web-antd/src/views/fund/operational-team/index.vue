@@ -17,7 +17,7 @@ import {
 import { useBlobExport } from '#/utils/file/export';
 
 import { columns, querySchema } from './data';
-import shareClassDetailModal from './share-class-detail-modal.vue';
+import fundDetailModal from '../components/fund-detail-modal.vue';
 import shareClassFormDrawer from './share-class-form-drawer.vue';
 import shareClassImportDrawer from './share-class-import-drawer.vue';
 
@@ -89,8 +89,8 @@ const [ShareClassFormDrawer, shareClassFormDrawerApi] = useVbenDrawer({
   connectedComponent: shareClassFormDrawer,
 });
 
-const [ShareClassDetailModal, shareClassDetailModalApi] = useVbenModal({
-  connectedComponent: shareClassDetailModal,
+const [FundDetailModal, fundDetailModalApi] = useVbenModal({
+  connectedComponent: fundDetailModal,
 });
 
 const [ShareClassImportDrawer, shareClassImportDrawerApi] = useVbenDrawer({
@@ -132,8 +132,8 @@ function handleCopy(row: ShareClass) {
 }
 
 function handleDetail(row: ShareClass) {
-  shareClassDetailModalApi.setData({ id: row.id });
-  shareClassDetailModalApi.open();
+  fundDetailModalApi.setData({ shareClassId: row.id, activeTab: 'operational' });
+  fundDetailModalApi.open();
 }
 
 function handleImport() {
@@ -213,7 +213,7 @@ const statusColorMap: Record<string, string> = {
       </template>
     </BasicTable>
     <ShareClassFormDrawer @reload="tableApi.query()" />
-    <ShareClassDetailModal />
+    <FundDetailModal />
     <ShareClassImportDrawer @reload="tableApi.query()" />
   </Page>
 </template>

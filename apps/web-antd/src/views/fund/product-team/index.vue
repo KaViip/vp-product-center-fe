@@ -17,7 +17,7 @@ import {
 import { useBlobExport } from '#/utils/file/export';
 
 import { columns, querySchema } from './data';
-import fundDetailModal from './fund-detail-modal.vue';
+import fundDetailModal from '../components/fund-detail-modal.vue';
 import fundFormDrawer from './fund-form-drawer.vue';
 import fundImportDrawer from './fund-import-drawer.vue';
 
@@ -132,7 +132,7 @@ function handleCopy(row: FundProduct) {
 }
 
 function handleDetail(row: FundProduct) {
-  fundDetailModalApi.setData({ id: row.id });
+  fundDetailModalApi.setData({ fundId: row.id, activeTab: 'product' });
   fundDetailModalApi.open();
 }
 

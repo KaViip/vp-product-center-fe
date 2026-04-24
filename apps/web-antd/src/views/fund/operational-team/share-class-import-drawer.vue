@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { UploadFile } from 'antdv-next';
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
 
@@ -32,12 +32,19 @@ const importing = ref(false);
 const importResult = ref<{ code: number; msg: string } | null>(null);
 const previewData = ref<Record<string, any>[]>([]);
 const previewColumns = ref<{ title: string; dataIndex: string; key: string; ellipsis?: boolean }[]>([]);
+const sheetNames = ref<string[]>([]);
+const selectedSheet = ref<string>('');
+const workbookCache = ref<XLSX.WorkBook | null>(null);
 
 const importModeOptions = [
   { label: 'Add Data', value: 'add data' },
   { label: 'Update Data', value: 'update data' },
   { label: 'Add and Update Data', value: 'add and update data' },
 ];
+
+watch(selectedSheet, (name) => {
+  if (name) renderSheet(name);
+});
 
 const [Drawer, drawerApi] = useVbenDrawer({
   onConfirm: handleConfirm,
@@ -52,9 +59,21 @@ async function handleExport() {
 
 async function parseExcelPreview(file: File) {
   const buffer = await file.arrayBuffer();
-  const workbook = XLSX.read(buffer, { type: 'array' });
-  const sheetName = workbook.SheetNames[0];
-  const sheet = workbook.Sheets[sheetName];
+  const wb = XLSX.read(buffer, { type: 'array' });
+  workbookCache.value = wb;
+  sheetNames.value = wb.SheetNames;
+  selectedSheet.value = wb.SheetNames[0] ?? '';
+  renderSheet(selectedSheet.value);
+}
+
+function renderSheet(sheetName: string) {
+  if (!workbookCache.value) return;
+  const sheet = workbookCache.value.Sheets[sheetName];
+  if (!sheet) {
+    previewData.value = [];
+    previewColumns.value = [];
+    return;
+  }
   const json: Record<string, any>[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
   if (json.length === 0) {
@@ -122,6 +141,9 @@ function handleReset() {
   importing.value = false;
   previewData.value = [];
   previewColumns.value = [];
+  sheetNames.value = [];
+  selectedSheet.value = '';
+  workbookCache.value = null;
 }
 </script>
 
@@ -176,6 +198,12 @@ function handleReset() {
         <span>File: <strong>{{ fileList[0]?.name }}</strong></span>
         <span>Mode: <strong>{{ importMode }}</strong></span>
         <span>Rows: <strong>{{ previewData.length }}</strong></span>
+      </div>
+      <div v-if="sheetNames.length > 1" class="flex items-center gap-2">
+        <span class="shrink-0 font-medium">Sheet Name:</span>
+        <Select v-model:value="selectedSheet" class="w-48">
+          <Select.Option v-for="name in sheetNames" :key="name" :value="name">{{ name }}</Select.Option>
+        </Select>
       </div>
       <Table
         :columns="previewColumns"
