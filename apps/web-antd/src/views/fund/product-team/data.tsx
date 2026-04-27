@@ -33,13 +33,8 @@ export const querySchema: FormSchemaGetter = () => [
   },
   {
     component: 'Input',
-    fieldName: 'fundNameTc',
-    label: 'Fund Name (TC)',
-  },
-  {
-    component: 'Input',
-    fieldName: 'fundNameSc',
-    label: 'Fund Name (SC)',
+    fieldName: 'fundNameTcSc',
+    label: 'Fund Name (TC/SC)',
   },
   {
     component: 'Select',
