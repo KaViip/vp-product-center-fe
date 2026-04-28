@@ -23,12 +23,12 @@ export const querySchema: FormSchemaGetter = () => [
   },
   {
     component: 'Input',
-    fieldName: 'fundNameEn',
+    fieldName: 'fundNameEnTcSc',
     label: 'Fund Name (EN/TC/SC)',
   },
   {
     component: 'Input',
-    fieldName: 'shareClassNameEn',
+    fieldName: 'shareClassNameEnTcSc',
     label: 'Share Class Name (EN/TC/SC)',
   },
   {

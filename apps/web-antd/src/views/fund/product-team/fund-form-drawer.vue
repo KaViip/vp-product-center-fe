@@ -66,6 +66,54 @@ const marketFocusOptions = enumToOptions(MarketFocusEnum);
 const hedgingPolicyOptions = enumToOptions(HedgingPolicyEnum);
 const riskRatingOptions = enumToOptions(RiskRatingEnum);
 
+// ISO 3166-1 Alpha-2 country codes (commonly used jurisdictions)
+const countryOptions = [
+  { label: 'HK - Hong Kong', value: 'HK' },
+  { label: 'IE - Ireland', value: 'IE' },
+  { label: 'KY - Cayman Islands', value: 'KY' },
+  { label: 'CN - China (Mainland)', value: 'CN' },
+  { label: 'SG - Singapore', value: 'SG' },
+  { label: 'LU - Luxembourg', value: 'LU' },
+  { label: 'GB - United Kingdom', value: 'GB' },
+  { label: 'US - United States', value: 'US' },
+  { label: 'CH - Switzerland', value: 'CH' },
+  { label: 'DE - Germany', value: 'DE' },
+  { label: 'FR - France', value: 'FR' },
+  { label: 'JP - Japan', value: 'JP' },
+  { label: 'BM - Bermuda', value: 'BM' },
+  { label: 'VG - British Virgin Islands', value: 'VG' },
+  { label: 'AU - Australia', value: 'AU' },
+  { label: 'NL - Netherlands', value: 'NL' },
+  { label: 'TW - Taiwan', value: 'TW' },
+  { label: 'MO - Macau', value: 'MO' },
+  { label: 'MY - Malaysia', value: 'MY' },
+  { label: 'KR - South Korea', value: 'KR' },
+  { label: 'IN - India', value: 'IN' },
+  { label: 'IT - Italy', value: 'IT' },
+  { label: 'ES - Spain', value: 'ES' },
+  { label: 'SE - Sweden', value: 'SE' },
+  { label: 'FI - Finland', value: 'FI' },
+  { label: 'DK - Denmark', value: 'DK' },
+  { label: 'NO - Norway', value: 'NO' },
+];
+
+// ISO 4217 currency codes
+const currencyCodeOptions = [
+  { label: 'HKD - Hong Kong Dollar', value: 'HKD' },
+  { label: 'USD - US Dollar', value: 'USD' },
+  { label: 'EUR - Euro', value: 'EUR' },
+  { label: 'CNY - Chinese Yuan', value: 'CNY' },
+  { label: 'CNH - Offshore Yuan', value: 'CNH' },
+  { label: 'GBP - British Pound', value: 'GBP' },
+  { label: 'JPY - Japanese Yen', value: 'JPY' },
+  { label: 'SGD - Singapore Dollar', value: 'SGD' },
+  { label: 'CHF - Swiss Franc', value: 'CHF' },
+  { label: 'AUD - Australian Dollar', value: 'AUD' },
+  { label: 'CAD - Canadian Dollar', value: 'CAD' },
+  { label: 'NZD - New Zealand Dollar', value: 'NZD' },
+  { label: 'RMB - Renminbi', value: 'RMB' },
+];
+
 const REGISTRATION_COUNTRIES = [
   { key: 'registrationUs', label: 'United States' },
   { key: 'registrationSingapore', label: 'Singapore' },
@@ -142,11 +190,19 @@ const currencyValidator = (_rule: any, value: string) => {
   return Promise.resolve();
 };
 
-// Percentage string: e.g. "10%", "25.5%"
-const percentValidator = (_rule: any, value: string) => {
+// Integer, non-negative validator
+const nonNegativeIntValidator = (_rule: any, value: string) => {
   if (!value) return Promise.resolve();
-  if (!/^\d+(\.\d+)?%?$/.test(value))
-    return Promise.reject('Must be a number (e.g. 10 or 10%)');
+  if (!/^\d+$/.test(value))
+    return Promise.reject('Must be a non-negative integer');
+  return Promise.resolve();
+};
+
+// Stop Loss — 2 decimal places, non-negative
+const nonNegativeDecimalValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^\d+(\.\d{1,2})?$/.test(value))
+    return Promise.reject('Must be a non-negative number (up to 2 decimal places)');
   return Promise.resolve();
 };
 
@@ -168,15 +224,15 @@ const rules = {
     { max: 200, message: 'Must be at most 200 characters' },
   ],
   fundType: [{ required: true, message: 'Fund Type is required' }],
+  domicileJurisdiction: [{ required: true, message: 'Domicile / Jurisdiction is required' }],
+  primaryRegulator: [{ required: true, message: 'Primary Regulator is required' }],
+  fundStatus: [{ required: true, message: 'Fund Status is required' }],
   launchDate: [{ required: true, message: 'Launch Date is required' }],
+  complexProduct: [{ required: true, message: 'Complex Product is required' }],
   fundManager: [{ required: true, message: 'Fund Manager is required' }],
   fundManagerLei: [
     { required: true, message: 'Fund Manager LEI is required' },
     { validator: leiValidator },
-  ],
-  baseCurrency: [{ validator: currencyValidator }],
-  domicileJurisdiction: [
-    { max: 10, message: 'Must be at most 10 characters' },
   ],
   primaryInstrumentType: [{ required: true, message: 'Instrument Type is required' }],
   investmentMarketFocus: [{ required: true, message: 'Market Focus is required' }],
@@ -194,11 +250,22 @@ const rules = {
   ],
   giinNumber: [{ validator: giinValidator }],
   leiNumber: [{ validator: leiValidator }],
-  leverageRatioMax: [{ validator: percentValidator }],
-  derivativesRatioMax: [{ validator: percentValidator }],
-  borrowingLimit: [{ validator: percentValidator }],
-  stopLossLimit: [{ validator: percentValidator }],
-  stopLossAlert: [{ validator: percentValidator }],
+  passiveOrActiveFund: [{ required: true, message: 'Passive or Active Fund is required' }],
+  hedgingPolicyFund: [{ required: true, message: 'Hedging Policy is required' }],
+  leverageRatioMax: [
+    { required: true, message: 'Leverage Ratio (Max) is required' },
+    { validator: nonNegativeIntValidator },
+  ],
+  derivativesRatioMax: [
+    { required: true, message: 'Derivatives Ratio (Max) is required' },
+    { validator: nonNegativeIntValidator },
+  ],
+  borrowingLimit: [
+    { required: true, message: 'Borrowing Limit is required' },
+    { validator: nonNegativeIntValidator },
+  ],
+  stopLossLimit: [{ validator: nonNegativeDecimalValidator }],
+  stopLossAlert: [{ validator: nonNegativeDecimalValidator }],
 };
 
 function getAutocompleteProps(field: string) {
@@ -239,6 +306,13 @@ const [Drawer, drawerApi] = useVbenDrawer({
       }
     } else {
       formData.value = {};
+    }
+
+    // Set defaults for all registration fields to 'N' for new records
+    for (const country of REGISTRATION_COUNTRIES) {
+      if (formData.value[country.key] === undefined || formData.value[country.key] === null) {
+        formData.value[country.key] = 'N';
+      }
     }
 
     await nextTick();
@@ -302,8 +376,15 @@ const anchorItems = [
   { href: '#section-core', title: 'Core Fund Identity' },
   { href: '#section-parties', title: 'Key Parties' },
   { href: '#section-strategy', title: 'Investment Strategy' },
-  { href: '#section-registration', title: 'Foreign Registration' },
+  { href: '#section-registration', title: 'Foreign Registration Status' },
 ];
+
+// TODO(v2): Enable when Asset Allocation file upload is implemented
+// function onAssetUploadSuccess(_file: any, response: { url: string }) {
+//   const current = formData.value.assetAllocationTable || '';
+//   const imageMarkdown = `![image](${response.url})`;
+//   formData.value.assetAllocationTable = current ? `${current}\n${imageMarkdown}` : imageMarkdown;
+// }
 
 function handleAnchorClick(e: Event, link: { href: string; title: string }) {
   e.preventDefault();
@@ -359,123 +440,111 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Fund ID" name="fundId">
-                    <Input v-model:value="formData.fundId" disabled />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
                   <FormItem label="Fund Name (EN)" name="fundNameEn">
                     <Input v-model:value="formData.fundNameEn" />
                   </FormItem>
                 </Col>
+              </Row>
+              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Name (TC)" name="fundNameTc">
                     <Input v-model:value="formData.fundNameTc" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Name (SC)" name="fundNameSc">
                     <Input v-model:value="formData.fundNameSc" />
                   </FormItem>
                 </Col>
+              </Row>
+              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Type" name="fundType">
                     <Select v-model:value="formData.fundType" :options="fundTypeOptions" show-search allow-clear option-filter-prop="label" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Umbrella/OFC Name">
+                  <FormItem label="Umbrella / OFC Name">
                     <Input v-model:value="formData.umbrellaOfcName" />
                   </FormItem>
                 </Col>
+              </Row>
+              <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Sub Fund Code">
+                  <FormItem label="Sub-Fund Code">
                     <Input v-model:value="formData.subFundCode" />
                   </FormItem>
                 </Col>
+                <Col :span="12">
+                  <FormItem label="Domicile / Jurisdiction" name="domicileJurisdiction">
+                    <Select v-model:value="formData.domicileJurisdiction" :options="countryOptions" show-search allow-clear option-filter-prop="label" placeholder="Select country" />
+                  </FormItem>
+                </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Domicile" name="domicileJurisdiction">
-                    <Input v-model:value="formData.domicileJurisdiction" placeholder="e.g. HK" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Primary Regulator">
+                  <FormItem label="Primary Regulator" name="primaryRegulator">
                     <Input v-model:value="formData.primaryRegulator" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Base Currency" name="baseCurrency">
-                    <Input v-model:value="formData.baseCurrency" placeholder="e.g. HKD, USD" />
+                    <Select v-model:value="formData.baseCurrency" :options="currencyCodeOptions" show-search allow-clear option-filter-prop="label" placeholder="Select currency" />
                   </FormItem>
                 </Col>
+              </Row>
+              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Status" name="fundStatus">
-                    <Select v-model:value="formData.fundStatus" :options="fundStatusOptions" allow-clear />
+                    <Select v-model:value="formData.fundStatus" :options="fundStatusOptions" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Application Submission Date">
+                    <DatePicker v-model:value="formData.applicationSubmissionDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Application Date">
-                    <DatePicker v-model:value="formData.applicationSubmissionDate" class="w-full" value-format="YYYY-MM-DD" />
-                  </FormItem>
-                </Col>
                 <Col :span="12">
                   <FormItem label="Authorization Date">
-                    <DatePicker v-model:value="formData.authorizationDate" class="w-full" value-format="YYYY-MM-DD" />
+                    <DatePicker v-model:value="formData.authorizationDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Launch Date" name="launchDate">
-                    <DatePicker v-model:value="formData.launchDate" class="w-full" value-format="YYYY-MM-DD" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Complex Product">
-                    <Select v-model:value="formData.complexProduct" :options="yesNoOptions" allow-clear />
+                    <DatePicker v-model:value="formData.launchDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Complex Product" name="complexProduct">
+                    <Select v-model:value="formData.complexProduct" :options="yesNoOptions" />
+                  </FormItem>
+                </Col>
                 <Col :span="12">
                   <FormItem label="IOP Start Date">
-                    <DatePicker v-model:value="formData.iopStartDate" class="w-full" value-format="YYYY-MM-DD" />
+                    <DatePicker v-model:value="formData.iopStartDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
+              </Row>
+              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Operation Start Date">
-                    <DatePicker v-model:value="formData.operationStartDate" class="w-full" value-format="YYYY-MM-DD" />
+                    <DatePicker v-model:value="formData.operationStartDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Listing Date">
-                    <DatePicker v-model:value="formData.listingDate" class="w-full" value-format="YYYY-MM-DD" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Termination Date">
-                    <DatePicker v-model:value="formData.terminationDate" class="w-full" value-format="YYYY-MM-DD" />
+                    <DatePicker v-model:value="formData.listingDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="GIIN Number" name="giinNumber">
-                    <Input v-model:value="formData.giinNumber" />
+                  <FormItem label="Termination Date">
+                    <DatePicker v-model:value="formData.terminationDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -486,21 +555,24 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Professional Investors Only">
+                  <FormItem label="GIIIN Number" name="giinNumber">
+                    <Input v-model:value="formData.giinNumber" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Professional Investors only">
                     <Select v-model:value="formData.professionalInvestorsOnly" :options="yesNoOptions" allow-clear />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
-                <Col :span="24">
-                  <FormItem label="Investor Nationality Restriction">
+                <Col :span="12">
+                  <FormItem label="Restriction on investor's nationality">
                     <Input v-model:value="formData.restrictionInvestorNationality" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="24">
-                  <FormItem label="Investor Residency Restriction">
+                <Col :span="12">
+                  <FormItem label="Restriction on investor's residency">
                     <Input v-model:value="formData.restrictionInvestorResidency" />
                   </FormItem>
                 </Col>
@@ -511,10 +583,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Manager" name="fundManager">
-                    <Select
-                      v-model:value="formData.fundManager"
-                      v-bind="getAutocompleteProps('fundManager')"
-                    />
+                    <Select v-model:value="formData.fundManager" v-bind="getAutocompleteProps('fundManager')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -537,12 +606,12 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Trustee/Administrator">
+                  <FormItem label="Trustee / Administrator">
                     <Select v-model:value="formData.trusteeAdministrator" v-bind="getAutocompleteProps('trusteeAdministrator')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Custodian/Prime Broker">
+                  <FormItem label="Custodian / Prime Broker">
                     <Select v-model:value="formData.custodianPrimeBroker" v-bind="getAutocompleteProps('custodianPrimeBroker')" />
                   </FormItem>
                 </Col>
@@ -564,24 +633,24 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             <CollapsePanel id="section-strategy" key="strategy" header="Investment Strategy">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Instrument Type" name="primaryInstrumentType">
+                  <FormItem label="Primary Instrument Type" name="primaryInstrumentType">
                     <Select v-model:value="formData.primaryInstrumentType" :options="instrumentTypeOptions" show-search allow-clear option-filter-prop="label" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Active/Passive">
-                    <Select v-model:value="formData.passiveOrActiveFund" :options="activePassiveOptions" allow-clear />
+                  <FormItem label="Passive or Active Fund" name="passiveOrActiveFund">
+                    <Select v-model:value="formData.passiveOrActiveFund" :options="activePassiveOptions" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Market Focus" name="investmentMarketFocus">
-                    <Select v-model:value="formData.investmentMarketFocus" :options="marketFocusOptions" allow-clear />
+                  <FormItem label="Investment Market Focus" name="investmentMarketFocus">
+                    <Select v-model:value="formData.investmentMarketFocus" :options="marketFocusOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Morningstar Category">
+                  <FormItem label="Strategy Category (MorningStar)">
                     <Input v-model:value="formData.morningstarCategory" />
                   </FormItem>
                 </Col>
@@ -602,15 +671,30 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="24">
-                  <FormItem label="Asset Allocation" name="assetAllocationTable">
-                    <Input v-model:value="formData.assetAllocationTable" type="textarea" :rows="3" />
+                  <FormItem label="Asset Allocation Table" name="assetAllocationTable">
+                    <Input v-model:value="formData.assetAllocationTable" type="textarea" :rows="4" />
+                    <!-- TODO(v2): Add file upload alongside text input -->
+                    <!-- <div class="mt-3">
+                      <FileUpload
+                        :accept="'image/jpeg,image/jpg,image/png,image/heic,image/heif'"
+                        :max-size="10"
+                        :max-count="5"
+                        :enable-drag-upload="true"
+                        :show-success-msg="false"
+                        :help-message="false"
+                        @success="onAssetUploadSuccess"
+                      />
+                      <div class="mt-1 text-xs text-gray-400">
+                        Supports JPEG, JPG, PNG, HEIC, HEIF. Max 10MB each, up to 5 images.
+                      </div>
+                    </div> -->
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Hedging Policy">
-                    <Select v-model:value="formData.hedgingPolicyFund" :options="hedgingPolicyOptions" allow-clear />
+                  <FormItem label="Hedging Policy (Fund)" name="hedgingPolicyFund">
+                    <Select v-model:value="formData.hedgingPolicyFund" :options="hedgingPolicyOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -626,36 +710,36 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Risk Rating">
-                    <Select v-model:value="formData.riskRating" :options="riskRatingOptions" allow-clear />
+                  <FormItem label="Risk Rating" name="riskRating">
+                    <Select v-model:value="formData.riskRating" :options="riskRatingOptions" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="8">
-                   <FormItem label="Max Leverage" name="leverageRatioMax">
+                   <FormItem label="Leverage Ratio (Max)(%)" name="leverageRatioMax">
                     <Input v-model:value="formData.leverageRatioMax" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                   <FormItem label="Max Derivatives" name="derivativesRatioMax">
+                   <FormItem label="Derivatives Ratio (Max)(%)" name="derivativesRatioMax">
                     <Input v-model:value="formData.derivativesRatioMax" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                   <FormItem label="Borrowing Limit" name="borrowingLimit">
+                   <FormItem label="Borrowing Limit (%)" name="borrowingLimit">
                     <Input v-model:value="formData.borrowingLimit" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="8">
-                   <FormItem label="Stop Loss Limit" name="stopLossLimit">
+                   <FormItem label="Stop Loss Limit (%)" name="stopLossLimit">
                     <Input v-model:value="formData.stopLossLimit" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                   <FormItem label="Stop Loss Alert" name="stopLossAlert">
+                   <FormItem label="Stop Loss Alert (%)" name="stopLossAlert">
                     <Input v-model:value="formData.stopLossAlert" />
                   </FormItem>
                 </Col>
@@ -665,8 +749,8 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             <CollapsePanel id="section-registration" key="registration" header="Foreign Registration Status">
               <Row :gutter="[16, 8]">
                 <Col v-for="country in REGISTRATION_COUNTRIES" :key="country.key" :span="8">
-                   <FormItem :label="country.label">
-                    <DatePicker v-model:value="formData[country.key]" class="w-full" value-format="YYYY-MM-DD" size="small" />
+                   <FormItem :label="country.label" :name="country.key" :rules="[{ required: true, message: `${country.label} is required` }]">
+                    <Select v-model:value="formData[country.key]" :options="yesNoOptions" />
                   </FormItem>
                 </Col>
               </Row>

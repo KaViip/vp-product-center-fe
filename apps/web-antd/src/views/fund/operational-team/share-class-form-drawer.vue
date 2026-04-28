@@ -15,7 +15,6 @@ import {
   Form,
   FormItem,
   Input,
-  InputNumber,
   Row,
   Select,
   Spin,
@@ -29,11 +28,14 @@ import {
   shareClassGet,
   shareClassUpdate,
 } from '#/api/product-center';
+import type { FundProduct } from '#/api/product-center/model/fund-product';
 import {
   ClassStatusEnum,
   CurrencyEnum,
 } from '#/api/product-center/model/fund-operational';
 import { YesNoEnum } from '#/api/product-center/model/fund-product';
+
+import { fundProductList } from '#/api/product-center';
 
 const emit = defineEmits<{ reload: [] }>();
 
@@ -45,6 +47,23 @@ const activeCollapseKeys = ref<string[]>(['fund-info', 'class-list', 'class-info
 const scrollContainerRef = ref<HTMLElement | null>(null);
 const classListData = ref<ShareClass[]>([]);
 const selectedClassRow = ref<ShareClass | null>(null);
+const fundCodeOptions = ref<{ label: string; value: string }[]>([]);
+
+const classListColumns = [
+  { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEn', key: 'en' },
+  { title: 'Share Class Name (TC)', dataIndex: 'shareClassNameTc', key: 'tc' },
+  { title: 'VPFS Class ID', dataIndex: 'vpfsClassId', key: 'vpfs' },
+  { title: 'Class Currency', dataIndex: 'classCurrency', key: 'ccy' },
+  { title: 'Status', dataIndex: 'classStatus', key: 'status' },
+];
+
+const classListRowSelection = {
+  type: 'radio' as const,
+  selectedRowKeys: ref<string[]>([]),
+  onChange: (_: string[], rows: ShareClass[]) => {
+    selectedClassRow.value = rows[0] || null;
+  },
+};
 
 const title = computed(() => {
   if (isCopy.value) return 'Copy Share Class';
@@ -59,6 +78,81 @@ const enumToOptions = (enumObj: Record<string, string | number>) =>
 const classStatusOptions = enumToOptions(ClassStatusEnum);
 const currencyOptions = enumToOptions(CurrencyEnum);
 const yesNoOptions = enumToOptions(YesNoEnum);
+
+// Distribution Policy
+const distributionPolicyOptions = [
+  { label: 'Monthly', value: 'Monthly' },
+  { label: 'Quarterly', value: 'Quarterly' },
+  { label: 'Annually', value: 'Annually' },
+  { label: 'N/A', value: 'N/A' },
+];
+
+// Unit Precision
+const unitPrecisionOptions = [
+  { label: '2', value: '2' },
+  { label: '3', value: '3' },
+  { label: '4', value: '4' },
+];
+
+// NAV Precision
+const navPrecisionOptions = [
+  { label: '0', value: '0' },
+  { label: '2', value: '2' },
+  { label: '4', value: '4' },
+];
+
+// Business Calendar (multi-select)
+const businessCalendarOptions = [
+  { label: 'Hong Kong', value: 'Hong Kong' },
+  { label: 'Taiwan', value: 'Taiwan' },
+  { label: 'Japan', value: 'Japan' },
+  { label: 'PRC - Stock Exchange', value: 'PRC - Stock Exchange' },
+  { label: 'PRC - Bank', value: 'PRC - Bank' },
+  { label: 'Ireland', value: 'Ireland' },
+  { label: 'UK', value: 'UK' },
+  { label: 'Relevant Market as per Prospectus', value: 'Relevant Market as per Prospectus' },
+];
+
+// Financial Year End
+const financialYearEndOptions = [
+  { label: '31-March', value: '31-March' },
+  { label: '30-June', value: '30-June' },
+  { label: '31-December', value: '31-December' },
+];
+
+// Dealing Frequency
+const dealingFrequencyOptions = [
+  { label: 'Daily', value: 'Daily' },
+  { label: 'Weekly', value: 'Weekly' },
+  { label: 'Monthly', value: 'Monthly' },
+  { label: 'Quarterly', value: 'Quarterly' },
+  { label: 'Yearly', value: 'Yearly' },
+];
+
+// Pricing Methodology (multi-select)
+const pricingMethodologyOptions = [
+  { label: 'Amortization', value: 'Amortization' },
+  { label: 'Cost', value: 'Cost' },
+  { label: 'Mark to Market', value: 'Mark to Market' },
+];
+
+// Country options for time+country picker (HKG, IRL, CHN first, then alpha)
+const tzCountryOptions = [
+  { label: 'HKG - Hong Kong', value: 'HKG' },
+  { label: 'IRL - Ireland', value: 'IRL' },
+  { label: 'CHN - China', value: 'CHN' },
+  { label: 'AUS - Australia', value: 'AUS' },
+  { label: 'CAN - Canada', value: 'CAN' },
+  { label: 'FRA - France', value: 'FRA' },
+  { label: 'DEU - Germany', value: 'DEU' },
+  { label: 'JPN - Japan', value: 'JPN' },
+  { label: 'LUX - Luxembourg', value: 'LUX' },
+  { label: 'SGP - Singapore', value: 'SGP' },
+  { label: 'CHE - Switzerland', value: 'CHE' },
+  { label: 'TWN - Taiwan', value: 'TWN' },
+  { label: 'GBR - United Kingdom', value: 'GBR' },
+  { label: 'USA - United States', value: 'USA' },
+];
 
 // ISIN: 2 letters + 10 alphanumeric (12 chars total)
 const isinValidator = (_rule: any, value: string) => {
@@ -108,34 +202,107 @@ const numericValidator = (label: string) => (_rule: any, value: string) => {
   return Promise.resolve();
 };
 
+// Decimal 2 places, non-negative validator
+const decimal2Validator = (label: string) => (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^\d+(\.\d{1,2})?$/.test(value))
+    return Promise.reject(`${label} must be a non-negative number (up to 2 decimal places)`);
+  return Promise.resolve();
+};
+
+// Time validator (HH:MM)
+const timeValidator = (_rule: any, value: string) => {
+  if (!value) return Promise.resolve();
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value))
+    return Promise.reject('Time must be in HH:MM format');
+  return Promise.resolve();
+};
+
 const rules = {
-  fundCode: [
-    { required: true, message: 'Fund Code is required' },
-    { max: 20, message: 'Fund Code must be at most 20 characters' },
-  ],
+  fundCode: [{ required: true, message: 'Fund Code is required' }],
   shareClassNameEn: [
     { required: true, message: 'Share Class Name (EN) is required' },
     { max: 200, message: 'Must be at most 200 characters' },
   ],
-  shareClassNameTc: [{ max: 200, message: 'Must be at most 200 characters' }],
-  shareClassNameSc: [{ max: 200, message: 'Must be at most 200 characters' }],
-  classCurrency: [{ required: true, message: 'Class Currency is required' }],
-  vpfsClassId: [
-    { required: true, message: 'VPFS Class ID is required' },
-    { max: 20, message: 'VPFS Class ID must be at most 20 characters' },
+  shareClassNameTc: [
+    { required: true, message: 'Share Class Name (TC) is required' },
+    { max: 200, message: 'Must be at most 200 characters' },
   ],
+  shareClassNameSc: [
+    { required: true, message: 'Share Class Name (SC) is required' },
+    { max: 200, message: 'Must be at most 200 characters' },
+  ],
+  classCurrency: [{ required: true, message: 'Class Currency is required' }],
+  classStatus: [{ required: true, message: 'Fund Class Status is required' }],
+  launchDate: [{ required: true, message: 'Launch Date is required' }],
+  distributionPolicy: [{ required: true, message: 'Distribution Policy is required' }],
+  hedged: [{ required: true, message: 'Hedged is required' }],
+  unitPrecision: [{ required: true, message: 'Unit Precision is required' }],
+  navPrecision: [{ required: true, message: 'NAV Precision is required' }],
+  businessDayDefinition: [{ required: true, message: 'Business Day Definition is required' }],
+  businessCalendar: [{ required: true, message: 'Business Calendar is required' }],
+  dealingFrequency: [{ required: true, message: 'Dealing Frequency is required' }],
+  valuationFrequency: [{ required: true, message: 'Valuation Frequency is required' }],
+  dealingCutOff: [{ required: true, message: 'Dealing Cut-off is required' }],
+  dealingCutOffTz: [{ required: true, message: 'Dealing Cut-off TZ is required' }],
+  valuationPoint: [{ required: true, message: 'Valuation Point is required' }],
+  valuationPointTz: [{ required: true, message: 'Valuation Point TZ is required' }],
+  pricingMethodology: [{ required: true, message: 'Pricing Methodology is required' }],
+  subscriptionSettlement: [{ required: true, message: 'Subscription Settlement is required' }],
+  redemptionSettlement: [{ required: true, message: 'Redemption Settlement is required' }],
+  minimumInitialSubscription: [{ required: true, message: 'Min Initial Subscription is required' }],
+  minimumSubsequentSubscription: [{ required: true, message: 'Min Subsequent Subscription is required' }],
+  minimumRedemption: [{ required: true, message: 'Minimum Redemption is required' }],
   isinCode: [{ validator: isinValidator }],
   stockCode: [{ validator: stockCodeValidator }],
   sedol: [{ validator: sedolValidator }],
   cusip: [{ validator: cusipValidator }],
-  unitPrecision: [{ validator: integerValidator }],
-  navPrecision: [{ validator: integerValidator }],
-  minimumInitialSubscription: [{ validator: numericValidator('Min Initial Subscription') }],
-  minimumSubsequentSubscription: [{ validator: numericValidator('Min Subsequent Subscription') }],
-  minimumRedemption: [{ validator: numericValidator('Minimum Redemption') }],
-  minimumHolding: [{ validator: numericValidator('Minimum Holding') }],
-  redemptionCharge: [{ validator: numericValidator('Redemption Charge') }],
+  latestTerRate: [{ validator: decimal2Validator('Latest TER Rate') }],
+  managementFee: [{ validator: decimal2Validator('Management Fee') }],
+  performanceFee: [{ validator: decimal2Validator('Performance Fee') }],
+  subscriptionSettlementT: [{ validator: integerValidator }],
+  redemptionSettlementT: [{ validator: integerValidator }],
+  contractNoteDeliveryDayT: [{ validator: integerValidator }],
+  valuationDeliveryTimeT: [{ validator: integerValidator }],
 };
+
+// Auto-detect Hedged from Share Class Name (EN)
+watch(() => formData.value.shareClassNameEn, (val) => {
+  if (val && /\bhedged\b/i.test(val)) {
+    formData.value.hedged = 'Y';
+  }
+});
+
+// When Fund Code changes, auto-populate Fund Name fields
+watch(() => formData.value.fundCode, async (fundCode) => {
+  if (!fundCode) {
+    formData.value.fundNameEn = undefined;
+    formData.value.fundNameTc = undefined;
+    formData.value.fundNameSc = undefined;
+    classListData.value = [];
+    return;
+  }
+  // Load class list for the selected fund
+  try {
+    classListData.value = await getClassListByFundCode(fundCode);
+  } catch {
+    classListData.value = [];
+  }
+  // Auto-populate fund names from fund code options
+  const fund = fundCodeOptions.value.find((o) => o.value === fundCode);
+  if (fund) {
+    // Try loading full fund data for names
+    try {
+      const fundList = await fundProductList({ pageNum: 1, pageSize: 1, fundCode });
+      const match = fundList.rows?.find((f: FundProduct) => f.fundCode === fundCode);
+      if (match) {
+        formData.value.fundNameEn = match.fundNameEn;
+        formData.value.fundNameTc = match.fundNameTc;
+        formData.value.fundNameSc = match.fundNameSc;
+      }
+    } catch { /* ignore */ }
+  }
+}, { immediate: true });
 
 function handleCopyFromClassList() {
   if (!selectedClassRow.value) return;
@@ -172,6 +339,15 @@ const [Drawer, drawerApi] = useVbenDrawer({
       selectedClassRow.value = null;
       return;
     }
+
+    // Load fund codes for dropdown
+    try {
+      const fundList = await fundProductList({ pageNum: 1, pageSize: 999 });
+      fundCodeOptions.value = (fundList.rows || []).map((f: FundProduct) => ({
+        label: `${f.fundCode} - ${f.fundNameEn}`,
+        value: f.fundCode,
+      }));
+    } catch { /* ignore */ }
 
     drawerApi.drawerLoading(true);
     const data = drawerApi.getData<Record<string, any>>();
@@ -300,11 +476,12 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             layout="vertical"
           >
             <Collapse v-model:activeKey="activeCollapseKeys" :bordered="false">
+            <!-- Fund Info -->
             <CollapsePanel id="section-fund-info" key="fund-info" header="Fund Info">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Code" name="fundCode">
-                    <Input v-model:value="formData.fundCode" :disabled="isUpdate" placeholder="e.g. VPAF" />
+                    <Select v-model:value="formData.fundCode" :options="fundCodeOptions" show-search allow-clear option-filter-prop="label" placeholder="Select Fund Code" :disabled="isUpdate" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -325,30 +502,12 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Fund Type">
-                    <Input v-model:value="formData.fundType" disabled />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Fund Manager">
-                    <Input v-model:value="formData.fundManager" disabled />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Fund Manager LEI">
-                    <Input v-model:value="formData.fundManagerLei" disabled />
-                  </FormItem>
-                </Col>
-              </Row>
             </CollapsePanel>
 
+            <!-- Class List -->
             <CollapsePanel id="section-class-list" key="class-list" header="Class List">
               <div class="mb-2 text-gray-500 text-xs">
-                Enter a Fund Code above to load existing share classes. Select a row and click "Copy" to fill the form below.
+                Select a Fund Code above to load existing share classes. Select a row and click "Copy from Class List" to auto-fill the form.
               </div>
               <Table
                 :columns="classListColumns"
@@ -361,131 +520,41 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               />
             </CollapsePanel>
 
+            <!-- Class Info -->
             <CollapsePanel id="section-class-info" key="class-info" header="Class Info">
               <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Share Class Name (EN)" name="shareClassNameEn">
+                    <Input v-model:value="formData.shareClassNameEn" />
+                  </FormItem>
+                </Col>
                 <Col :span="12">
                   <FormItem label="Share Class Name (TC)" name="shareClassNameTc">
                     <Input v-model:value="formData.shareClassNameTc" />
                   </FormItem>
                 </Col>
+              </Row>
+              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Share Class Name (SC)" name="shareClassNameSc">
                     <Input v-model:value="formData.shareClassNameSc" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Share Class Name (SC)">
-                    <Input v-model:value="formData.shareClassNameSc" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Class Currency" name="classCurrency">
-                    <Select v-model:value="formData.classCurrency" :options="currencyOptions" show-search allow-clear option-filter-prop="label" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="VPFS Class ID" name="vpfsClassId">
+                  <FormItem label="VPFS Class ID">
                     <Input v-model:value="formData.vpfsClassId" :disabled="isUpdate" />
                   </FormItem>
                 </Col>
-                <Col :span="12">
-                  <FormItem label="Class Status">
-                    <Select v-model:value="formData.classStatus" :options="classStatusOptions" allow-clear />
-                  </FormItem>
-                </Col>
               </Row>
               <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="End of IOP Date">
-                    <DatePicker v-model:value="formData.endOfIopDate" class="w-full" value-format="YYYY-MM-DD" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Launch Date">
-                    <DatePicker v-model:value="formData.launchDate" class="w-full" value-format="YYYY-MM-DD" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Stock Code" name="stockCode">
-                    <Input v-model:value="formData.stockCode" />
-                  </FormItem>
-                </Col>
                 <Col :span="12">
                   <FormItem label="ISIN Code" name="isinCode">
                     <Input v-model:value="formData.isinCode" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Morningstar Fund ID">
-                    <Input v-model:value="formData.morningstarFundId" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Morningstar Sec ID">
-                    <Input v-model:value="formData.morningstarSecId" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Morningstar Perf ID">
-                    <Input v-model:value="formData.morningstarPerformanceId" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="CUSIP">
-                    <Input v-model:value="formData.cusip" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Valor Code">
-                    <Input v-model:value="formData.valorCode" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Lipper Code">
-                    <Input v-model:value="formData.lipperCode" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Bloomberg Ticker">
-                    <Input v-model:value="formData.bloombergTicker" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="BBG ID Equity">
-                    <Input v-model:value="formData.bbgIdEquity" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="CUSIP" name="cusip">
                     <Input v-model:value="formData.cusip" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Valor Code">
-                    <Input v-model:value="formData.valorCode" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Lipper Code">
-                    <Input v-model:value="formData.lipperCode" />
                   </FormItem>
                 </Col>
               </Row>
@@ -508,65 +577,115 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Distribution Policy">
-                    <Input v-model:value="formData.distributionPolicy" />
+                  <FormItem label="Morningstar Fund ID">
+                    <Input v-model:value="formData.morningstarFundId" />
                   </FormItem>
                 </Col>
               </Row>
-            </CollapsePanel>
-
-            <CollapsePanel id="section-dealing" key="dealing" header="Dealing & Valuation">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Dealing Frequency">
-                    <Input v-model:value="formData.dealingFrequency" />
+                  <FormItem label="Morningstar Sec ID">
+                    <Input v-model:value="formData.morningstarSecId" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Unit Precision">
-                    <Input v-model:value="formData.unitPrecision" />
+                  <FormItem label="Morningstar Perf ID">
+                    <Input v-model:value="formData.morningstarPerformanceId" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Stock Code" name="stockCode">
+                    <Input v-model:value="formData.stockCode" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Valor Code">
+                    <Input v-model:value="formData.valorCode" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Lipper Code">
+                    <Input v-model:value="formData.lipperCode" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Fund Class Status" name="classStatus">
+                    <Select v-model:value="formData.classStatus" :options="classStatusOptions" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Class Currency" name="classCurrency">
+                    <Select v-model:value="formData.classCurrency" :options="currencyOptions" show-search option-filter-prop="label" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="End of IOP Date">
+                    <DatePicker v-model:value="formData.endOfIopDate" class="w-full" value-format="YYYY/MM/DD" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Launch Date" name="launchDate">
+                    <DatePicker v-model:value="formData.launchDate" class="w-full" value-format="YYYY/MM/DD" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Latest TER Date">
+                    <DatePicker v-model:value="formData.latestTerDate" class="w-full" picker="month" value-format="YYYY/MM" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Latest TER Rate(%)" name="latestTerRate">
+                    <Input v-model:value="formData.latestTerRate" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Distribution Policy" name="distributionPolicy">
+                    <Select v-model:value="formData.distributionPolicy" :options="distributionPolicyOptions" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Hedged" name="hedged">
+                    <Select v-model:value="formData.hedged" :options="yesNoOptions" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Hedging Currency">
+                    <Select v-model:value="formData.hedgingCurrency" :options="currencyOptions" show-search option-filter-prop="label" :disabled="formData.hedged !== 'Y'" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Unit Precision" name="unitPrecision">
-                    <Input v-model:value="formData.unitPrecision" />
+                    <Select v-model:value="formData.unitPrecision" :options="unitPrecisionOptions" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="NAV Precision" name="navPrecision">
-                    <Input v-model:value="formData.navPrecision" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Dealing Cut Off">
-                    <Input v-model:value="formData.dealingCutOff" />
+                    <Select v-model:value="formData.navPrecision" :options="navPrecisionOptions" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Business Day Def.">
-                    <Input v-model:value="formData.businessDayDefinition" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Business Calendar">
-                    <Input v-model:value="formData.businessCalendar" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Subscription Settlement">
+                  <FormItem label="Subscription Settlement(T+)" name="subscriptionSettlement">
                     <Input v-model:value="formData.subscriptionSettlement" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Redemption Settlement">
+                  <FormItem label="Redemption Settlement(T+)" name="redemptionSettlement">
                     <Input v-model:value="formData.redemptionSettlement" />
                   </FormItem>
                 </Col>
@@ -578,7 +697,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Min Subsequent Sub." name="minimumSubsequentSubscription">
+                  <FormItem label="Min Subsequent Subscription" name="minimumSubsequentSubscription">
                     <Input v-model:value="formData.minimumSubsequentSubscription" />
                   </FormItem>
                 </Col>
@@ -590,87 +709,108 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Minimum Holding" name="minimumHolding">
+                  <FormItem label="Minimum Holding">
                     <Input v-model:value="formData.minimumHolding" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Redemption Charge" name="redemptionCharge">
+                  <FormItem label="Redemption Charge">
                     <Input v-model:value="formData.redemptionCharge" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Management Fee">
-                    <InputNumber v-model:value="formData.managementFee" :min="0" :max="1" :step="0.0001" class="w-full" :precision="5" />
+                  <FormItem label="Management Fee(%)" name="managementFee">
+                    <Input v-model:value="formData.managementFee" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Performance Fee">
-                    <InputNumber v-model:value="formData.performanceFee" :min="0" :max="1" :step="0.0001" class="w-full" :precision="5" />
+                  <FormItem label="Performance Fee(%)" name="performanceFee">
+                    <Input v-model:value="formData.performanceFee" />
                   </FormItem>
                 </Col>
-                <Col :span="12">
-                  <FormItem label="TER">
-                    <Input v-model:value="formData.ter" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Financial Year End">
-                    <Input v-model:value="formData.financialYearEnd" />
+                    <Select v-model:value="formData.financialYearEnd" :options="financialYearEndOptions" />
+                  </FormItem>
+                </Col>
+              </Row>
+            </CollapsePanel>
+
+            <!-- Dealing & Valuation -->
+            <CollapsePanel id="section-dealing" key="dealing" header="Dealing & Valuation">
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Dealing Frequency" name="dealingFrequency">
+                    <Select v-model:value="formData.dealingFrequency" :options="dealingFrequencyOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Contract Note Del. Day">
+                  <FormItem label="Valuation Frequency" name="valuationFrequency">
+                    <Select v-model:value="formData.valuationFrequency" :options="dealingFrequencyOptions" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Dealing Cut-off (Time)" name="dealingCutOff">
+                    <Input v-model:value="formData.dealingCutOff" placeholder="HH:MM" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Dealing Cut-off (TZ)" name="dealingCutOffTz">
+                    <Select v-model:value="formData.dealingCutOffTz" :options="tzCountryOptions" show-search option-filter-prop="label" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Valuation Point (Time)" name="valuationPoint">
+                    <Input v-model:value="formData.valuationPoint" placeholder="HH:MM" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Valuation Point (TZ)" name="valuationPointTz">
+                    <Select v-model:value="formData.valuationPointTz" :options="tzCountryOptions" show-search option-filter-prop="label" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Business Day Definition" name="businessDayDefinition">
+                    <Input v-model:value="formData.businessDayDefinition" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem label="Business Calendar" name="businessCalendar">
+                    <Select v-model:value="formData.businessCalendar" :options="businessCalendarOptions" mode="multiple" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem label="Contract Note Del. Day(T+)">
                     <Input v-model:value="formData.contractNoteDeliveryDay" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Pricing Methodology">
-                    <Input v-model:value="formData.pricingMethodology" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Valuation Point">
-                    <Input v-model:value="formData.valuationPoint" />
+                  <FormItem label="Pricing Methodology" name="pricingMethodology">
+                    <Select v-model:value="formData.pricingMethodology" :options="pricingMethodologyOptions" mode="multiple" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Valuation Frequency">
-                    <Input v-model:value="formData.valuationFrequency" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Valuation Delivery Time">
+                  <FormItem label="Valuation Delivery Time(T+)">
                     <Input v-model:value="formData.valuationDeliveryTime" />
                   </FormItem>
                 </Col>
-              </Row>
-              <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Security Lending">
                     <Select v-model:value="formData.securityLending" :options="yesNoOptions" allow-clear />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Hedged">
-                    <Select v-model:value="formData.hedged" :options="yesNoOptions" allow-clear />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Hedging Currency">
-                    <Input v-model:value="formData.hedgingCurrency" />
                   </FormItem>
                 </Col>
               </Row>

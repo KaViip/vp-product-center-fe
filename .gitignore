@@ -23,6 +23,8 @@ package-lock.json
 pnpm-lock.yaml
 .VSCodeCounter
 **/backend-mock/data
+mock-fund-product.ts
+mock-fund-operational.ts
 
 # local env files
 .env.local

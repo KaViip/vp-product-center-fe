@@ -19,14 +19,15 @@ const routes: RouteRecordRaw[] = [
         name: 'FundOperationalTeam',
         path: '/fund/operational-team',
       },
-      {
-        component: () => import('#/views/fund/documents/index.vue'),
-        meta: {
-          title: 'Documents',
-        },
-        name: 'FundDocuments',
-        path: '/fund/documents',
-      },
+      // TODO(v2): Enable Documents menu
+      // {
+      //   component: () => import('#/views/fund/documents/index.vue'),
+      //   meta: {
+      //     title: 'Documents',
+      //   },
+      //   name: 'FundDocuments',
+      //   path: '/fund/documents',
+      // },
     ],
     meta: {
       icon: 'lucide:landmark',
