@@ -8,7 +8,7 @@ enum Api {
   autocomplete = '/productcenter/productCenterMasterdata/autocomplete',
   root = '/productcenter/productCenterMasterdata',
   export = '/productcenter/productCenterMasterdata/export',
-  import = '/productcenter/productCenterMasterdata/import',
+  importData = '/productcenter/productCenterMasterdata/importData',
   importTemplate = '/productcenter/productCenterMasterdata/importTemplate',
   list = '/productcenter/productCenterMasterdata/list',
 }
@@ -38,7 +38,7 @@ export function fundProductExport(data: Partial<FundProduct>) {
 }
 
 export function fundProductImport(data: FormData) {
-  return alovaInstance.post<ImportResult>(Api.import, data, {
+  return alovaInstance.post<ImportResult>(Api.importData, data, {
     headers: { 'Content-Type': ContentTypeEnum.FORM_DATA },
     isTransformResponse: false,
   });

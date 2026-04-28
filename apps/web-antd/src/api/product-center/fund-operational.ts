@@ -8,7 +8,7 @@ import { alovaInstance } from '#/utils/http';
 enum Api {
   classList = '/productcenter/productCenterData/class-list',
   export = '/productcenter/productCenterData/export',
-  import = '/productcenter/productCenterData/import',
+  importData = '/productcenter/productCenterData/importData',
   importTemplate = '/productcenter/productCenterData/importTemplate',
   list = '/productcenter/productCenterData/list',
   root = '/productcenter/productCenterData',
@@ -39,7 +39,7 @@ export function shareClassExport(data: Partial<ShareClass>) {
 }
 
 export function shareClassImport(data: FormData) {
-  return alovaInstance.post<ImportResult>(Api.import, data, {
+  return alovaInstance.post<ImportResult>(Api.importData, data, {
     headers: { 'Content-Type': ContentTypeEnum.FORM_DATA },
     isTransformResponse: false,
   });
