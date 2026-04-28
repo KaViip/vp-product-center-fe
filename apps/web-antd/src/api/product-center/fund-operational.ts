@@ -1,25 +1,25 @@
 import type { ImportResult } from './model/fund-product';
 import type { ShareClass } from './model/fund-operational';
-import type { ID, IDS, PageQuery, PageResult } from '#/api/common';
+import type { IDS, PageQuery, PageResult } from '#/api/common';
 
 import { commonExport, ContentTypeEnum } from '#/api/helper';
 import { alovaInstance } from '#/utils/http';
 
 enum Api {
-  classList = '/product-center/fund/operational/class-list',
-  export = '/product-center/fund/operational/export',
-  import = '/product-center/fund/operational/import',
-  importTemplate = '/product-center/fund/operational/importTemplate',
-  list = '/product-center/fund/operational/list',
-  root = '/product-center/fund/operational',
+  classList = '/productcenter/productCenterData/class-list',
+  export = '/productcenter/productCenterData/export',
+  import = '/productcenter/productCenterData/import',
+  importTemplate = '/productcenter/productCenterData/importTemplate',
+  list = '/productcenter/productCenterData/list',
+  root = '/productcenter/productCenterData',
 }
 
 export function shareClassList(params?: PageQuery) {
   return alovaInstance.get<PageResult<ShareClass>>(Api.list, { params });
 }
 
-export function shareClassGet(id: ID) {
-  return alovaInstance.get<ShareClass>(`${Api.root}/${id}`);
+export function shareClassGet(productClassId: number) {
+  return alovaInstance.get<ShareClass>(`${Api.root}/${productClassId}`);
 }
 
 export function shareClassAdd(data: Partial<ShareClass>) {
@@ -30,8 +30,8 @@ export function shareClassUpdate(data: Partial<ShareClass>) {
   return alovaInstance.putWithMsg<void>(Api.root, data);
 }
 
-export function shareClassRemove(ids: IDS) {
-  return alovaInstance.deleteWithMsg<void>(`${Api.root}/${ids}`);
+export function shareClassRemove(productClassIds: IDS) {
+  return alovaInstance.deleteWithMsg<void>(`${Api.root}/${productClassIds}`);
 }
 
 export function shareClassExport(data: Partial<ShareClass>) {

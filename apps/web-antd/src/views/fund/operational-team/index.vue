@@ -185,8 +185,8 @@ const statusColorMap: Record<string, string> = {
         </Space>
       </template>
       <template #status="{ row }">
-        <Tag :color="statusColorMap[row.classStatus] || 'default'">
-          {{ row.classStatus }}
+        <Tag :color="statusColorMap[row.fundClassStatus] || 'default'">
+          {{ row.fundClassStatus }}
         </Tag>
       </template>
       <template #action="{ row }">

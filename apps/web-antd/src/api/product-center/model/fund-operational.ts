@@ -10,6 +10,8 @@ import type { FundTypeEnum, YesNoEnum } from './fund-product';
 export interface ShareClass {
   /** 系统ID */
   id?: string;
+  /** Backend PK */
+  productClassId?: number;
   /** VPFS Fund ID */
   fundCode: string;
   /** 基金名称(EN) */
@@ -18,6 +20,8 @@ export interface ShareClass {
   fundNameTc?: string;
   /** 基金名称(SC) */
   fundNameSc?: string;
+  /** 基金中文名 */
+  fundNameChinese?: string;
   /** 基金类型 */
   fundType?: FundTypeEnum;
   /** 基金经理 */
@@ -25,13 +29,13 @@ export interface ShareClass {
   /** 基金经理LEI */
   fundManagerLei?: string;
   /** Share Class状态 */
-  classStatus?: ClassStatusEnum;
+  fundClassStatus?: ClassStatusEnum;
   /** 份额类别名称(EN) Official Name */
-  shareClassNameEn: string;
+  shareClassNameEnOfficialName: string;
   /** 份额类别名称(TC) Official Name */
-  shareClassNameTc?: string;
+  shareClassNameTcOfficialName?: string;
   /** 份额类别名称(SC) Official Name */
-  shareClassNameSc?: string;
+  shareClassNameScOfficialName?: string;
   /** Class Currency */
   classCurrency?: CurrencyEnum;
   /** VPFS Class ID */
@@ -95,7 +99,7 @@ export interface ShareClass {
   /** 业绩费 */
   performanceFee?: number;
   /** TER */
-  ter?: string;
+  ter?: number;
   /** 财年截止 */
   financialYearEnd?: string;
   /** 合同通知交付日 */
@@ -109,11 +113,13 @@ export interface ShareClass {
   /** 估值交付时间 */
   valuationDeliveryTime?: string;
   /** 证券借贷 */
-  securityLending?: YesNoEnum;
+  securityLending?: boolean;
   /** 是否对冲 */
-  hedged?: YesNoEnum;
+  hedged?: boolean;
   /** 对冲货币 */
   hedgingCurrency?: string;
+  /** 创建时间 */
+  createTime?: string;
   /** 上传时间 */
   uploadTime?: string;
   /** 上传人 */

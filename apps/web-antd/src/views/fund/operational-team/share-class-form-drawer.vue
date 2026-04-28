@@ -33,9 +33,6 @@ import {
   ClassStatusEnum,
   CurrencyEnum,
 } from '#/api/product-center/model/fund-operational';
-import { YesNoEnum } from '#/api/product-center/model/fund-product';
-
-import { fundProductList } from '#/api/product-center';
 
 const emit = defineEmits<{ reload: [] }>();
 
@@ -50,11 +47,11 @@ const selectedClassRow = ref<ShareClass | null>(null);
 const fundCodeOptions = ref<{ label: string; value: string }[]>([]);
 
 const classListColumns = [
-  { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEn', key: 'en' },
-  { title: 'Share Class Name (TC)', dataIndex: 'shareClassNameTc', key: 'tc' },
+  { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEnOfficialName', key: 'en' },
+  { title: 'Share Class Name (TC)', dataIndex: 'shareClassNameTcOfficialName', key: 'tc' },
   { title: 'VPFS Class ID', dataIndex: 'vpfsClassId', key: 'vpfs' },
   { title: 'Class Currency', dataIndex: 'classCurrency', key: 'ccy' },
-  { title: 'Status', dataIndex: 'classStatus', key: 'status' },
+  { title: 'Status', dataIndex: 'fundClassStatus', key: 'status' },
 ];
 
 const classListRowSelection = {
@@ -75,9 +72,12 @@ const formData = ref<Record<string, any>>({});
 const enumToOptions = (enumObj: Record<string, string | number>) =>
   Object.entries(enumObj).map(([_, value]) => ({ label: String(value), value }));
 
-const classStatusOptions = enumToOptions(ClassStatusEnum);
+const fundClassStatusOptions = enumToOptions(ClassStatusEnum);
 const currencyOptions = enumToOptions(CurrencyEnum);
-const yesNoOptions = enumToOptions(YesNoEnum);
+const yesNoOptions = [
+  { label: 'Yes', value: true },
+  { label: 'No', value: false },
+];
 
 // Distribution Policy
 const distributionPolicyOptions = [
@@ -220,20 +220,20 @@ const timeValidator = (_rule: any, value: string) => {
 
 const rules = {
   fundCode: [{ required: true, message: 'Fund Code is required' }],
-  shareClassNameEn: [
+  shareClassNameEnOfficialName: [
     { required: true, message: 'Share Class Name (EN) is required' },
     { max: 200, message: 'Must be at most 200 characters' },
   ],
-  shareClassNameTc: [
+  shareClassNameTcOfficialName: [
     { required: true, message: 'Share Class Name (TC) is required' },
     { max: 200, message: 'Must be at most 200 characters' },
   ],
-  shareClassNameSc: [
+  shareClassNameScOfficialName: [
     { required: true, message: 'Share Class Name (SC) is required' },
     { max: 200, message: 'Must be at most 200 characters' },
   ],
   classCurrency: [{ required: true, message: 'Class Currency is required' }],
-  classStatus: [{ required: true, message: 'Fund Class Status is required' }],
+  fundClassStatus: [{ required: true, message: 'Fund Class Status is required' }],
   launchDate: [{ required: true, message: 'Launch Date is required' }],
   distributionPolicy: [{ required: true, message: 'Distribution Policy is required' }],
   hedged: [{ required: true, message: 'Hedged is required' }],
@@ -267,9 +267,15 @@ const rules = {
 };
 
 // Auto-detect Hedged from Share Class Name (EN)
-watch(() => formData.value.shareClassNameEn, (val) => {
+watch(() => formData.value.shareClassNameEnOfficialName, (val) => {
   if (val && /\bhedged\b/i.test(val)) {
-    formData.value.hedged = 'Y';
+    formData.value.hedged = true;
+  }
+});
+
+watch(() => formData.value.hedged, (val) => {
+  if (val !== true) {
+    formData.value.hedgingCurrency = undefined;
   }
 });
 
@@ -308,8 +314,8 @@ function handleCopyFromClassList() {
   if (!selectedClassRow.value) return;
   const source = cloneDeep(selectedClassRow.value);
   const copyFields: (keyof ShareClass)[] = [
-    'shareClassNameEn', 'shareClassNameTc', 'shareClassNameSc',
-    'classCurrency', 'classStatus', 'vpfsClassId',
+    'shareClassNameEnOfficialName', 'shareClassNameTcOfficialName', 'shareClassNameScOfficialName',
+    'classCurrency', 'fundClassStatus', 'vpfsClassId',
     'endOfIopDate', 'launchDate', 'stockCode', 'isinCode',
     'morningstarFundId', 'morningstarSecId', 'morningstarPerformanceId',
     'cusip', 'valorCode', 'lipperCode', 'bloombergTicker', 'bbgIdEquity', 'sedol',
@@ -360,7 +366,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
         if (isCopy.value) {
           shareClassData.id = undefined;
           shareClassData.vpfsClassId = '';
-          shareClassData.shareClassNameEn = '';
+          shareClassData.shareClassNameEnOfficialName = '';
         }
         formData.value = cloneDeep(shareClassData);
       } catch {
@@ -397,7 +403,7 @@ async function handleConfirm() {
     const excludeId = isUpdate.value ? formData.value.id : undefined;
     const isUnique = await shareClassCheckUnique(
       formData.value.fundCode,
-      formData.value.shareClassNameEn,
+      formData.value.shareClassNameEnOfficialName,
       formData.value.vpfsClassId,
       excludeId,
     );
@@ -524,20 +530,20 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             <CollapsePanel id="section-class-info" key="class-info" header="Class Info">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Share Class Name (EN)" name="shareClassNameEn">
-                    <Input v-model:value="formData.shareClassNameEn" />
+                  <FormItem label="Share Class Name (EN)" name="shareClassNameEnOfficialName">
+                    <Input v-model:value="formData.shareClassNameEnOfficialName" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Share Class Name (TC)" name="shareClassNameTc">
-                    <Input v-model:value="formData.shareClassNameTc" />
+                  <FormItem label="Share Class Name (TC)" name="shareClassNameTcOfficialName">
+                    <Input v-model:value="formData.shareClassNameTcOfficialName" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Share Class Name (SC)" name="shareClassNameSc">
-                    <Input v-model:value="formData.shareClassNameSc" />
+                  <FormItem label="Share Class Name (SC)" name="shareClassNameScOfficialName">
+                    <Input v-model:value="formData.shareClassNameScOfficialName" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -613,8 +619,8 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Fund Class Status" name="classStatus">
-                    <Select v-model:value="formData.classStatus" :options="classStatusOptions" />
+                  <FormItem label="Fund Class Status" name="fundClassStatus">
+                    <Select v-model:value="formData.fundClassStatus" :options="fundClassStatusOptions" />
                   </FormItem>
                 </Col>
               </Row>
@@ -662,7 +668,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem label="Hedging Currency">
-                    <Select v-model:value="formData.hedgingCurrency" :options="currencyOptions" show-search option-filter-prop="label" :disabled="formData.hedged !== 'Y'" />
+                    <Select v-model:value="formData.hedgingCurrency" :options="currencyOptions" show-search option-filter-prop="label" :disabled="!formData.hedged" />
                   </FormItem>
                 </Col>
               </Row>

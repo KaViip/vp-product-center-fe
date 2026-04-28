@@ -48,7 +48,7 @@ export const querySchema: FormSchemaGetter = () => [
       mode: 'multiple',
       options: classStatusOptions,
     },
-    fieldName: 'classStatus',
+    fieldName: 'fundClassStatus',
     label: 'Class Status',
   },
 ];
@@ -66,17 +66,17 @@ export const columns: VxeGridProps['columns'] = [
     minWidth: 200,
   },
   {
-    field: 'shareClassNameEn',
+    field: 'shareClassNameEnOfficialName',
     title: 'Share Class Name (EN)',
     minWidth: 200,
   },
   {
-    field: 'shareClassNameTc',
+    field: 'shareClassNameTcOfficialName',
     title: 'Share Class Name (TC)',
     minWidth: 160,
   },
   {
-    field: 'shareClassNameSc',
+    field: 'shareClassNameScOfficialName',
     title: 'Share Class Name (SC)',
     minWidth: 160,
   },
@@ -86,7 +86,7 @@ export const columns: VxeGridProps['columns'] = [
     minWidth: 100,
   },
   {
-    field: 'classStatus',
+    field: 'fundClassStatus',
     title: 'Class Status',
     minWidth: 100,
     slots: { default: 'status' },

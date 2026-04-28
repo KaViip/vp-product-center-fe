@@ -34,8 +34,6 @@ import {
   HedgingPolicyEnum,
   InstrumentTypeEnum,
   MarketFocusEnum,
-  RiskRatingEnum,
-  YesNoEnum,
 } from '#/api/product-center/model/fund-product';
 
 const emit = defineEmits<{ reload: [] }>();
@@ -60,11 +58,20 @@ const enumToOptions = (enumObj: Record<string, string | number>) =>
 const fundTypeOptions = enumToOptions(FundTypeEnum);
 const fundStatusOptions = enumToOptions(FundStatusEnum);
 const instrumentTypeOptions = enumToOptions(InstrumentTypeEnum);
-const yesNoOptions = enumToOptions(YesNoEnum);
+const yesNoOptions = [
+  { label: 'Yes', value: true },
+  { label: 'No', value: false },
+];
 const activePassiveOptions = enumToOptions(ActivePassiveEnum);
 const marketFocusOptions = enumToOptions(MarketFocusEnum);
 const hedgingPolicyOptions = enumToOptions(HedgingPolicyEnum);
-const riskRatingOptions = enumToOptions(RiskRatingEnum);
+const riskLevelOptions = [
+  { label: '1', value: 1 },
+  { label: '2', value: 2 },
+  { label: '3', value: 3 },
+  { label: '4', value: 4 },
+  { label: '5', value: 5 },
+];
 
 // ISO 3166-1 Alpha-2 country codes (commonly used jurisdictions)
 const countryOptions = [
@@ -710,8 +717,8 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Risk Rating" name="riskRating">
-                    <Select v-model:value="formData.riskRating" :options="riskRatingOptions" />
+                  <FormItem label="Risk Rating" name="riskLevel">
+                    <Select v-model:value="formData.riskLevel" :options="riskLevelOptions" />
                   </FormItem>
                 </Col>
               </Row>

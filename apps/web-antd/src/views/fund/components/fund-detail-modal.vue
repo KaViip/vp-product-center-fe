@@ -105,7 +105,7 @@ const strategyFields = [
   { label: 'Morningstar Category', key: 'morningstarCategory' },
   { label: 'Benchmark', key: 'benchmark' },
   { label: 'Benchmark Code', key: 'benchmarkCode' },
-  { label: 'Risk Rating', key: 'riskRating' },
+  { label: 'Risk Rating', key: 'riskLevel' },
   { label: 'Hedging Policy', key: 'hedgingPolicyFund' },
 ];
 
@@ -121,12 +121,12 @@ const fundInfoFields = [
 ];
 
 const classInfoFields = [
-  { label: 'Share Class Name (EN)', key: 'shareClassNameEn' },
+  { label: 'Share Class Name (EN)', key: 'shareClassNameEnOfficialName' },
   { label: 'Share Class Name (TC)', key: 'shareClassNameTc' },
   { label: 'Share Class Name (SC)', key: 'shareClassNameSc' },
   { label: 'VPFS Class ID', key: 'vpfsClassId' },
   { label: 'Class Currency', key: 'classCurrency' },
-  { label: 'Class Status', key: 'classStatus' },
+  { label: 'Class Status', key: 'fundClassStatus' },
   { label: 'End of IOP Date', key: 'endOfIopDate' },
   { label: 'Launch Date', key: 'launchDate' },
   { label: 'Stock Code', key: 'stockCode' },
@@ -173,9 +173,9 @@ const dealingFields = [
 
 const opTeamColumns = [
   { title: 'VPFS Class ID', dataIndex: 'vpfsClassId', key: 'vpfsClassId', width: 120 },
-  { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEn', key: 'shareClassNameEn', width: 200 },
+  { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEnOfficialName', key: 'shareClassNameEnOfficialName', width: 200 },
   { title: 'Currency', dataIndex: 'classCurrency', key: 'classCurrency', width: 80 },
-  { title: 'Status', dataIndex: 'classStatus', key: 'classStatus', width: 90 },
+  { title: 'Status', dataIndex: 'fundClassStatus', key: 'fundClassStatus', width: 90 },
   { title: 'Launch Date', dataIndex: 'launchDate', key: 'launchDate', width: 110 },
   { title: 'ISIN Code', dataIndex: 'isinCode', key: 'isinCode', width: 140 },
   { title: 'Dealing Freq.', dataIndex: 'dealingFrequency', key: 'dealingFrequency', width: 100 },

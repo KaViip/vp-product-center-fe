@@ -6,12 +6,12 @@
 
 /** 基金主数据 (Product Team 维护) */
 export interface FundProduct {
-  /** 系统生成唯一标识 */
+  /** 系统生成唯一标识（前端内部使用） */
   id?: string;
-  /** VPFS Fund ID Equity */
+  /** VPFS Fund Code (primary key) */
   fundCode: string;
   /** 系统生成唯一标识 */
-  fundId?: string;
+  fundId?: number;
   /** 英文基金名称 */
   fundNameEn: string;
   /** 繁体中文基金名称 */
@@ -32,14 +32,42 @@ export interface FundProduct {
   baseCurrency?: string;
   /** 基金状态 */
   fundStatus?: FundStatusEnum;
+  /** 成立日期 */
+  launchDate: string;
+  /** 是否复杂产品 */
+  complexProduct?: boolean;
+  /** 仅限专业投资者 */
+  professionalInvestorsOnly?: boolean;
+  /** 基金经理 */
+  fundManager: string;
+  /** 基金经理LEI */
+  fundManagerLei: string;
+  /** 主要工具类型 */
+  primaryInstrumentType: InstrumentTypeEnum;
+  /** 投资目标 */
+  investmentObjective: string;
+  /** 基准 */
+  benchmark?: string;
+  /** 最大杠杆比率 */
+  leverageRatioMax?: number;
+  /** 最大衍生品比率 */
+  derivativesRatioMax?: number;
+  /** 借款限制(%) */
+  borrowingLimit?: number;
+  /** 止损限制(%) */
+  stopLossLimit?: number;
+  /** 止损预警(%) */
+  stopLossAlert?: number;
+  /** 风险评级 (1-5) */
+  riskLevel?: number;
+  /** 创建时间 */
+  createTime?: string;
+
+  // -- 以下字段后端暂未返回，表单保留但提交时可能为 null --
   /** 申请提交日期 */
   applicationSubmissionDate?: string;
   /** 授权日期 */
   authorizationDate?: string;
-  /** 成立日期 */
-  launchDate: string;
-  /** 是否复杂产品 */
-  complexProduct?: YesNoEnum;
   /** 首次发行期开始日期 */
   iopStartDate?: string;
   /** 运营开始日期 */
@@ -52,18 +80,10 @@ export interface FundProduct {
   giinNumber?: string;
   /** LEI编号 */
   leiNumber?: string;
-  /** 仅限专业投资者 */
-  professionalInvestorsOnly?: YesNoEnum;
   /** 投资者国籍限制 */
   restrictionInvestorNationality?: string;
   /** 投资者居住地限制 */
   restrictionInvestorResidency?: string;
-  /** 可销售国家 */
-  countryAvailableForSale?: string;
-  /** 基金经理 */
-  fundManager: string;
-  /** 基金经理LEI */
-  fundManagerLei: string;
   /** 副经理 */
   subManager?: string;
   /** 投资顾问 */
@@ -76,39 +96,21 @@ export interface FundProduct {
   subCustodian?: string;
   /** 审计师 */
   auditor?: string;
-  /** 主要工具类型 */
-  primaryInstrumentType: InstrumentTypeEnum;
   /** 主动/被动基金 */
   passiveOrActiveFund?: ActivePassiveEnum;
   /** 晨星类别 */
   morningstarCategory?: string;
   /** 投资市场焦点 */
   investmentMarketFocus: MarketFocusEnum;
-  /** 投资目标 */
-  investmentObjective: string;
   /** 投资策略 */
   investmentStrategy: string;
   /** 资产配置表 */
   assetAllocationTable: string;
   /** 对冲政策 */
   hedgingPolicyFund: HedgingPolicyEnum;
-  /** 基准 */
-  benchmark?: string;
   /** 基准代码 */
   benchmarkCode?: string;
-  /** 最大杠杆比率 */
-  leverageRatioMax?: string;
-  /** 最大衍生品比率 */
-  derivativesRatioMax?: string;
-  /** 借款限制(%) */
-  borrowingLimit?: string;
-  /** 止损限制(%) */
-  stopLossLimit?: string;
-  /** 止损预警(%) */
-  stopLossAlert?: string;
-  /** 风险评级 (1-5) */
-  riskRating?: RiskRatingEnum;
-  /** 境外注册状态 - 各国家/地区日期 */
+  /** 境外注册状态 - 各国家/地区 Y/N */
   registrationUs?: string;
   registrationSingapore?: string;
   registrationMacau?: string;

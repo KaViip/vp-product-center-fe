@@ -1,24 +1,24 @@
 import type { FundProduct, ImportResult } from './model/fund-product';
-import type { ID, IDS, PageQuery, PageResult } from '#/api/common';
+import type { IDS, PageQuery, PageResult } from '#/api/common';
 
 import { commonExport, ContentTypeEnum } from '#/api/helper';
 import { alovaInstance } from '#/utils/http';
 
 enum Api {
-  autocomplete = '/product-center/fund/product/autocomplete',
-  root = '/product-center/fund/product',
-  export = '/product-center/fund/product/export',
-  import = '/product-center/fund/product/import',
-  importTemplate = '/product-center/fund/product/importTemplate',
-  list = '/product-center/fund/product/list',
+  autocomplete = '/productcenter/productCenterMasterdata/autocomplete',
+  root = '/productcenter/productCenterMasterdata',
+  export = '/productcenter/productCenterMasterdata/export',
+  import = '/productcenter/productCenterMasterdata/import',
+  importTemplate = '/productcenter/productCenterMasterdata/importTemplate',
+  list = '/productcenter/productCenterMasterdata/list',
 }
 
 export function fundProductList(params?: PageQuery) {
   return alovaInstance.get<PageResult<FundProduct>>(Api.list, { params });
 }
 
-export function fundProductGet(id: ID) {
-  return alovaInstance.get<FundProduct>(`${Api.root}/${id}`);
+export function fundProductGet(fundCode: string) {
+  return alovaInstance.get<FundProduct>(`${Api.root}/${fundCode}`);
 }
 
 export function fundProductAdd(data: Partial<FundProduct>) {
@@ -29,8 +29,8 @@ export function fundProductUpdate(data: Partial<FundProduct>) {
   return alovaInstance.putWithMsg<void>(Api.root, data);
 }
 
-export function fundProductRemove(ids: IDS) {
-  return alovaInstance.deleteWithMsg<void>(`${Api.root}/${ids}`);
+export function fundProductRemove(fundCodes: IDS) {
+  return alovaInstance.deleteWithMsg<void>(`${Api.root}/${fundCodes}`);
 }
 
 export function fundProductExport(data: Partial<FundProduct>) {
