@@ -70,7 +70,7 @@ const gridOptions: VxeGridProps = {
     height: 48,
   },
   rowConfig: {
-    keyField: 'id',
+    keyField: 'productClassId',
     isHover: true,
   },
   id: 'fund-operational-team-index',
@@ -103,18 +103,18 @@ function handleAdd() {
 }
 
 function handleEdit(row: ShareClass) {
-  shareClassFormDrawerApi.setData({ id: row.id });
+  shareClassFormDrawerApi.setData({ productClassId: row.productClassId });
   shareClassFormDrawerApi.open();
 }
 
 async function handleDelete(row: ShareClass) {
-  await shareClassRemove([row.id!]);
+  await shareClassRemove([row.productClassId!]);
   await tableApi.query();
 }
 
 function handleMultiDelete() {
   const rows = tableApi.grid.getCheckboxRecords();
-  const ids = rows.map((row: ShareClass) => row.id);
+  const ids = rows.map((row: ShareClass) => row.productClassId);
   window.modal.confirm({
     title: 'Confirm',
     okType: 'danger',
@@ -127,12 +127,12 @@ function handleMultiDelete() {
 }
 
 function handleCopy(row: ShareClass) {
-  shareClassFormDrawerApi.setData({ id: row.id, isCopy: true });
+  shareClassFormDrawerApi.setData({ productClassId: row.productClassId, isCopy: true });
   shareClassFormDrawerApi.open();
 }
 
 function handleDetail(row: ShareClass) {
-  fundDetailModalApi.setData({ shareClassId: row.id, activeTab: 'operational' });
+  fundDetailModalApi.setData({ shareClassId: row.productClassId, activeTab: 'operational' });
   fundDetailModalApi.open();
 }
 

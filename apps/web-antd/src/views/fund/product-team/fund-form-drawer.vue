@@ -295,14 +295,13 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     drawerApi.drawerLoading(true);
     const data = drawerApi.getData<Record<string, any>>();
-    isUpdate.value = !!data?.id && !data?.isCopy;
+    isUpdate.value = !!data?.fundCode && !data?.isCopy;
     isCopy.value = !!data?.isCopy;
 
-    if (data?.id) {
+    if (data?.fundCode) {
       try {
-        const fundData = await fundProductGet(data.id);
+        const fundData = await fundProductGet(data.fundCode);
         if (isCopy.value) {
-          fundData.id = undefined;
           fundData.fundCode = '';
           fundData.fundNameEn = '';
         }
@@ -345,7 +344,7 @@ async function handleConfirm() {
       return;
     }
 
-    const excludeId = isUpdate.value ? formData.value.id : undefined;
+    const excludeFundCode = isUpdate.value ? formData.value.fundCode : undefined;
     const uniqueFields = [
       { field: 'fundCode', label: 'Fund Code', value: formData.value.fundCode },
       { field: 'fundNameEn', label: 'Fund Name (EN)', value: formData.value.fundNameEn },
@@ -354,7 +353,7 @@ async function handleConfirm() {
     ];
     for (const { field, label, value } of uniqueFields) {
       if (!value) continue;
-      const conflict = await fundProductCheckUnique(field, value, excludeId);
+      const conflict = await fundProductCheckUnique(field, value, excludeFundCode);
       if (conflict) {
         window.message.error(`${label} must be unique!`);
         return;

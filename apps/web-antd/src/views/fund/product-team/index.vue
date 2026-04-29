@@ -70,7 +70,7 @@ const gridOptions: VxeGridProps = {
     height: 48,
   },
   rowConfig: {
-    keyField: 'id',
+    keyField: 'fundCode',
     isHover: true,
   },
   id: 'fund-product-team-index',
@@ -103,36 +103,36 @@ function handleAdd() {
 }
 
 function handleEdit(row: FundProduct) {
-  fundFormDrawerApi.setData({ id: row.id });
+  fundFormDrawerApi.setData({ fundCode: row.fundCode });
   fundFormDrawerApi.open();
 }
 
 async function handleDelete(row: FundProduct) {
-  await fundProductRemove([row.id!]);
+  await fundProductRemove([row.fundCode]);
   await tableApi.query();
 }
 
 function handleMultiDelete() {
   const rows = tableApi.grid.getCheckboxRecords();
-  const ids = rows.map((row: FundProduct) => row.id);
+  const fundCodes = rows.map((row: FundProduct) => row.fundCode);
   window.modal.confirm({
     title: 'Confirm',
     okType: 'danger',
-    content: `Are you sure you want to delete ${ids.length} selected record(s)?`,
+    content: `Are you sure you want to delete ${fundCodes.length} selected record(s)?`,
     onOk: async () => {
-      await fundProductRemove(ids);
+      await fundProductRemove(fundCodes);
       await tableApi.query();
     },
   });
 }
 
 function handleCopy(row: FundProduct) {
-  fundFormDrawerApi.setData({ id: row.id, isCopy: true });
+  fundFormDrawerApi.setData({ fundCode: row.fundCode, isCopy: true });
   fundFormDrawerApi.open();
 }
 
 function handleDetail(row: FundProduct) {
-  fundDetailModalApi.setData({ fundId: row.id, activeTab: 'product' });
+  fundDetailModalApi.setData({ fundId: row.fundCode, activeTab: 'product' });
   fundDetailModalApi.open();
 }
 

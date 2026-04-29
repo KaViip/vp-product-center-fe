@@ -357,14 +357,13 @@ const [Drawer, drawerApi] = useVbenDrawer({
 
     drawerApi.drawerLoading(true);
     const data = drawerApi.getData<Record<string, any>>();
-    isUpdate.value = !!data?.id && !data?.isCopy;
+    isUpdate.value = !!data?.productClassId && !data?.isCopy;
     isCopy.value = !!data?.isCopy;
 
-    if (data?.id) {
+    if (data?.productClassId) {
       try {
-        const shareClassData = await shareClassGet(data.id);
+        const shareClassData = await shareClassGet(data.productClassId);
         if (isCopy.value) {
-          shareClassData.id = undefined;
           shareClassData.vpfsClassId = '';
           shareClassData.shareClassNameEnOfficialName = '';
         }
@@ -400,7 +399,7 @@ async function handleConfirm() {
       return;
     }
 
-    const excludeId = isUpdate.value ? formData.value.id : undefined;
+    const excludeId = isUpdate.value ? formData.value.productClassId : undefined;
     const isUnique = await shareClassCheckUnique(
       formData.value.fundCode,
       formData.value.shareClassNameEnOfficialName,
@@ -519,7 +518,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 :columns="classListColumns"
                 :data-source="classListData"
                 :row-selection="classListRowSelection"
-                :row-key="(record: ShareClass) => record.id"
+                :row-key="(record: ShareClass) => record.productClassId ?? record.vpfsClassId"
                 size="small"
                 :pagination="false"
                 :scroll="{ y: 200 }"

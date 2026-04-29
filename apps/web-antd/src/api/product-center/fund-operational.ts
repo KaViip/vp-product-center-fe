@@ -64,12 +64,12 @@ export async function shareClassCheckUnique(
   fundCode: string,
   shareClassNameEn: string,
   vpfsClassId: string,
-  excludeId?: number,
+  excludeProductClassId?: number,
 ): Promise<boolean> {
   try {
     const result = await shareClassList({ pageNum: 1, pageSize: 1, fundCode, shareClassNameEn, vpfsClassId });
     const rows = result.rows || [];
-    const match = rows.find((r: any) => r.id !== excludeId);
+    const match = rows.find((r: any) => r.productClassId !== excludeProductClassId);
     return !match;
   } catch {
     return true;

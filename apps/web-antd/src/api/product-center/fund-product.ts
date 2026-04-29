@@ -65,14 +65,14 @@ export function fundProductAutocomplete(field: string, keyword: string) {
 export async function fundProductCheckUnique(
   field: string,
   value: string,
-  excludeId?: number,
+  excludeFundCode?: string,
 ): Promise<string | null> {
   // Mock implementation: query list and check
-  // In production, this should be a dedicated API: GET /product-center/fund/product/check-unique?field=xxx&value=xxx&excludeId=xxx
+  // In production, this should be a dedicated API: GET /product-center/fund/product/check-unique?field=xxx&value=xxx&excludeFundCode=xxx
   try {
     const result = await fundProductList({ pageNum: 1, pageSize: 1, [field]: value });
     const rows = result.rows || [];
-    const match = rows.find((r: any) => r[field] === value && r.id !== excludeId);
+    const match = rows.find((r: any) => r[field] === value && r.fundCode !== excludeFundCode);
     return match ? field : null;
   } catch {
     return null;

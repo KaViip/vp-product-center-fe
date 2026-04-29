@@ -286,7 +286,7 @@ const opTeamColumns = [
               v-else
               :columns="opTeamColumns"
               :data-source="shareClassList"
-              :row-key="(record: ShareClass) => record.id ?? record.vpfsClassId"
+              :row-key="(record: ShareClass) => record.productClassId ?? record.vpfsClassId"
               size="small"
               :pagination="false"
               bordered
