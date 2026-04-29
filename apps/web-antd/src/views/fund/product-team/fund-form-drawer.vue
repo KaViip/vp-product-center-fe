@@ -8,6 +8,7 @@ import { cloneDeep } from '@vben/utils';
 
 import {
   Anchor,
+  AutoComplete,
   Collapse,
   CollapsePanel,
   Col,
@@ -277,8 +278,6 @@ const rules = {
 
 function getAutocompleteProps(field: string) {
   return {
-    filterOption: false,
-    showSearch: true,
     allowClear: true,
     placeholder: 'Type to search...',
     options: computed(() => autocompleteOptions.value[field] || []),
@@ -590,7 +589,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Manager" name="fundManager">
-                    <Select v-model:value="formData.fundManager" v-bind="getAutocompleteProps('fundManager')" />
+                    <AutoComplete v-model:value="formData.fundManager" v-bind="getAutocompleteProps('fundManager')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -607,19 +606,19 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem label="Investment Advisor">
-                    <Select v-model:value="formData.investmentAdvisor" v-bind="getAutocompleteProps('investmentAdvisor')" />
+                    <AutoComplete v-model:value="formData.investmentAdvisor" v-bind="getAutocompleteProps('investmentAdvisor')" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Trustee / Administrator">
-                    <Select v-model:value="formData.trusteeAdministrator" v-bind="getAutocompleteProps('trusteeAdministrator')" />
+                    <AutoComplete v-model:value="formData.trusteeAdministrator" v-bind="getAutocompleteProps('trusteeAdministrator')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
                   <FormItem label="Custodian / Prime Broker">
-                    <Select v-model:value="formData.custodianPrimeBroker" v-bind="getAutocompleteProps('custodianPrimeBroker')" />
+                    <AutoComplete v-model:value="formData.custodianPrimeBroker" v-bind="getAutocompleteProps('custodianPrimeBroker')" />
                   </FormItem>
                 </Col>
               </Row>
@@ -631,7 +630,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem label="Auditor">
-                    <Select v-model:value="formData.auditor" v-bind="getAutocompleteProps('auditor')" />
+                    <AutoComplete v-model:value="formData.auditor" v-bind="getAutocompleteProps('auditor')" />
                   </FormItem>
                 </Col>
               </Row>
@@ -706,7 +705,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem label="Benchmark">
-                    <Select v-model:value="formData.benchmark" v-bind="getAutocompleteProps('benchmark')" />
+                    <AutoComplete v-model:value="formData.benchmark" v-bind="getAutocompleteProps('benchmark')" />
                   </FormItem>
                 </Col>
               </Row>
