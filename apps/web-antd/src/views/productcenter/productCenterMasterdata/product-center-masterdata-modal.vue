@@ -5,6 +5,7 @@ import { computed, nextTick, onMounted, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
 import { cloneDeep } from '@vben/utils';
+import dayjs from 'dayjs';
 
 import {
   Anchor,
@@ -293,7 +294,30 @@ const [Drawer, drawerApi] = useVbenDrawer({
           fundData.fundCode = '';
           fundData.fundNameEn = '';
         }
-        formData.value = cloneDeep(fundData);
+        const d = cloneDeep(fundData);
+
+          // Convert date strings "YYYY-MM-DD HH:mm:ss" → dayjs for DatePicker
+          const dateFields = [
+            'applicationSubmissionDate', 'authorizationDate', 'launchDate',
+            'iopStartDate', 'operationStartDate', 'listingDate', 'terminationDate',
+          ];
+          for (const key of dateFields) {
+            if (d[key]) {
+              d[key] = dayjs(d[key]);
+            }
+          }
+
+          // Trim decimal strings: integer fields → strip decimals, decimal fields → max 2dp
+          const intFields = ['leverageRatioMax', 'derivativesRatioMax', 'borrowingLimit'];
+          const decimalFields = ['stopLossLimit', 'stopLossAlert'];
+          for (const key of intFields) {
+            if (d[key] != null) d[key] = String(Math.round(Number(d[key])));
+          }
+          for (const key of decimalFields) {
+            if (d[key] != null) d[key] = String(Number.parseFloat(Number(d[key]).toFixed(2)));
+          }
+
+          formData.value = d;
       } catch {
         formData.value = {};
       }

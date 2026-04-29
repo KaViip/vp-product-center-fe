@@ -3,6 +3,8 @@ import type { ProductCenterData } from '#/api/productcenter/productCenterData/mo
 
 import { computed, nextTick, ref, watch } from 'vue';
 
+import dayjs from 'dayjs';
+
 import { useVbenDrawer } from '@vben/common-ui';
 import { cloneDeep } from '@vben/utils';
 
@@ -369,7 +371,19 @@ const [Drawer, drawerApi] = useVbenDrawer({
             shareClassData.vpfsClassId = '';
             shareClassData.shareClassNameEnOfficialName = '';
           }
-          formData.value = cloneDeep(shareClassData);
+          const d = cloneDeep(shareClassData);
+
+          // Convert date strings "YYYY-MM-DD HH:mm:ss" → dayjs for DatePicker
+          const dateFields = ['endOfIopDate', 'launchDate'];
+          const monthFields = ['latestTerDate'];
+          for (const key of dateFields) {
+            if (d[key]) d[key] = dayjs(d[key]);
+          }
+          for (const key of monthFields) {
+            if (d[key]) d[key] = dayjs(d[key]);
+          }
+
+          formData.value = d;
         } catch {
           formData.value = {};
         }
