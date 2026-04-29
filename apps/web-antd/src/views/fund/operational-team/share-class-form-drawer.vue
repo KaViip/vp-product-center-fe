@@ -347,46 +347,52 @@ const [Drawer, drawerApi] = useVbenDrawer({
       return;
     }
 
-    // Load fund codes for dropdown
     try {
-      const fundList = await fundProductList({ pageNum: 1, pageSize: 999 });
-      fundCodeOptions.value = (fundList.rows || []).map((f: FundProduct) => ({
-        label: `${f.fundCode} - ${f.fundNameEn}`,
-        value: f.fundCode,
-      }));
-    } catch { /* ignore */ }
-
-    drawerApi.drawerLoading(true);
-    const data = drawerApi.getData<Record<string, any>>();
-    isUpdate.value = !!data?.productClassId && !data?.isCopy;
-    isCopy.value = !!data?.isCopy;
-
-    if (data?.productClassId) {
+      // Load fund codes for dropdown
       try {
-        const shareClassData = await shareClassGet(data.productClassId);
-        if (isCopy.value) {
-          shareClassData.vpfsClassId = '';
-          shareClassData.shareClassNameEnOfficialName = '';
+        const fundList = await fundProductList({ pageNum: 1, pageSize: 999 });
+        fundCodeOptions.value = (fundList.rows || []).map((f: FundProduct) => ({
+          label: `${f.fundCode} - ${f.fundNameEn}`,
+          value: f.fundCode,
+        }));
+      } catch { /* ignore */ }
+
+      drawerApi.drawerLoading(true);
+      const data = drawerApi.getData<Record<string, any>>();
+      isUpdate.value = !!data?.productClassId && !data?.isCopy;
+      isCopy.value = !!data?.isCopy;
+
+      if (data?.productClassId) {
+        try {
+          const shareClassData = await shareClassGet(data.productClassId);
+          if (isCopy.value) {
+            shareClassData.vpfsClassId = '';
+            shareClassData.shareClassNameEnOfficialName = '';
+          }
+          formData.value = cloneDeep(shareClassData);
+        } catch {
+          formData.value = {};
         }
-        formData.value = cloneDeep(shareClassData);
-      } catch {
+      } else {
         formData.value = {};
       }
-    } else {
+
+      await nextTick();
+    } catch (error) {
+      console.error('[ShareClassFormDrawer] onOpenChange error:', error);
       formData.value = {};
-    }
+    } finally {
+      drawerApi.drawerLoading(false);
 
-    await nextTick();
-    drawerApi.drawerLoading(false);
-
-    // Resolve scroll container for Anchor scroll-spy
-    await nextTick();
-    const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"]');
-    for (let i = dialogs.length - 1; i >= 0; i--) {
-      const sc = dialogs[i]!.querySelector<HTMLElement>('.overflow-y-auto');
-      if (sc && sc.scrollHeight > 0) {
-        scrollContainerRef.value = sc;
-        break;
+      // Resolve scroll container for Anchor scroll-spy
+      await nextTick();
+      const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"]');
+      for (let i = dialogs.length - 1; i >= 0; i--) {
+        const sc = dialogs[i]!.querySelector<HTMLElement>('.overflow-y-auto');
+        if (sc && sc.scrollHeight > 0) {
+          scrollContainerRef.value = sc;
+          break;
+        }
       }
     }
   },
