@@ -383,6 +383,16 @@ const [Drawer, drawerApi] = useVbenDrawer({
             if (d[key]) d[key] = dayjs(d[key]);
           }
 
+          // Backend stores comma-separated strings → split for multi-select
+          const multiSelectFields = ['businessCalendar', 'pricingMethodology'];
+          for (const key of multiSelectFields) {
+            if (typeof d[key] === 'string' && d[key]) {
+              d[key] = d[key].split(',');
+            } else if (!Array.isArray(d[key])) {
+              d[key] = [];
+            }
+          }
+
           formData.value = d;
         } catch {
           formData.value = {};
@@ -433,6 +443,15 @@ async function handleConfirm() {
     }
 
     const submitData = cloneDeep(formData.value);
+
+    // Backend expects comma-separated strings, not arrays
+    if (Array.isArray(submitData.businessCalendar)) {
+      submitData.businessCalendar = submitData.businessCalendar.join(',');
+    }
+    if (Array.isArray(submitData.pricingMethodology)) {
+      submitData.pricingMethodology = submitData.pricingMethodology.join(',');
+    }
+
     if (isUpdate.value) {
       await productCenterDataUpdate(submitData);
       window.message.success('Updated successfully');
