@@ -22,10 +22,10 @@ import {
 } from 'antdv-next';
 
 import {
-  getClassListByFundCode,
   productCenterDataAdd,
   productCenterDataCheckUnique,
   productCenterDataInfo,
+  productCenterDataList,
   productCenterDataUpdate,
 } from '#/api/productcenter/productCenterData';
 import type { ProductCenterMasterdata } from '#/api/productcenter/productCenterMasterdata/model';
@@ -290,7 +290,7 @@ watch(() => formData.value.fundCode, async (fundCode) => {
   }
   // Load class list for the selected fund
   try {
-    classListData.value = await getClassListByFundCode(fundCode);
+    classListData.value = (await productCenterDataList({ pageNum: 1, pageSize: 999, fundCode })).rows || [];
   } catch {
     classListData.value = [];
   }

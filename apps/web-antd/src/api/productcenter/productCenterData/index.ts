@@ -5,7 +5,6 @@ import { commonExport, ContentTypeEnum } from '#/api/helper';
 import { alovaInstance } from '#/utils/http';
 
 enum Api {
-  classList = '/productcenter/productCenterData/class-list',
   export = '/productcenter/productCenterData/export',
   importData = '/productcenter/productCenterData/importData',
   importTemplate = '/productcenter/productCenterData/importTemplate',
@@ -48,10 +47,6 @@ export function productCenterDataImport(file: File) {
     headers: { 'Content-Type': ContentTypeEnum.FORM_DATA },
     isTransformResponse: false,
   });
-}
-
-export function getClassListByFundCode(fundCode: string) {
-  return alovaInstance.get<ProductCenterData[]>(`${Api.classList}/${fundCode}`);
 }
 
 export async function productCenterDataCheckUnique(
