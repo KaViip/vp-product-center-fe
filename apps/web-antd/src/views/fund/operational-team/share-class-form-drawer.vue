@@ -22,6 +22,7 @@ import {
 } from 'antdv-next';
 
 import {
+  fundProductList,
   getClassListByFundCode,
   shareClassAdd,
   shareClassCheckUnique,
