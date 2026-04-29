@@ -55,13 +55,15 @@ const classListColumns = [
   { title: 'Status', dataIndex: 'fundClassStatus', key: 'status' },
 ];
 
-const classListRowSelection = {
+const classListSelectedRowKeys = ref<(number | string)[]>([]);
+
+const classListRowSelection = computed(() => ({
   type: 'radio' as const,
-  selectedRowKeys: ref<string[]>([]),
-  onChange: (_: string[], rows: ShareClass[]) => {
+  selectedRowKeys: classListSelectedRowKeys.value,
+  onChange: (_keys: (number | string)[], rows: ShareClass[]) => {
     selectedClassRow.value = rows[0] || null;
   },
-};
+}));
 
 const title = computed(() => {
   if (isCopy.value) return 'Copy Share Class';
@@ -344,6 +346,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
       formData.value = {};
       classListData.value = [];
       selectedClassRow.value = null;
+      classListSelectedRowKeys.value = [];
       return;
     }
 
