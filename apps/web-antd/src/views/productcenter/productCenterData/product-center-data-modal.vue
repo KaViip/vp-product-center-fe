@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ProductCenterData } from '#/api/productcenter/productCenterData/model';
 
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 
 import dayjs from 'dayjs';
 
@@ -22,6 +22,7 @@ import {
   Select,
   Spin,
   Table,
+  TimePicker,
 } from 'antdv-next';
 
 import {
@@ -34,6 +35,7 @@ import {
 import type { ProductCenterMasterdata } from '#/api/productcenter/productCenterMasterdata/model';
 import { productCenterMasterdataList } from '#/api/productcenter/productCenterMasterdata';
 import { ClassStatusEnum, CurrencyEnum } from '#/api/productcenter/productCenterData/model';
+import { dictDataInfo } from '#/api/system/dict/dict-data';
 
 const emit = defineEmits<{ reload: [] }>();
 
@@ -77,10 +79,7 @@ const enumToOptions = (enumObj: Record<string, string | number>) =>
 
 const fundClassStatusOptions = enumToOptions(ClassStatusEnum);
 const currencyOptions = enumToOptions(CurrencyEnum);
-const yesNoOptions = [
-  { label: 'Yes', value: true },
-  { label: 'No', value: false },
-];
+const yesNoOptions = ref<{ label: string; value: string }[]>([]);
 
 // Distribution Policy
 const distributionPolicyOptions = [
@@ -269,15 +268,25 @@ const rules = {
   valuationDeliveryTimeT: [{ validator: integerValidator }],
 };
 
+onMounted(async () => {
+  try {
+    const data = await dictDataInfo('sys_yes_no');
+    yesNoOptions.value = data.map((item) => ({
+      label: item.dictLabel,
+      value: item.dictValue,
+    }));
+  } catch { /* ignore */ }
+});
+
 // Auto-detect Hedged from Share Class Name (EN)
 watch(() => formData.value.shareClassNameEnOfficialName, (val) => {
   if (val && /\bhedged\b/i.test(val)) {
-    formData.value.hedged = true;
+    formData.value.hedged = 'Y';
   }
 });
 
 watch(() => formData.value.hedged, (val) => {
-  if (val !== true) {
+  if (val !== 'Y') {
     formData.value.hedgingCurrency = undefined;
   }
 });
@@ -394,6 +403,29 @@ const [Drawer, drawerApi] = useVbenDrawer({
             }
           }
 
+          // Normalize YesNo fields for dict compatibility (Y/N)
+          const yesNoFields = ['hedged', 'securityLending'];
+          for (const key of yesNoFields) {
+            if (d[key] === true || d[key] === 'true') d[key] = 'Y';
+            else if (d[key] === false || d[key] === 'false') d[key] = 'N';
+          }
+
+          // Convert time strings "HH:mm" → dayjs for TimePicker
+          const timeFields = ['dealingCutOff', 'valuationPoint'];
+          for (const key of timeFields) {
+            if (d[key] && typeof d[key] === 'string') {
+              d[key] = dayjs(d[key], 'HH:mm');
+            }
+          }
+
+          // Trim fee fields to max 2 decimal places
+          const feeFields = ['managementFee', 'performanceFee'];
+          for (const key of feeFields) {
+            if (d[key] != null) {
+              d[key] = String(Number.parseFloat(Number(d[key]).toFixed(2)));
+            }
+          }
+
           formData.value = d;
         } catch {
           formData.value = {};
@@ -451,6 +483,14 @@ async function handleConfirm() {
     }
     if (Array.isArray(submitData.pricingMethodology)) {
       submitData.pricingMethodology = submitData.pricingMethodology.join(',');
+    }
+
+    // Convert dayjs time → "HH:mm" string for backend
+    const timeFields = ['dealingCutOff', 'valuationPoint'];
+    for (const key of timeFields) {
+      if (submitData[key] && dayjs.isDayjs(submitData[key])) {
+        submitData[key] = submitData[key].format('HH:mm');
+      }
     }
 
     if (isUpdate.value) {
@@ -802,24 +842,24 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Dealing Cut-off (Time)" name="dealingCutOff">
-                    <Input v-model:value="formData.dealingCutOff" placeholder="HH:MM" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Dealing Cut-off (TZ)" name="dealingCutOffTz">
+                   <FormItem :label="$t('pages.productCenter.dealingCutOff') + ' (' + $t('pages.productCenter.selectCountry') + ')'" name="dealingCutOff">
+                     <TimePicker v-model:value="formData.dealingCutOff" format="HH:mm" :allow-clear="true" class="w-full" />
+                   </FormItem>
+                 </Col>
+                 <Col :span="12">
+                   <FormItem :label="$t('pages.productCenter.dealingCutOff') + ' (TZ)'" name="dealingCutOffTz">
                     <Select v-model:value="formData.dealingCutOffTz" :options="tzCountryOptions" show-search option-filter-prop="label" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Valuation Point (Time)" name="valuationPoint">
-                    <Input v-model:value="formData.valuationPoint" placeholder="HH:MM" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Valuation Point (TZ)" name="valuationPointTz">
+                   <FormItem :label="$t('pages.productCenter.valuationPoint') + ' (' + $t('pages.productCenter.selectCountry') + ')'" name="valuationPoint">
+                     <TimePicker v-model:value="formData.valuationPoint" format="HH:mm" :allow-clear="true" class="w-full" />
+                   </FormItem>
+                 </Col>
+                 <Col :span="12">
+                   <FormItem label="Valuation Point (TZ)" name="valuationPointTz">
                     <Select v-model:value="formData.valuationPointTz" :options="tzCountryOptions" show-search option-filter-prop="label" />
                   </FormItem>
                 </Col>
