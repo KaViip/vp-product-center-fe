@@ -146,9 +146,17 @@ const { exportBlob, exportLoading, buildExportFileName } =
   useBlobExport(productCenterDataExport);
 
 async function handleExport() {
-  const formValues = await tableApi.formApi.getValues();
-    const fileName = buildExportFileName('ProductCenterDataInfo');
-  exportBlob({ data: formValues, fileName });
+  const rows = tableApi.grid.getCheckboxRecords();
+  const fileName = buildExportFileName('ProductCenterDataInfo');
+  if (rows.length > 0) {
+    // 勾選了行 → 按主鍵導出
+    const productClassIds = rows.map((row: ProductCenterData) => row.productClassId);
+    exportBlob({ data: { productClassIds }, fileName });
+  } else {
+    // 未勾選 → 按搜索條件導出全部
+    const formValues = await tableApi.formApi.getValues();
+    exportBlob({ data: formValues, fileName });
+  }
 }
 
 const statusColorMap: Record<string, string> = {

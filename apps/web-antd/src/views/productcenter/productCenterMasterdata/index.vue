@@ -146,9 +146,17 @@ const { exportBlob, exportLoading, buildExportFileName } =
   useBlobExport(productCenterMasterdataExport);
 
 async function handleExport() {
-  const formValues = await tableApi.formApi.getValues();
-    const fileName = buildExportFileName('FundInfo');
-  exportBlob({ data: formValues, fileName });
+  const rows = tableApi.grid.getCheckboxRecords();
+  const fileName = buildExportFileName('FundInfo');
+  if (rows.length > 0) {
+    // 勾選了行 → 按主鍵導出
+    const fundCodes = rows.map((row: ProductCenterMasterdata) => row.fundCode);
+    exportBlob({ data: { fundCodes }, fileName });
+  } else {
+    // 未勾選 → 按搜索條件導出全部
+    const formValues = await tableApi.formApi.getValues();
+    exportBlob({ data: formValues, fileName });
+  }
 }
 
 const statusColorMap: Record<string, string> = {
