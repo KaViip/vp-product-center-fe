@@ -62,7 +62,10 @@ const enumToOptions = (enumObj: Record<string, string | number>) =>
 const fundTypeOptions = enumToOptions(FundTypeEnum);
 const fundStatusOptions = enumToOptions(FundStatusEnum);
 const instrumentTypeOptions = enumToOptions(InstrumentTypeEnum);
-const yesNoOptions = ref<{ label: string; value: string }[]>([]);
+const yesNoOptions = [
+  { label: 'Yes', value: true },
+  { label: 'No', value: false },
+];
 const activePassiveOptions = enumToOptions(ActivePassiveEnum);
 const marketFocusOptions = enumToOptions(MarketFocusEnum);
 const hedgingPolicyOptions = enumToOptions(HedgingPolicyEnum);
@@ -127,17 +130,12 @@ const regionOptions = ref<{ label: string; value: number }[]>([]);
 onMounted(async () => {
   try {
     const data = await dictDataInfo('sys_product_center_region');
-    regionOptions.value = data.map((item) => ({
-      label: item.dictLabel,
-      value: item.dictCode,
-    }));
-  } catch { /* ignore */ }
-  try {
-    const data = await dictDataInfo('sys_yes_no');
-    yesNoOptions.value = data.map((item) => ({
-      label: item.dictLabel,
-      value: item.dictValue,
-    }));
+    regionOptions.value = data
+      .map((item) => ({
+        label: item.dictLabel,
+        value: item.dictCode,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
   } catch { /* ignore */ }
 });
 
@@ -320,13 +318,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
           }
           for (const key of decimalFields) {
             if (d[key] != null) d[key] = String(Number.parseFloat(Number(d[key]).toFixed(2)));
-          }
-
-          // Normalize YesNo fields for dict compatibility (Y/N)
-          const masterdataYesNoFields = ['complexProduct', 'professionalInvestorsOnly'];
-          for (const key of masterdataYesNoFields) {
-            if (d[key] === true || d[key] === 'true') d[key] = 'Y';
-            else if (d[key] === false || d[key] === 'false') d[key] = 'N';
           }
 
           formData.value = d;

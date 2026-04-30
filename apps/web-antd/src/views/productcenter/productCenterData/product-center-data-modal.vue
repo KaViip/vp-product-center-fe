@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ProductCenterData } from '#/api/productcenter/productCenterData/model';
 
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 
 import dayjs from 'dayjs';
 
@@ -35,7 +35,6 @@ import {
 import type { ProductCenterMasterdata } from '#/api/productcenter/productCenterMasterdata/model';
 import { productCenterMasterdataList } from '#/api/productcenter/productCenterMasterdata';
 import { ClassStatusEnum, CurrencyEnum } from '#/api/productcenter/productCenterData/model';
-import { dictDataInfo } from '#/api/system/dict/dict-data';
 
 const emit = defineEmits<{ reload: [] }>();
 
@@ -79,7 +78,10 @@ const enumToOptions = (enumObj: Record<string, string | number>) =>
 
 const fundClassStatusOptions = enumToOptions(ClassStatusEnum);
 const currencyOptions = enumToOptions(CurrencyEnum);
-const yesNoOptions = ref<{ label: string; value: string }[]>([]);
+const yesNoOptions = [
+  { label: 'Yes', value: true },
+  { label: 'No', value: false },
+];
 
 // Distribution Policy
 const distributionPolicyOptions = [
@@ -268,25 +270,15 @@ const rules = {
   valuationDeliveryTimeT: [{ validator: integerValidator }],
 };
 
-onMounted(async () => {
-  try {
-    const data = await dictDataInfo('sys_yes_no');
-    yesNoOptions.value = data.map((item) => ({
-      label: item.dictLabel,
-      value: item.dictValue,
-    }));
-  } catch { /* ignore */ }
-});
-
 // Auto-detect Hedged from Share Class Name (EN)
 watch(() => formData.value.shareClassNameEnOfficialName, (val) => {
   if (val && /\bhedged\b/i.test(val)) {
-    formData.value.hedged = 'Y';
+    formData.value.hedged = true;
   }
 });
 
 watch(() => formData.value.hedged, (val) => {
-  if (val !== 'Y') {
+  if (val !== true) {
     formData.value.hedgingCurrency = undefined;
   }
 });
@@ -401,13 +393,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
             } else if (!Array.isArray(d[key])) {
               d[key] = [];
             }
-          }
-
-          // Normalize YesNo fields for dict compatibility (Y/N)
-          const yesNoFields = ['hedged', 'securityLending'];
-          for (const key of yesNoFields) {
-            if (d[key] === true || d[key] === 'true') d[key] = 'Y';
-            else if (d[key] === false || d[key] === 'false') d[key] = 'N';
           }
 
           // Convert time strings "HH:mm" → dayjs for TimePicker
