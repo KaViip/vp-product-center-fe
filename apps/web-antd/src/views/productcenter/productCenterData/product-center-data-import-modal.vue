@@ -106,9 +106,10 @@ async function handleConfirm() {
     currentStep.value = 2;
     importing.value = true;
     try {
-      const data = new FormData();
-      data.append('file', fileList.value[0]!.originFileObj as Blob);
-      data.append('importMode', importMode.value);
+      const data = {
+        file: fileList.value[0]!.originFileObj as Blob,
+        importMode: importMode.value,
+      };
       const result = await productCenterDataImport(data);
       importResult.value = result as any;
       emit('reload');
