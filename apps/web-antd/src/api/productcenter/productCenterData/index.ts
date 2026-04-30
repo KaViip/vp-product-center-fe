@@ -40,10 +40,13 @@ export function productCenterDataImportTemplate() {
   return commonExport(Api.importTemplate, {});
 }
 
-export function productCenterDataImport(file: File) {
-  const formData = new FormData();
-  formData.append('file', file);
-  return alovaInstance.post<ImportResult>(Api.importData, formData, {
+export interface ProductCenterDataImportParam {
+  file: Blob | File;
+  importMode?: string;
+}
+
+export function productCenterDataImport(data: ProductCenterDataImportParam) {
+  return alovaInstance.post<ImportResult>(Api.importData, data, {
     headers: { 'Content-Type': ContentTypeEnum.FORM_DATA },
     isTransformResponse: false,
   });
