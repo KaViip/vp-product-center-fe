@@ -69,11 +69,11 @@
     "acceptsFiles": "接受 .xlsx, .xls 文件",
     "downloadTemplate": "下载模板",
     "sheetName": "工作表名称：",
-    "previewTip": "已上传数据预览。点击"导入"继续。",
+    "previewTip": "已上传数据预览。点击「导入」继续。",
     "importing": "导入中...",
     "importSuccessful": "导入成功",
     "importFailed": "导入失败",
-    "classListTip": "请先选择基金代码以加载已有份额类别。选择一行并点击"从列表复制"自动填充表单。",
+    "classListTip": "请先选择基金代码以加载已有份额类别。选择一行并点击「从列表复制」自动填充表单。",
     "fundCode": "基金代码",
     "fundNameEn": "基金名称(EN)",
     "fundNameTcSc": "基金名称(TC/SC)",
@@ -102,6 +102,10 @@
     "done": "完成",
     "previous": "上一步",
     "nextStep": "下一步",
-    "importBtn": "导入"
+    "importBtn": "导入",
+    "detailDrawerTitle": "产品详情",
+    "noData": "暂无数据",
+    "dealingCutOff": "交易截止时间",
+    "valuationPoint": "估值点"
   }
 }

@@ -102,6 +102,10 @@
     "done": "Done",
     "previous": "Previous",
     "nextStep": "Next",
-    "importBtn": "Import"
+    "importBtn": "Import",
+    "detailDrawerTitle": "Product Details",
+    "noData": "No data available",
+    "dealingCutOff": "Dealing Cut-off",
+    "valuationPoint": "Valuation Point"
   }
 }

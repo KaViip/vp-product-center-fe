@@ -102,6 +102,10 @@
     "done": "完成",
     "previous": "上一步",
     "nextStep": "下一步",
-    "importBtn": "導入"
+    "importBtn": "導入",
+    "detailDrawerTitle": "產品詳情",
+    "noData": "暫無數據",
+    "dealingCutOff": "交易截止時間",
+    "valuationPoint": "估值點"
   }
 }

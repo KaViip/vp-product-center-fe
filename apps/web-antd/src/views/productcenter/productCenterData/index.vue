@@ -4,7 +4,7 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { ProductCenterData } from '#/api/productcenter/productCenterData/model';
 
-import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
+import { Page, useVbenDrawer } from '@vben/common-ui';
 
 import { Popconfirm, Space, Tag } from 'antdv-next';
 
@@ -19,7 +19,7 @@ import {
 import { useBlobExport } from '#/utils/file/export';
 
 import { columns, querySchema } from './data';
-import fundDetailModal from '../../fund/components/fund-detail-modal.vue';
+import productCenterDetailDrawer from '../product-center-detail-drawer.vue';
 import productCenterDataModal from './product-center-data-modal.vue';
 import productCenterDataImportModal from './product-center-data-import-modal.vue';
 
@@ -91,8 +91,8 @@ const [ProductCenterDataFormDrawer, productCenterDataModalApi] = useVbenDrawer({
   connectedComponent: productCenterDataModal,
 });
 
-const [FundDetailModal, fundDetailModalApi] = useVbenModal({
-  connectedComponent: fundDetailModal,
+const [ProductCenterDetailDrawer, productCenterDetailDrawerApi] = useVbenDrawer({
+  connectedComponent: productCenterDetailDrawer,
 });
 
 const [ProductCenterDataImportDrawer, productCenterDataImportModalApi] = useVbenDrawer({
@@ -134,8 +134,8 @@ function handleCopy(row: ProductCenterData) {
 }
 
 function handleDetail(row: ProductCenterData) {
-  fundDetailModalApi.setData({ shareClassId: row.productClassId, activeTab: 'operational' });
-  fundDetailModalApi.open();
+  productCenterDetailDrawerApi.setData({ productClassId: row.productClassId });
+  productCenterDetailDrawerApi.open();
 }
 
 function handleImport() {
@@ -215,7 +215,7 @@ const statusColorMap: Record<string, string> = {
       </template>
     </BasicTable>
     <ProductCenterDataFormDrawer @reload="tableApi.query()" />
-    <FundDetailModal />
+    <ProductCenterDetailDrawer />
     <ProductCenterDataImportDrawer @reload="tableApi.query()" />
   </Page>
 </template>
