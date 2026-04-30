@@ -778,7 +778,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
         </div>
 
         <div class="w-[160px] shrink-0 sticky top-0 self-start">
-          <Anchor :items="anchorItems" :offset-top="16" :target-offset="60" :affix="false" :get-container="() => scrollContainerRef || window" @click="handleAnchorClick" />
+          <Anchor :key="scrollContainerRef" :items="anchorItems" :offset-top="16" :target-offset="60" :affix="false" :get-container="() => scrollContainerRef || window" @click="handleAnchorClick" />
         </div>
       </div>
     </Spin>
