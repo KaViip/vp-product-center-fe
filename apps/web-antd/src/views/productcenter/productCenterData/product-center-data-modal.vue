@@ -6,6 +6,7 @@ import { computed, nextTick, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 
 import { useVbenDrawer } from '@vben/common-ui';
+import { $t } from '@vben/locales';
 import { cloneDeep } from '@vben/utils';
 
 import {
@@ -65,8 +66,8 @@ const classListRowSelection = computed(() => ({
 }));
 
 const title = computed(() => {
-  if (isCopy.value) return 'Copy Share Class';
-  return isUpdate.value ? 'Edit Share Class' : 'Add Share Class';
+  if (isCopy.value) return $t('pages.productCenter.copyShareClass');
+  return isUpdate.value ? $t('pages.productCenter.editShareClass') : $t('pages.productCenter.addShareClass');
 });
 
 const formData = ref<Record<string, any>>({});
@@ -438,7 +439,7 @@ async function handleConfirm() {
       excludeId,
     );
     if (!isUnique) {
-      window.message.error('Fund Code + Share Class Name (EN) + VPFS Class ID must be unique!');
+      window.message.error($t('pages.productCenter.fundCodeShareClassUnique'));
       return;
     }
 
@@ -454,10 +455,10 @@ async function handleConfirm() {
 
     if (isUpdate.value) {
       await productCenterDataUpdate(submitData);
-      window.message.success('Updated successfully');
+      window.message.success($t('pages.productCenter.updatedSuccessfully'));
     } else {
       await productCenterDataAdd(submitData);
-      window.message.success('Added successfully');
+      window.message.success($t('pages.productCenter.addedSuccessfully'));
     }
     emit('reload');
     drawerApi.close();
@@ -468,12 +469,12 @@ async function handleConfirm() {
   }
 }
 
-const anchorItems = [
-  { href: '#section-fund-info', title: 'Fund Info' },
-  { href: '#section-class-list', title: 'Class List' },
-  { href: '#section-class-info', title: 'Class Info' },
-  { href: '#section-dealing', title: 'Dealing & Valuation' },
-];
+const anchorItems = computed(() => [
+  { href: '#section-fund-info', title: $t('pages.productCenter.fundInfo') },
+  { href: '#section-class-list', title: $t('pages.productCenter.classList') },
+  { href: '#section-class-info', title: $t('pages.productCenter.classInfo') },
+  { href: '#section-dealing', title: $t('pages.productCenter.dealingAndValuation') },
+]);
 
 function handleAnchorClick(e: Event, link: { href: string; title: string }) {
   e.preventDefault();
@@ -522,11 +523,11 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
           >
             <Collapse v-model:activeKey="activeCollapseKeys" :bordered="false">
             <!-- Fund Info -->
-            <CollapsePanel id="section-fund-info" key="fund-info" header="Fund Info">
+            <CollapsePanel id="section-fund-info" key="fund-info" :header="$t('pages.productCenter.fundInfo')">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Code" name="fundCode">
-                    <Select v-model:value="formData.fundCode" :options="fundCodeOptions" show-search allow-clear option-filter-prop="label" placeholder="Select Fund Code" :disabled="isUpdate" />
+                    <Select v-model:value="formData.fundCode" :options="fundCodeOptions" show-search allow-clear option-filter-prop="label" :placeholder="$t('pages.productCenter.selectFundCode')" :disabled="isUpdate" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -550,9 +551,9 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             </CollapsePanel>
 
             <!-- Class List -->
-            <CollapsePanel id="section-class-list" key="class-list" header="Class List">
+            <CollapsePanel id="section-class-list" key="class-list" :header="$t('pages.productCenter.classList')">
               <div class="mb-2 text-gray-500 text-xs">
-                Select a Fund Code above to load existing share classes. Select a row and click "Copy from Class List" to auto-fill the form.
+                {{ $t('pages.productCenter.classListTip') }}
               </div>
               <Table
                 :columns="classListColumns"
@@ -566,7 +567,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             </CollapsePanel>
 
             <!-- Class Info -->
-            <CollapsePanel id="section-class-info" key="class-info" header="Class Info">
+            <CollapsePanel id="section-class-info" key="class-info" :header="$t('pages.productCenter.classInfo')">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Share Class Name (EN)" name="shareClassNameEnOfficialName">
@@ -786,7 +787,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             </CollapsePanel>
 
             <!-- Dealing & Valuation -->
-            <CollapsePanel id="section-dealing" key="dealing" header="Dealing & Valuation">
+            <CollapsePanel id="section-dealing" key="dealing" :header="$t('pages.productCenter.dealingAndValuation')">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Dealing Frequency" name="dealingFrequency">
@@ -873,11 +874,11 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
     <template #footer>
       <div class="flex justify-end gap-2">
         <a-button :disabled="!selectedClassRow" @click="handleCopyFromClassList">
-          Copy from Class List
+          {{ $t('pages.productCenter.copyFromClassList') }}
         </a-button>
-        <a-button @click="drawerApi.close()">Cancel</a-button>
+        <a-button @click="drawerApi.close()">{{ $t('pages.common.cancel') }}</a-button>
         <a-button type="primary" @click="handleConfirm">
-          {{ isUpdate ? 'Update' : 'Save' }}
+          {{ isUpdate ? $t('pages.common.edit') : $t('pages.common.add') }}
         </a-button>
       </div>
     </template>

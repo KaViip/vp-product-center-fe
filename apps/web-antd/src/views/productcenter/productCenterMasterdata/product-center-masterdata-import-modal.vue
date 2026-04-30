@@ -4,6 +4,7 @@ import type { UploadFile } from 'antdv-next';
 import { ref, watch } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
+import { $t } from '@vben/locales';
 
 import { InboxOutlined } from '@antdv-next/icons';
 import * as XLSX from 'xlsx';
@@ -38,9 +39,9 @@ const selectedSheet = ref<string>('');
 const workbookCache = ref<XLSX.WorkBook | null>(null);
 
 const importModeOptions = [
-  { label: 'Add Data', value: 'add data' },
-  { label: 'Update Data', value: 'update data' },
-  { label: 'Add and Update Data', value: 'add and update data' },
+  { label: $t('pages.productCenter.addData'), value: 'add data' },
+  { label: $t('pages.productCenter.updateData'), value: 'update data' },
+  { label: $t('pages.productCenter.addAndUpdateData'), value: 'add and update data' },
 ];
 
 watch(selectedSheet, (name) => {
@@ -151,22 +152,22 @@ function handleReset() {
 
 <template>
   <Drawer
-    :title="'Import Fund Data'"
+    :title="$t('pages.productCenter.importFundData')"
     :class="'w-[70%]'"
     :footer="true"
-    :confirm-text="currentStep === 2 ? 'Done' : currentStep === 1 ? 'Import' : 'Next'"
-    :cancel-text="currentStep > 0 && currentStep < 2 ? 'Previous' : 'Cancel'"
+    :confirm-text="currentStep === 2 ? $t('pages.productCenter.done') : currentStep === 1 ? $t('pages.productCenter.importBtn') : $t('pages.productCenter.nextStep')"
+    :cancel-text="currentStep > 0 && currentStep < 2 ? $t('pages.productCenter.previous') : $t('pages.common.cancel')"
   >
     <Steps
       :current="currentStep"
-      :items="[{ title: 'Select Excel' }, { title: 'Browse Data' }, { title: 'Import Result' }]"
+      :items="[{ title: $t('pages.productCenter.selectExcel') }, { title: $t('pages.productCenter.browseData') }, { title: $t('pages.productCenter.importResult') }]"
       style="margin-bottom: 24px"
     />
 
     <!-- Step 0: Select Excel -->
     <div v-if="currentStep === 0" class="space-y-4">
       <div class="flex items-center gap-3">
-        <span class="shrink-0 font-medium">Import Mode:</span>
+        <span class="shrink-0 font-medium">{{ $t('pages.productCenter.importMode') }}</span>
         <Select v-model:value="importMode" :options="importModeOptions" class="w-56" />
       </div>
       <UploadDragger
@@ -179,17 +180,17 @@ function handleReset() {
         <p class="ant-upload-drag-icon flex items-center justify-center">
           <InboxOutlined class="size-[48px] text-primary" />
         </p>
-        <p>Click or drag Excel file here to upload</p>
+        <p>{{ $t('pages.productCenter.clickOrDrag') }}</p>
       </UploadDragger>
       <div class="mt-1 flex items-center justify-between">
-        <span class="text-gray-500">Accepts .xlsx, .xls files</span>
+        <span class="text-gray-500">{{ $t('pages.productCenter.acceptsFiles') }}</span>
         <Button
           type="link"
           :loading="exportLoading"
           :disabled="exportLoading"
           @click="handleExport"
         >
-          Download Template
+          {{ $t('pages.productCenter.downloadTemplate') }}
         </Button>
       </div>
     </div>
@@ -197,12 +198,12 @@ function handleReset() {
     <!-- Step 1: Browse Data -->
     <div v-if="currentStep === 1" class="space-y-4">
       <div class="flex items-center gap-6 text-sm">
-        <span>File: <strong>{{ fileList[0]?.name }}</strong></span>
-        <span>Mode: <strong>{{ importMode }}</strong></span>
-        <span>Rows: <strong>{{ previewData.length }}</strong></span>
+        <span>{{ $t('pages.productCenter.file') }} <strong>{{ fileList[0]?.name }}</strong></span>
+        <span>{{ $t('pages.productCenter.mode') }} <strong>{{ importMode }}</strong></span>
+        <span>{{ $t('pages.productCenter.rows') }} <strong>{{ previewData.length }}</strong></span>
       </div>
       <div v-if="sheetNames.length > 1" class="flex items-center gap-2">
-        <span class="shrink-0 font-medium">Sheet Name:</span>
+        <span class="shrink-0 font-medium">{{ $t('pages.productCenter.sheetName') }}</span>
         <Select v-model:value="selectedSheet" class="w-48">
           <Select.Option v-for="name in sheetNames" :key="name" :value="name">{{ name }}</Select.Option>
         </Select>
@@ -216,17 +217,17 @@ function handleReset() {
         bordered
       />
       <p class="text-xs text-gray-400">
-        Preview of uploaded data. Click "Import" to proceed.
+        {{ $t('pages.productCenter.previewTip') }}
       </p>
     </div>
 
     <!-- Step 2: Import Result -->
     <div v-if="currentStep === 2">
-      <Spin :spinning="importing" tip="Importing...">
+      <Spin :spinning="importing" :tip="$t('pages.productCenter.importing')">
         <Result
           v-if="importResult"
           :status="importResult.code === 200 ? 'success' : 'error'"
-          :title="importResult.code === 200 ? 'Import Successful' : 'Import Failed'"
+          :title="importResult.code === 200 ? $t('pages.productCenter.importSuccessful') : $t('pages.productCenter.importFailed')"
         >
           <template #extra>
             <div

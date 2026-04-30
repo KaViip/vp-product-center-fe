@@ -3,6 +3,8 @@ import type { VxeGridProps } from '#/adapter/vxe-table';
 
 import { getPopupContainer } from '@vben/utils';
 
+import { $t } from '@vben/locales';
+
 import {
   FundTypeEnum,
   InstrumentTypeEnum,
@@ -24,17 +26,17 @@ export const querySchema: FormSchemaGetter = () => [
   {
     component: 'Input',
     fieldName: 'fundCode',
-    label: 'Fund Code',
+    label: $t('pages.productCenter.fundCode'),
   },
   {
     component: 'Input',
     fieldName: 'fundNameEn',
-    label: 'Fund Name (EN)',
+    label: $t('pages.productCenter.fundNameEn'),
   },
   {
     component: 'Input',
     fieldName: 'fundNameTcSc',
-    label: 'Fund Name (TC/SC)',
+    label: $t('pages.productCenter.fundNameTcSc'),
   },
   {
     component: 'Select',
@@ -44,7 +46,7 @@ export const querySchema: FormSchemaGetter = () => [
       options: fundTypeOptions,
     },
     fieldName: 'fundType',
-    label: 'Fund Type',
+    label: $t('pages.productCenter.fundType'),
   },
   {
     component: 'Select',
@@ -54,12 +56,12 @@ export const querySchema: FormSchemaGetter = () => [
       options: instrumentTypeOptions,
     },
     fieldName: 'primaryInstrumentType',
-    label: 'Instrument Type',
+    label: $t('pages.productCenter.instrumentType'),
   },
   {
     component: 'Input',
     fieldName: 'umbrellaOfcName',
-    label: 'Umbrella / OFC Name',
+    label: $t('pages.productCenter.umbrellaOfcName'),
   },
 ];
 
@@ -67,60 +69,60 @@ export const columns: VxeGridProps['columns'] = [
   { type: 'checkbox', width: 60 },
   {
     field: 'fundCode',
-    title: 'Fund Code',
+    title: $t('pages.productCenter.fundCode'),
     minWidth: 100,
   },
   {
     field: 'fundNameEn',
-    title: 'Fund Name (EN)',
+    title: $t('pages.productCenter.fundNameEn'),
     minWidth: 200,
   },
   {
     field: 'fundNameTc',
-    title: 'Fund Name (TC)',
+    title: $t('pages.productCenter.fundNameTc'),
     minWidth: 160,
   },
   {
     field: 'fundNameSc',
-    title: 'Fund Name (SC)',
+    title: $t('pages.productCenter.fundNameSc'),
     minWidth: 160,
   },
   {
     field: 'fundType',
-    title: 'Fund Type',
+    title: $t('pages.productCenter.fundType'),
     minWidth: 140,
   },
   {
     field: 'umbrellaOfcName',
-    title: 'Umbrella / OFC Name',
+    title: $t('pages.productCenter.umbrellaOfcName'),
     minWidth: 160,
   },
   {
     field: 'domicileJurisdiction',
-    title: 'Domicile / Jurisdiction',
+    title: $t('pages.productCenter.domicileJurisdiction'),
     minWidth: 140,
   },
   {
     field: 'baseCurrency',
-    title: 'Base Currency',
+    title: $t('pages.productCenter.baseCurrency'),
     minWidth: 100,
   },
   {
     field: 'fundStatus',
-    title: 'Fund Status',
+    title: $t('pages.productCenter.fundStatus'),
     minWidth: 100,
     slots: { default: 'status' },
   },
   {
     field: 'launchDate',
-    title: 'Launch Date',
+    title: $t('pages.productCenter.launchDate'),
     minWidth: 120,
   },
   {
     field: 'action',
     fixed: 'right',
     slots: { default: 'action' },
-    title: 'Action',
+    title: $t('pages.productCenter.action'),
     resizable: false,
     width: 'auto',
   },

@@ -4,6 +4,7 @@ import type { ProductCenterMasterdata } from '#/api/productcenter/productCenterM
 import { computed, nextTick, onMounted, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
+import { $t } from '@vben/locales';
 import { cloneDeep } from '@vben/utils';
 import dayjs from 'dayjs';
 
@@ -49,8 +50,8 @@ const activeCollapseKeys = ref<string[]>(['core', 'parties', 'strategy', 'regist
 const scrollContainerRef = ref<HTMLElement | null>(null);
 
 const title = computed(() => {
-  if (isCopy.value) return 'Copy Fund';
-  return isUpdate.value ? 'Edit Fund' : 'Add Fund';
+  if (isCopy.value) return $t('pages.productCenter.copyFund');
+  return isUpdate.value ? $t('pages.productCenter.editFund') : $t('pages.productCenter.addFund');
 });
 
 const formData = ref<Record<string, any>>({});
@@ -268,7 +269,7 @@ const rules = {
 function getAutocompleteProps(field: string) {
   return {
     allowClear: true,
-    placeholder: 'Type to search...',
+    placeholder: $t('pages.productCenter.typeToSearch'),
     options: computed(() => autocompleteOptions.value[field] || []),
     onSearch: (value: string) => handleAutocomplete(field, value),
   };
@@ -364,7 +365,7 @@ async function handleConfirm() {
       if (!value) continue;
       const conflict = await productCenterMasterdataCheckUnique(field, value, excludeFundCode);
       if (conflict) {
-        window.message.error(`${label} must be unique!`);
+        window.message.error(`${label} ${$t('pages.productCenter.mustBeUnique')}`);
         return;
       }
     }
@@ -372,10 +373,10 @@ async function handleConfirm() {
     const submitData = cloneDeep(formData.value);
     if (isUpdate.value) {
       await productCenterMasterdataUpdate(submitData);
-      window.message.success('Updated successfully');
+      window.message.success($t('pages.productCenter.updatedSuccessfully'));
     } else {
       await productCenterMasterdataAdd(submitData);
-      window.message.success('Added successfully');
+      window.message.success($t('pages.productCenter.addedSuccessfully'));
     }
     emit('reload');
     drawerApi.close();
@@ -386,12 +387,12 @@ async function handleConfirm() {
   }
 }
 
-const anchorItems = [
-  { href: '#section-core', title: 'Core Fund Identity' },
-  { href: '#section-parties', title: 'Key Parties' },
-  { href: '#section-strategy', title: 'Investment Strategy' },
-  { href: '#section-registration', title: 'Foreign Registration Status' },
-];
+const anchorItems = computed(() => [
+  { href: '#section-core', title: $t('pages.productCenter.coreFundIdentity') },
+  { href: '#section-parties', title: $t('pages.productCenter.keyParties') },
+  { href: '#section-strategy', title: $t('pages.productCenter.investmentStrategy') },
+  { href: '#section-registration', title: $t('pages.productCenter.foreignRegistration') },
+]);
 
 // TODO(v2): Enable when Asset Allocation file upload is implemented
 // function onAssetUploadSuccess(_file: any, response: { url: string }) {
@@ -446,11 +447,11 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             layout="vertical"
           >
             <Collapse v-model:activeKey="activeCollapseKeys" :bordered="false">
-            <CollapsePanel id="section-core" key="core" header="Core Fund Identity">
+            <CollapsePanel id="section-core" key="core" :header="$t('pages.productCenter.coreFundIdentity')">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Code" name="fundCode">
-                    <Input v-model:value="formData.fundCode" :disabled="isUpdate" placeholder="e.g. VPAF" />
+                     <Input v-model:value="formData.fundCode" :disabled="isUpdate" :placeholder="$t('pages.productCenter.fundCode')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -491,7 +492,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem label="Domicile / Jurisdiction" name="domicileJurisdiction">
-                    <Select v-model:value="formData.domicileJurisdiction" :options="countryOptions" show-search allow-clear option-filter-prop="label" placeholder="Select country" />
+                     <Select v-model:value="formData.domicileJurisdiction" :options="countryOptions" show-search allow-clear option-filter-prop="label" :placeholder="$t('pages.productCenter.selectCountry')" />
                   </FormItem>
                 </Col>
               </Row>
@@ -503,7 +504,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem label="Base Currency" name="baseCurrency">
-                    <Select v-model:value="formData.baseCurrency" :options="currencyCodeOptions" show-search allow-clear option-filter-prop="label" placeholder="Select currency" />
+                     <Select v-model:value="formData.baseCurrency" :options="currencyCodeOptions" show-search allow-clear option-filter-prop="label" :placeholder="$t('pages.productCenter.selectCurrency')" />
                   </FormItem>
                 </Col>
               </Row>
@@ -593,7 +594,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
             </CollapsePanel>
 
-            <CollapsePanel id="section-parties" key="parties" header="Key Parties">
+             <CollapsePanel id="section-parties" key="parties" :header="$t('pages.productCenter.keyParties')">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Fund Manager" name="fundManager">
@@ -644,7 +645,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
             </CollapsePanel>
 
-            <CollapsePanel id="section-strategy" key="strategy" header="Investment Strategy">
+             <CollapsePanel id="section-strategy" key="strategy" :header="$t('pages.productCenter.investmentStrategy')">
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Primary Instrument Type" name="primaryInstrumentType">
@@ -760,13 +761,13 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
             </CollapsePanel>
 
-            <CollapsePanel id="section-registration" key="registration" header="Foreign Registration Status">
+             <CollapsePanel id="section-registration" key="registration" :header="$t('pages.productCenter.foreignRegistration')">
               <FormItem label="Registered Regions" name="regionDictCodes">
                 <Select
                   v-model:value="formData.regionDictCodes"
                   :options="regionOptions"
                   mode="multiple"
-                  placeholder="Select regions"
+                   :placeholder="$t('pages.productCenter.selectRegions')"
                   allow-clear
                   :filter-option="true"
                   option-filter-prop="label"
@@ -785,9 +786,9 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <a-button @click="drawerApi.close()">Cancel</a-button>
+        <a-button @click="drawerApi.close()">{{ $t('pages.common.cancel') }}</a-button>
         <a-button type="primary" @click="handleConfirm">
-          {{ isUpdate ? 'Update' : 'Save' }}
+          {{ isUpdate ? $t('pages.common.edit') : $t('pages.common.add') }}
         </a-button>
       </div>
     </template>
