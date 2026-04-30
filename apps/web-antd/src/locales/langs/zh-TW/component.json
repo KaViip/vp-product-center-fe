@@ -1,0 +1,59 @@
+{
+  "cropper": {
+    "selectImage": "選擇圖片",
+    "uploadSuccess": "上傳成功",
+    "imageTooBig": "圖片超限",
+    "modalTitle": "頭像上傳",
+    "okText": "確認並上傳",
+    "btn_reset": "重置",
+    "btn_rotate_left": "逆時針旋轉",
+    "btn_rotate_right": "順時針旋轉",
+    "btn_scale_x": "水平翻轉",
+    "btn_scale_y": "垂直翻轉",
+    "btn_zoom_in": "放大",
+    "btn_zoom_out": "縮小",
+    "preview": "預覽"
+  },
+  "tenantToggle": {
+    "placeholder": "選擇租戶",
+    "switch": "切換當前租戶為: ",
+    "reset": "還原為默認租戶"
+  },
+  "notice": {
+    "title": "消息",
+    "received": "收到新消息"
+  },
+  "upload": {
+    "save": "保存",
+    "upload": "上傳",
+    "imgUpload": "圖片上傳",
+    "uploaded": "已上傳",
+    "operating": "操作",
+    "del": "刪除",
+    "download": "下載",
+    "saveWarn": "請等待文件上傳後，保存!",
+    "saveError": "沒有上傳成功的文件，無法保存!",
+    "preview": "預覽",
+    "choose": "選擇文件",
+    "accept": "支持{0}格式",
+    "acceptUpload": "只能上傳{0}格式文件",
+    "maxSize": "單個文件不超過{0}MB",
+    "maxSizeMultiple": "只能上傳不超過{0}MB的文件!",
+    "maxNumber": "最多只能上傳{0}個文件",
+    "legend": "略縮圖",
+    "fileName": "文件名",
+    "fileSize": "文件大小",
+    "fileStatue": "狀態",
+    "pending": "待上傳",
+    "startUpload": "開始上傳",
+    "uploadSuccess": "上傳成功",
+    "uploadError": "上傳失敗",
+    "uploading": "上傳中",
+    "uploadWait": "請等待文件上傳結束後操作",
+    "reUploadFailed": "重新上傳失敗文件",
+    "uploadHelpMessage": "請上傳不超過{size}的{ext}格式文件",
+    "unknownFileType": "未知的文件類型, 無法上傳",
+    "confirmDelete": "確認刪除文件 {0}?",
+    "clickOrDrag": "點擊或拖動文件到這個區域上傳"
+  }
+}

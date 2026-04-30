@@ -1,0 +1,55 @@
+{
+  "root": "根目錄",
+  "system": {
+    "root": "系統管理",
+    "user": "用戶管理",
+    "role": "角色管理",
+    "menu": "菜單管理",
+    "dept": "部門管理",
+    "post": "崗位管理",
+    "dict": "字典管理",
+    "config": "參數設置",
+    "notice": "通知公告",
+    "log": {
+      "root": "日誌管理",
+      "operation": "操作日誌",
+      "login": "登錄日誌"
+    },
+    "oss": "文件管理",
+    "client": "客戶端管理"
+  },
+  "tenant": {
+    "root": "租戶管理",
+    "package": "套餐管理"
+  },
+  "monitor": {
+    "root": "系統監控",
+    "online": "在線用戶",
+    "cache": "緩存監控",
+    "admin": "Admin監控",
+    "job": "任務調度中心"
+  },
+  "tool": {
+    "root": "系統工具",
+    "gen": "代碼生成"
+  },
+  "workflow": {
+    "root": "工作流",
+    "category": "流程分類",
+    "model": "模型管理",
+    "define": "流程定義",
+    "monitor": {
+      "root": "流程監控",
+      "instance": "流程實例",
+      "todo": "待辦任務"
+    },
+    "form": "表單管理"
+  },
+  "task": {
+    "root": "我的任務",
+    "apply": "我發起的",
+    "todo": "我的待辦",
+    "done": "我的已辦",
+    "cc": "我的抄送"
+  }
+}

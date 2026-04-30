@@ -1,0 +1,7 @@
+{
+  "apiRequestFailed": "請求出錯，請稍候重試",
+  "operationSuccess": "操作成功",
+  "successTip": "成功提示",
+  "errorTip": "錯誤提示",
+  "loginTimeout": "登錄超時, 請重新登錄"
+}
