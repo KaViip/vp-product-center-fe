@@ -452,144 +452,144 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             <CollapsePanel id="section-core" key="core" :header="$t('pages.productCenter.coreFundIdentity')">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Fund Code" name="fundCode">
+                  <FormItem :label="$t('pages.productCenter.form.fundCode')" name="fundCode">
                      <Input v-model:value="formData.fundCode" :disabled="isUpdate" :placeholder="$t('pages.productCenter.fundCode')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Fund Name (EN)" name="fundNameEn">
+                  <FormItem :label="$t('pages.productCenter.form.fundNameEn')" name="fundNameEn">
                     <Input v-model:value="formData.fundNameEn" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Fund Name (TC)" name="fundNameTc">
+                  <FormItem :label="$t('pages.productCenter.form.fundNameTc')" name="fundNameTc">
                     <Input v-model:value="formData.fundNameTc" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Fund Name (SC)" name="fundNameSc">
+                  <FormItem :label="$t('pages.productCenter.form.fundNameSc')" name="fundNameSc">
                     <Input v-model:value="formData.fundNameSc" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Fund Type" name="fundType">
+                  <FormItem :label="$t('pages.productCenter.form.fundType')" name="fundType">
                     <Select v-model:value="formData.fundType" :options="fundTypeOptions" show-search allow-clear option-filter-prop="label" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Umbrella / OFC Name">
+                  <FormItem :label="$t('pages.productCenter.form.umbrellaOfcName')">
                     <Input v-model:value="formData.umbrellaOfcName" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Sub-Fund Code">
+                  <FormItem :label="$t('pages.productCenter.form.subFundCode')">
                     <Input v-model:value="formData.subFundCode" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Domicile / Jurisdiction" name="domicileJurisdiction">
+                  <FormItem :label="$t('pages.productCenter.form.domicileJurisdiction')" name="domicileJurisdiction">
                      <Select v-model:value="formData.domicileJurisdiction" :options="countryOptions" show-search allow-clear option-filter-prop="label" :placeholder="$t('pages.productCenter.selectCountry')" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Primary Regulator" name="primaryRegulator">
+                  <FormItem :label="$t('pages.productCenter.form.primaryRegulator')" name="primaryRegulator">
                     <Input v-model:value="formData.primaryRegulator" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Base Currency" name="baseCurrency">
+                  <FormItem :label="$t('pages.productCenter.form.baseCurrency')" name="baseCurrency">
                      <Select v-model:value="formData.baseCurrency" :options="currencyCodeOptions" show-search allow-clear option-filter-prop="label" :placeholder="$t('pages.productCenter.selectCurrency')" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Fund Status" name="fundStatus">
+                  <FormItem :label="$t('pages.productCenter.form.fundStatus')" name="fundStatus">
                     <Select v-model:value="formData.fundStatus" :options="fundStatusOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Application Submission Date">
+                  <FormItem :label="$t('pages.productCenter.form.applicationSubmissionDate')">
                     <DatePicker v-model:value="formData.applicationSubmissionDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Authorization Date">
+                  <FormItem :label="$t('pages.productCenter.form.authorizationDate')">
                     <DatePicker v-model:value="formData.authorizationDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Launch Date" name="launchDate">
+                  <FormItem :label="$t('pages.productCenter.form.launchDate')" name="launchDate">
                     <DatePicker v-model:value="formData.launchDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Complex Product" name="complexProduct">
+                  <FormItem :label="$t('pages.productCenter.form.complexProduct')" name="complexProduct">
                     <Select v-model:value="formData.complexProduct" :options="yesNoOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="IOP Start Date">
+                  <FormItem :label="$t('pages.productCenter.form.iopStartDate')">
                     <DatePicker v-model:value="formData.iopStartDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Operation Start Date">
+                  <FormItem :label="$t('pages.productCenter.form.operationStartDate')">
                     <DatePicker v-model:value="formData.operationStartDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Listing Date">
+                  <FormItem :label="$t('pages.productCenter.form.listingDate')">
                     <DatePicker v-model:value="formData.listingDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Termination Date">
+                  <FormItem :label="$t('pages.productCenter.form.terminationDate')">
                     <DatePicker v-model:value="formData.terminationDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="LEI Number" name="leiNumber">
+                  <FormItem :label="$t('pages.productCenter.form.leiNumber')" name="leiNumber">
                     <Input v-model:value="formData.leiNumber" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="GIIIN Number" name="giinNumber">
+                  <FormItem :label="$t('pages.productCenter.form.giinNumber')" name="giinNumber">
                     <Input v-model:value="formData.giinNumber" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Professional Investors only">
+                  <FormItem :label="$t('pages.productCenter.form.professionalInvestorsOnly')">
                     <Select v-model:value="formData.professionalInvestorsOnly" :options="yesNoOptions" allow-clear />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Restriction on investor's nationality">
+                  <FormItem :label="$t('pages.productCenter.form.restrictionInvestorNationality')">
                     <Input v-model:value="formData.restrictionInvestorNationality" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Restriction on investor's residency">
+                  <FormItem :label="$t('pages.productCenter.form.restrictionInvestorResidency')">
                     <Input v-model:value="formData.restrictionInvestorResidency" />
                   </FormItem>
                 </Col>
@@ -599,48 +599,48 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
              <CollapsePanel id="section-parties" key="parties" :header="$t('pages.productCenter.keyParties')">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Fund Manager" name="fundManager">
+                  <FormItem :label="$t('pages.productCenter.form.fundManager')" name="fundManager">
                     <AutoComplete v-model:value="formData.fundManager" v-bind="getAutocompleteProps('fundManager')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Fund Manager LEI" name="fundManagerLei">
+                  <FormItem :label="$t('pages.productCenter.form.fundManagerLei')" name="fundManagerLei">
                     <Input v-model:value="formData.fundManagerLei" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Sub Manager">
+                  <FormItem :label="$t('pages.productCenter.form.subManager')">
                     <Input v-model:value="formData.subManager" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Investment Advisor">
+                  <FormItem :label="$t('pages.productCenter.form.investmentAdvisor')">
                     <AutoComplete v-model:value="formData.investmentAdvisor" v-bind="getAutocompleteProps('investmentAdvisor')" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Trustee / Administrator">
+                  <FormItem :label="$t('pages.productCenter.form.trusteeAdministrator')">
                     <AutoComplete v-model:value="formData.trusteeAdministrator" v-bind="getAutocompleteProps('trusteeAdministrator')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Custodian / Prime Broker">
+                  <FormItem :label="$t('pages.productCenter.form.custodianPrimeBroker')">
                     <AutoComplete v-model:value="formData.custodianPrimeBroker" v-bind="getAutocompleteProps('custodianPrimeBroker')" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Sub Custodian">
+                  <FormItem :label="$t('pages.productCenter.form.subCustodian')">
                     <Input v-model:value="formData.subCustodian" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Auditor">
+                  <FormItem :label="$t('pages.productCenter.form.auditor')">
                     <AutoComplete v-model:value="formData.auditor" v-bind="getAutocompleteProps('auditor')" />
                   </FormItem>
                 </Col>
@@ -650,45 +650,45 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
              <CollapsePanel id="section-strategy" key="strategy" :header="$t('pages.productCenter.investmentStrategy')">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Primary Instrument Type" name="primaryInstrumentType">
+                  <FormItem :label="$t('pages.productCenter.form.primaryInstrumentType')" name="primaryInstrumentType">
                     <Select v-model:value="formData.primaryInstrumentType" :options="instrumentTypeOptions" show-search allow-clear option-filter-prop="label" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Passive or Active Fund" name="passiveOrActiveFund">
+                  <FormItem :label="$t('pages.productCenter.form.passiveOrActiveFund')" name="passiveOrActiveFund">
                     <Select v-model:value="formData.passiveOrActiveFund" :options="activePassiveOptions" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Investment Market Focus" name="investmentMarketFocus">
+                  <FormItem :label="$t('pages.productCenter.form.investmentMarketFocus')" name="investmentMarketFocus">
                     <Select v-model:value="formData.investmentMarketFocus" :options="marketFocusOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Strategy Category (MorningStar)">
+                  <FormItem :label="$t('pages.productCenter.form.morningstarCategory')">
                     <Input v-model:value="formData.morningstarCategory" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="24">
-                  <FormItem label="Investment Objective" name="investmentObjective">
+                  <FormItem :label="$t('pages.productCenter.form.investmentObjective')" name="investmentObjective">
                     <Input v-model:value="formData.investmentObjective" type="textarea" :rows="3" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="24">
-                  <FormItem label="Investment Strategy" name="investmentStrategy">
+                  <FormItem :label="$t('pages.productCenter.form.investmentStrategy')" name="investmentStrategy">
                     <Input v-model:value="formData.investmentStrategy" type="textarea" :rows="3" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="24">
-                  <FormItem label="Asset Allocation Table" name="assetAllocationTable">
+                  <FormItem :label="$t('pages.productCenter.form.assetAllocationTable')" name="assetAllocationTable">
                     <Input v-model:value="formData.assetAllocationTable" type="textarea" :rows="4" />
                     <!-- TODO(v2): Add file upload alongside text input -->
                     <!-- <div class="mt-3">
@@ -710,53 +710,53 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Hedging Policy (Fund)" name="hedgingPolicyFund">
+                  <FormItem :label="$t('pages.productCenter.form.hedgingPolicyFund')" name="hedgingPolicyFund">
                     <Select v-model:value="formData.hedgingPolicyFund" :options="hedgingPolicyOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Benchmark">
+                  <FormItem :label="$t('pages.productCenter.form.benchmark')">
                     <AutoComplete v-model:value="formData.benchmark" v-bind="getAutocompleteProps('benchmark')" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Benchmark Code">
+                  <FormItem :label="$t('pages.productCenter.form.benchmarkCode')">
                     <Input v-model:value="formData.benchmarkCode" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Risk Rating" name="riskLevel">
+                  <FormItem :label="$t('pages.productCenter.form.riskLevel')" name="riskLevel">
                     <Select v-model:value="formData.riskLevel" :options="riskLevelOptions" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="8">
-                   <FormItem label="Leverage Ratio (Max)(%)" name="leverageRatioMax">
+                   <FormItem :label="$t('pages.productCenter.form.leverageRatioMax')" name="leverageRatioMax">
                     <Input v-model:value="formData.leverageRatioMax" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                   <FormItem label="Derivatives Ratio (Max)(%)" name="derivativesRatioMax">
+                   <FormItem :label="$t('pages.productCenter.form.derivativesRatioMax')" name="derivativesRatioMax">
                     <Input v-model:value="formData.derivativesRatioMax" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                   <FormItem label="Borrowing Limit (%)" name="borrowingLimit">
+                   <FormItem :label="$t('pages.productCenter.form.borrowingLimit')" name="borrowingLimit">
                     <Input v-model:value="formData.borrowingLimit" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="8">
-                   <FormItem label="Stop Loss Limit (%)" name="stopLossLimit">
+                   <FormItem :label="$t('pages.productCenter.form.stopLossLimit')" name="stopLossLimit">
                     <Input v-model:value="formData.stopLossLimit" />
                   </FormItem>
                 </Col>
                 <Col :span="8">
-                   <FormItem label="Stop Loss Alert (%)" name="stopLossAlert">
+                   <FormItem :label="$t('pages.productCenter.form.stopLossAlert')" name="stopLossAlert">
                     <Input v-model:value="formData.stopLossAlert" />
                   </FormItem>
                 </Col>
@@ -764,7 +764,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             </CollapsePanel>
 
              <CollapsePanel id="section-registration" key="registration" :header="$t('pages.productCenter.foreignRegistration')">
-              <FormItem label="Registered Regions" name="regionDictCodes">
+              <FormItem :label="$t('pages.productCenter.form.registeredRegions')" name="regionDictCodes">
                 <Select
                   v-model:value="formData.regionDictCodes"
                   :options="regionOptions"

@@ -555,24 +555,24 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             <CollapsePanel id="section-fund-info" key="fund-info" :header="$t('pages.productCenter.fundInfo')">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Fund Code" name="fundCode">
+                  <FormItem :label="$t('pages.productCenter.form.fundCode')" name="fundCode">
                     <Select v-model:value="formData.fundCode" :options="fundCodeOptions" show-search allow-clear option-filter-prop="label" :placeholder="$t('pages.productCenter.selectFundCode')" :disabled="isUpdate" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Fund Name (EN)">
+                  <FormItem :label="$t('pages.productCenter.form.fundNameEn')">
                     <Input v-model:value="formData.fundNameEn" disabled />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Fund Name (TC)">
+                  <FormItem :label="$t('pages.productCenter.form.fundNameTc')">
                     <Input v-model:value="formData.fundNameTc" disabled />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Fund Name (SC)">
+                  <FormItem :label="$t('pages.productCenter.form.fundNameSc')">
                     <Input v-model:value="formData.fundNameSc" disabled />
                   </FormItem>
                 </Col>
@@ -598,223 +598,223 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             <CollapsePanel id="section-class-info" key="class-info" :header="$t('pages.productCenter.classInfo')">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Share Class Name (EN)" name="shareClassNameEnOfficialName">
+                  <FormItem :label="$t('pages.productCenter.form.shareClassNameEn')" name="shareClassNameEnOfficialName">
                     <Input v-model:value="formData.shareClassNameEnOfficialName" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Share Class Name (TC)" name="shareClassNameTcOfficialName">
+                  <FormItem :label="$t('pages.productCenter.form.shareClassNameTc')" name="shareClassNameTcOfficialName">
                     <Input v-model:value="formData.shareClassNameTcOfficialName" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Share Class Name (SC)" name="shareClassNameScOfficialName">
+                  <FormItem :label="$t('pages.productCenter.form.shareClassNameSc')" name="shareClassNameScOfficialName">
                     <Input v-model:value="formData.shareClassNameScOfficialName" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="VPFS Class ID">
+                  <FormItem :label="$t('pages.productCenter.form.vpfsClassId')">
                     <Input v-model:value="formData.vpfsClassId" :disabled="isUpdate" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="ISIN Code" name="isinCode">
+                  <FormItem :label="$t('pages.productCenter.form.isinCode')" name="isinCode">
                     <Input v-model:value="formData.isinCode" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="CUSIP" name="cusip">
+                  <FormItem :label="$t('pages.productCenter.form.cusip')" name="cusip">
                     <Input v-model:value="formData.cusip" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Bloomberg Ticker">
+                  <FormItem :label="$t('pages.productCenter.form.bloombergTicker')">
                     <Input v-model:value="formData.bloombergTicker" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="BBG ID Equity">
+                  <FormItem :label="$t('pages.productCenter.form.bbgIdEquity')">
                     <Input v-model:value="formData.bbgIdEquity" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="SEDOL" name="sedol">
+                  <FormItem :label="$t('pages.productCenter.form.sedol')" name="sedol">
                     <Input v-model:value="formData.sedol" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Morningstar Fund ID">
+                  <FormItem :label="$t('pages.productCenter.form.morningstarFundId')">
                     <Input v-model:value="formData.morningstarFundId" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Morningstar Sec ID">
+                  <FormItem :label="$t('pages.productCenter.form.morningstarSecId')">
                     <Input v-model:value="formData.morningstarSecId" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Morningstar Perf ID">
+                  <FormItem :label="$t('pages.productCenter.form.morningstarPerfId')">
                     <Input v-model:value="formData.morningstarPerformanceId" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Stock Code" name="stockCode">
+                  <FormItem :label="$t('pages.productCenter.form.stockCode')" name="stockCode">
                     <Input v-model:value="formData.stockCode" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Valor Code">
+                  <FormItem :label="$t('pages.productCenter.form.valorCode')">
                     <Input v-model:value="formData.valorCode" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Lipper Code">
+                  <FormItem :label="$t('pages.productCenter.form.lipperCode')">
                     <Input v-model:value="formData.lipperCode" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Fund Class Status" name="fundClassStatus">
+                  <FormItem :label="$t('pages.productCenter.form.fundClassStatus')" name="fundClassStatus">
                     <Select v-model:value="formData.fundClassStatus" :options="fundClassStatusOptions" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Class Currency" name="classCurrency">
+                  <FormItem :label="$t('pages.productCenter.form.classCurrency')" name="classCurrency">
                     <Select v-model:value="formData.classCurrency" :options="currencyOptions" show-search option-filter-prop="label" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="End of IOP Date">
+                  <FormItem :label="$t('pages.productCenter.form.endOfIopDate')">
                     <DatePicker v-model:value="formData.endOfIopDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Launch Date" name="launchDate">
+                  <FormItem :label="$t('pages.productCenter.form.launchDate')" name="launchDate">
                     <DatePicker v-model:value="formData.launchDate" class="w-full" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Latest TER Date">
+                  <FormItem :label="$t('pages.productCenter.form.latestTerDate')">
                     <DatePicker v-model:value="formData.latestTerDate" class="w-full" picker="month" value-format="YYYY/MM" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Latest TER Rate(%)" name="latestTerRate">
+                  <FormItem :label="$t('pages.productCenter.form.latestTerRate')" name="latestTerRate">
                     <Input v-model:value="formData.latestTerRate" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Distribution Policy" name="distributionPolicy">
+                  <FormItem :label="$t('pages.productCenter.form.distributionPolicy')" name="distributionPolicy">
                     <Select v-model:value="formData.distributionPolicy" :options="distributionPolicyOptions" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Hedged" name="hedged">
+                  <FormItem :label="$t('pages.productCenter.form.hedged')" name="hedged">
                     <Select v-model:value="formData.hedged" :options="yesNoOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Hedging Currency">
+                  <FormItem :label="$t('pages.productCenter.form.hedgingCurrency')">
                     <Select v-model:value="formData.hedgingCurrency" :options="currencyOptions" show-search option-filter-prop="label" :disabled="!formData.hedged" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Unit Precision" name="unitPrecision">
+                  <FormItem :label="$t('pages.productCenter.form.unitPrecision')" name="unitPrecision">
                     <Select v-model:value="formData.unitPrecision" :options="unitPrecisionOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="NAV Precision" name="navPrecision">
+                  <FormItem :label="$t('pages.productCenter.form.navPrecision')" name="navPrecision">
                     <Select v-model:value="formData.navPrecision" :options="navPrecisionOptions" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Subscription Settlement(T+)" name="subscriptionSettlement">
+                  <FormItem :label="$t('pages.productCenter.form.subscriptionSettlement')" name="subscriptionSettlement">
                     <Input v-model:value="formData.subscriptionSettlement" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Redemption Settlement(T+)" name="redemptionSettlement">
+                  <FormItem :label="$t('pages.productCenter.form.redemptionSettlement')" name="redemptionSettlement">
                     <Input v-model:value="formData.redemptionSettlement" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Min Initial Subscription" name="minimumInitialSubscription">
+                  <FormItem :label="$t('pages.productCenter.form.minimumInitialSubscription')" name="minimumInitialSubscription">
                     <Input v-model:value="formData.minimumInitialSubscription" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Min Subsequent Subscription" name="minimumSubsequentSubscription">
+                  <FormItem :label="$t('pages.productCenter.form.minimumSubsequentSubscription')" name="minimumSubsequentSubscription">
                     <Input v-model:value="formData.minimumSubsequentSubscription" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Minimum Redemption" name="minimumRedemption">
+                  <FormItem :label="$t('pages.productCenter.form.minimumRedemption')" name="minimumRedemption">
                     <Input v-model:value="formData.minimumRedemption" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Minimum Holding">
+                  <FormItem :label="$t('pages.productCenter.form.minimumHolding')">
                     <Input v-model:value="formData.minimumHolding" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Redemption Charge">
+                  <FormItem :label="$t('pages.productCenter.form.redemptionCharge')">
                     <Input v-model:value="formData.redemptionCharge" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Management Fee(%)" name="managementFee">
+                  <FormItem :label="$t('pages.productCenter.form.managementFee')" name="managementFee">
                     <Input v-model:value="formData.managementFee" />
                   </FormItem>
                 </Col>
               </Row>
                <Row :gutter="16">
                  <Col :span="12">
-                   <FormItem label="Performance Fee(%)" name="performanceFee">
+                   <FormItem :label="$t('pages.productCenter.form.performanceFee')" name="performanceFee">
                      <Input v-model:value="formData.performanceFee" />
                    </FormItem>
                  </Col>
                  <Col :span="12">
-                   <FormItem label="Financial Year End">
+                   <FormItem :label="$t('pages.productCenter.form.financialYearEnd')">
                      <Select v-model:value="formData.financialYearEnd" :options="financialYearEndOptions" />
                    </FormItem>
                  </Col>
                </Row>
                <Row :gutter="16">
                  <Col :span="12">
-                   <FormItem label="Cutoff Time" name="cutoffTime">
+                   <FormItem :label="$t('pages.productCenter.form.cutoffTime')" name="cutoffTime">
                      <div class="flex gap-2">
                        <TimePicker v-model:value="formData.cutoffTime_time" format="HH:mm" :allow-clear="true" class="flex-1" />
                        <Select v-model:value="formData.cutoffTime_tz" :options="tzCountryOptions" show-search option-filter-prop="label" class="w-[140px]" placeholder="TZ" />
@@ -828,19 +828,19 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
             <CollapsePanel id="section-dealing" key="dealing" :header="$t('pages.productCenter.dealingAndValuation')">
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Dealing Frequency" name="dealingFrequency">
+                  <FormItem :label="$t('pages.productCenter.form.dealingFrequency')" name="dealingFrequency">
                     <Select v-model:value="formData.dealingFrequency" :options="dealingFrequencyOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Valuation Frequency" name="valuationFrequency">
+                  <FormItem :label="$t('pages.productCenter.form.valuationFrequency')" name="valuationFrequency">
                     <Select v-model:value="formData.valuationFrequency" :options="dealingFrequencyOptions" />
                   </FormItem>
                 </Col>
               </Row>
                <Row :gutter="16">
                  <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.dealingCutOff')" name="dealingCutOff">
+                   <FormItem :label="$t('pages.productCenter.form.dealingCutOff')" name="dealingCutOff">
                      <div class="flex gap-2">
                        <TimePicker v-model:value="formData.dealingCutOff_time" format="HH:mm" :allow-clear="true" class="flex-1" />
                        <Select v-model:value="formData.dealingCutOff_tz" :options="tzCountryOptions" show-search option-filter-prop="label" class="w-[140px]" placeholder="TZ" />
@@ -848,7 +848,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                    </FormItem>
                  </Col>
                  <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.valuationPoint')" name="valuationPoint">
+                   <FormItem :label="$t('pages.productCenter.form.valuationPoint')" name="valuationPoint">
                      <div class="flex gap-2">
                        <TimePicker v-model:value="formData.valuationPoint_time" format="HH:mm" :allow-clear="true" class="flex-1" />
                        <Select v-model:value="formData.valuationPoint_tz" :options="tzCountryOptions" show-search option-filter-prop="label" class="w-[140px]" placeholder="TZ" />
@@ -858,36 +858,36 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Business Day Definition" name="businessDayDefinition">
+                  <FormItem :label="$t('pages.productCenter.form.businessDayDefinition')" name="businessDayDefinition">
                     <Input v-model:value="formData.businessDayDefinition" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Business Calendar" name="businessCalendar">
+                  <FormItem :label="$t('pages.productCenter.form.businessCalendar')" name="businessCalendar">
                     <Select v-model:value="formData.businessCalendar" :options="businessCalendarOptions" mode="multiple" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Contract Note Del. Day(T+)">
+                  <FormItem :label="$t('pages.productCenter.form.contractNoteDeliveryDay')">
                     <Input v-model:value="formData.contractNoteDeliveryDay" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Pricing Methodology" name="pricingMethodology">
+                  <FormItem :label="$t('pages.productCenter.form.pricingMethodology')" name="pricingMethodology">
                     <Select v-model:value="formData.pricingMethodology" :options="pricingMethodologyOptions" mode="multiple" />
                   </FormItem>
                 </Col>
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem label="Valuation Delivery Time(T+)">
+                  <FormItem :label="$t('pages.productCenter.form.valuationDeliveryTime')">
                     <Input v-model:value="formData.valuationDeliveryTime" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem label="Security Lending">
+                  <FormItem :label="$t('pages.productCenter.form.securityLending')">
                     <Select v-model:value="formData.securityLending" :options="yesNoOptions" allow-clear />
                   </FormItem>
                 </Col>
