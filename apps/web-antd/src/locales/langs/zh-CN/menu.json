@@ -45,6 +45,11 @@
     },
     "form": "表单管理"
   },
+  "fund": {
+    "root": "基金",
+    "productTeam": "Product Team",
+    "operationalTeam": "Operational Team"
+  },
   "task": {
     "root": "我的任务",
     "apply": "我发起的",

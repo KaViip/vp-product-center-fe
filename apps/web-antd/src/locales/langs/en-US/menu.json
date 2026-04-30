@@ -45,6 +45,11 @@
     },
     "form": "Form"
   },
+  "fund": {
+    "root": "Fund",
+    "productTeam": "Product Team",
+    "operationalTeam": "Operational Team"
+  },
   "task": {
     "root": "My Tasks",
     "apply": "My Initiated Tasks",
