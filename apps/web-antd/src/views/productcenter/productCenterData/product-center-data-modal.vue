@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ProductCenterData } from '#/api/productcenter/productCenterData/model';
 
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, h, nextTick, ref, watch } from 'vue';
 
 import dayjs from 'dayjs';
 
@@ -11,6 +11,7 @@ import { cloneDeep } from '@vben/utils';
 
 import {
   Anchor,
+  Button,
   Collapse,
   CollapsePanel,
   Col,
@@ -45,26 +46,27 @@ const formRef = ref();
 const activeCollapseKeys = ref<string[]>(['fund-info', 'class-list', 'class-info', 'dealing']);
 const scrollContainerRef = ref<HTMLElement | null>(null);
 const classListData = ref<ProductCenterData[]>([]);
-const selectedClassRow = ref<ProductCenterData | null>(null);
 const fundCodeOptions = ref<{ label: string; value: string }[]>([]);
 
-const classListColumns = [
+const classListColumns: any[] = [
   { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEnOfficialName', key: 'en' },
   { title: 'Share Class Name (TC)', dataIndex: 'shareClassNameTcOfficialName', key: 'tc' },
   { title: 'VPFS Class ID', dataIndex: 'vpfsClassId', key: 'vpfs' },
   { title: 'Class Currency', dataIndex: 'classCurrency', key: 'ccy' },
   { title: 'Status', dataIndex: 'fundClassStatus', key: 'status' },
-];
-
-const classListSelectedRowKeys = ref<(number | string)[]>([]);
-
-const classListRowSelection = computed(() => ({
-  type: 'radio' as const,
-  selectedRowKeys: classListSelectedRowKeys.value,
-  onChange: (_keys: (number | string)[], rows: ProductCenterData[]) => {
-    selectedClassRow.value = rows[0] || null;
+  {
+    title: 'Action',
+    key: 'action',
+    width: 80,
+    align: 'center',
+    customRender: ({ record }: { record: ProductCenterData }) =>
+      h(Button, {
+        type: 'link',
+        size: 'small',
+        onClick: () => handleCopyFromClassList(record),
+      }, () => 'Copy'),
   },
-}));
+];
 
 const title = computed(() => {
   if (isCopy.value) return $t('pages.productCenter.copyShareClass');
@@ -313,29 +315,67 @@ watch(() => formData.value.fundCode, async (fundCode) => {
   }
 }, { immediate: true });
 
-function handleCopyFromClassList() {
-  if (!selectedClassRow.value) return;
-  const source = cloneDeep(selectedClassRow.value);
-  const copyFields: (keyof ProductCenterData)[] = [
-    'shareClassNameEnOfficialName', 'shareClassNameTcOfficialName', 'shareClassNameScOfficialName',
-    'classCurrency', 'fundClassStatus', 'vpfsClassId',
-    'endOfIopDate', 'launchDate', 'stockCode', 'isinCode',
-    'morningstarFundId', 'morningstarSecId', 'morningstarPerformanceId',
-    'cusip', 'valorCode', 'lipperCode', 'bloombergTicker', 'bbgIdEquity', 'sedol',
-    'dealingFrequency', 'distributionPolicy', 'unitPrecision', 'navPrecision',
-    'dealingCutOff', 'cutoffTime', 'businessDayDefinition', 'businessCalendar',
-    'subscriptionSettlement', 'redemptionSettlement',
-    'minimumInitialSubscription', 'minimumSubsequentSubscription',
-    'minimumRedemption', 'minimumHolding', 'redemptionCharge',
-    'managementFee', 'performanceFee', 'ter', 'financialYearEnd',
-    'contractNoteDeliveryDay', 'pricingMethodology', 'valuationPoint',
-    'valuationFrequency', 'valuationDeliveryTime',
-    'securityLending', 'hedged', 'hedgingCurrency',
-  ];
-  for (const field of copyFields) {
-    if (source[field] !== undefined && source[field] !== null) {
-      formData.value[field] = source[field];
+// Transform raw API data into form-ready format (dayjs, arrays, composite time split, fee trim)
+function transformShareClassData(d: Record<string, any>) {
+  // Convert date strings → dayjs for DatePicker
+  const dateFields = ['endOfIopDate', 'launchDate'];
+  const monthFields = ['latestTerDate'];
+  for (const key of dateFields) {
+    if (d[key]) d[key] = dayjs(d[key]);
+  }
+  for (const key of monthFields) {
+    if (d[key]) d[key] = dayjs(d[key]);
+  }
+
+  // Backend stores comma-separated strings → split for multi-select
+  const multiSelectFields = ['businessCalendar', 'pricingMethodology'];
+  for (const key of multiSelectFields) {
+    if (typeof d[key] === 'string' && d[key]) {
+      d[key] = d[key].split(',');
+    } else if (!Array.isArray(d[key])) {
+      d[key] = [];
     }
+  }
+
+  // Convert composite time+tz strings "HH:mm CCC" → separate _time (dayjs) and _tz (string)
+  const compositeTimeFields = ['dealingCutOff', 'valuationPoint', 'cutoffTime'];
+  for (const key of compositeTimeFields) {
+    const raw = d[key];
+    if (raw && typeof raw === 'string') {
+      const parts = raw.trim().split(/\s+/);
+      d[`${key}_time`] = dayjs(parts[0], 'HH:mm');
+      d[`${key}_tz`] = parts[1] || undefined;
+      delete d[key];
+    }
+  }
+
+  // Trim fee fields to max 2 decimal places
+  const feeFields = ['managementFee', 'performanceFee'];
+  for (const key of feeFields) {
+    if (d[key] != null) {
+      d[key] = String(Number.parseFloat(Number(d[key]).toFixed(2)));
+    }
+  }
+
+  return d;
+}
+
+async function handleCopyFromClassList(record: ProductCenterData) {
+  if (!record.productClassId) return;
+  try {
+    const detail = await productCenterDataInfo(record.productClassId);
+    const d = cloneDeep(detail);
+    transformShareClassData(d);
+    // Merge transformed data into formData (preserve fundCode, fundName fields)
+    const preserved = {
+      fundCode: formData.value.fundCode,
+      fundNameEn: formData.value.fundNameEn,
+      fundNameTc: formData.value.fundNameTc,
+      fundNameSc: formData.value.fundNameSc,
+    };
+    formData.value = { ...d, ...preserved };
+  } catch {
+    window.message.error('Failed to load class details');
   }
 }
 
@@ -345,8 +385,6 @@ const [Drawer, drawerApi] = useVbenDrawer({
     if (!isOpen) {
       formData.value = {};
       classListData.value = [];
-      selectedClassRow.value = null;
-      classListSelectedRowKeys.value = [];
       return;
     }
 
@@ -373,48 +411,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
             shareClassData.shareClassNameEnOfficialName = '';
           }
           const d = cloneDeep(shareClassData);
-
-          // Convert date strings "YYYY-MM-DD HH:mm:ss" → dayjs for DatePicker
-          const dateFields = ['endOfIopDate', 'launchDate'];
-          const monthFields = ['latestTerDate'];
-          for (const key of dateFields) {
-            if (d[key]) d[key] = dayjs(d[key]);
-          }
-          for (const key of monthFields) {
-            if (d[key]) d[key] = dayjs(d[key]);
-          }
-
-          // Backend stores comma-separated strings → split for multi-select
-          const multiSelectFields = ['businessCalendar', 'pricingMethodology'];
-          for (const key of multiSelectFields) {
-            if (typeof d[key] === 'string' && d[key]) {
-              d[key] = d[key].split(',');
-            } else if (!Array.isArray(d[key])) {
-              d[key] = [];
-            }
-          }
-
-          // Convert composite time+tz strings "HH:mm CCC" → separate _time (dayjs) and _tz (string) for UI
-          const compositeTimeFields = ['dealingCutOff', 'valuationPoint', 'cutoffTime'];
-          for (const key of compositeTimeFields) {
-            const raw = d[key];
-            if (raw && typeof raw === 'string') {
-              // Support formats: "18:12 HKG", "18:12", or legacy "18:12" from old separate fields
-              const parts = raw.trim().split(/\s+/);
-              d[`${key}_time`] = dayjs(parts[0], 'HH:mm');
-              d[`${key}_tz`] = parts[1] || undefined;
-              delete d[key];
-            }
-          }
-
-          // Trim fee fields to max 2 decimal places
-          const feeFields = ['managementFee', 'performanceFee'];
-          for (const key of feeFields) {
-            if (d[key] != null) {
-              d[key] = String(Number.parseFloat(Number(d[key]).toFixed(2)));
-            }
-          }
-
+          transformShareClassData(d);
           formData.value = d;
         } catch {
           formData.value = {};
@@ -590,7 +587,6 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               <Table
                 :columns="classListColumns"
                 :data-source="classListData"
-                :row-selection="classListRowSelection"
                 :row-key="(record: ProductCenterData) => record.productClassId ?? record.vpfsClassId"
                 size="small"
                 :pagination="false"
@@ -909,9 +905,6 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <a-button :disabled="!selectedClassRow" @click="handleCopyFromClassList">
-          {{ $t('pages.productCenter.copyFromClassList') }}
-        </a-button>
         <a-button @click="drawerApi.close()">{{ $t('pages.common.cancel') }}</a-button>
         <a-button type="primary" @click="handleConfirm">
           {{ isUpdate ? $t('pages.common.edit') : $t('pages.common.add') }}
