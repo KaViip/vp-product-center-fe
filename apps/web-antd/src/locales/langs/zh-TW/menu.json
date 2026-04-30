@@ -47,8 +47,8 @@
   },
   "fund": {
     "root": "基金",
-    "productTeam": "Product Team",
-    "operationalTeam": "Operational Team"
+    "productTeam": "產品團隊",
+    "operationalTeam": "運營團隊"
   },
   "task": {
     "root": "我的任務",
