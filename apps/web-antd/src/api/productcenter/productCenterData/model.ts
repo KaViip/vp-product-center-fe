@@ -35,9 +35,8 @@ export interface ProductCenterData {
   unitPrecision?: string;
   navPrecision?: string;
   dealingCutOff?: string;
-  dealingCutOffTz?: string;
   valuationPoint?: string;
-  valuationPointTz?: string;
+  cutoffTime?: string;
   businessDayDefinition?: string;
   businessCalendar?: string;
   subscriptionSettlement?: string;

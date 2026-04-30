@@ -150,14 +150,13 @@ const classInfoFields: FieldDef[] = [
   { label: 'Management Fee(%)', key: 'managementFee' },
   { label: 'Performance Fee(%)', key: 'performanceFee' },
   { label: 'Financial Year End', key: 'financialYearEnd' },
+  { label: 'Cutoff Time', key: 'cutoffTime' },
 ];
 
 const dealingFields: FieldDef[] = [
   { label: 'Dealing Frequency', key: 'dealingFrequency' },
   { label: 'Dealing Cut-off', key: 'dealingCutOff' },
-  { label: 'Dealing Cut-off TZ', key: 'dealingCutOffTz' },
   { label: 'Valuation Point', key: 'valuationPoint' },
-  { label: 'Valuation Point TZ', key: 'valuationPointTz' },
   { label: 'Valuation Frequency', key: 'valuationFrequency' },
   { label: 'Valuation Delivery Time', key: 'valuationDeliveryTime' },
   { label: 'Business Day Definition', key: 'businessDayDefinition' },

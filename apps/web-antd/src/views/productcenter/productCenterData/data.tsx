@@ -25,13 +25,13 @@ export const querySchema: FormSchemaGetter = () => [
   },
   {
     component: 'Input',
-    fieldName: 'fundNameEnTcSc',
-    label: $t('pages.productCenter.fundNameEnTcSc'),
+    fieldName: 'fundName',
+    label: $t('pages.productCenter.fundName'),
   },
   {
     component: 'Input',
-    fieldName: 'shareClassNameEnTcSc',
-    label: $t('pages.productCenter.shareClassNameEnTcSc'),
+    fieldName: 'shareClassName',
+    label: $t('pages.productCenter.shareClassName'),
   },
   {
     component: 'Select',

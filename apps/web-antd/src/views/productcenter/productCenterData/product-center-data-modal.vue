@@ -248,9 +248,8 @@ const rules = {
   dealingFrequency: [{ required: true, message: 'Dealing Frequency is required' }],
   valuationFrequency: [{ required: true, message: 'Valuation Frequency is required' }],
   dealingCutOff: [{ required: true, message: 'Dealing Cut-off is required' }],
-  dealingCutOffTz: [{ required: true, message: 'Dealing Cut-off TZ is required' }],
   valuationPoint: [{ required: true, message: 'Valuation Point is required' }],
-  valuationPointTz: [{ required: true, message: 'Valuation Point TZ is required' }],
+  cutoffTime: [{ required: true, message: 'Cutoff Time is required' }],
   pricingMethodology: [{ required: true, message: 'Pricing Methodology is required' }],
   subscriptionSettlement: [{ required: true, message: 'Subscription Settlement is required' }],
   redemptionSettlement: [{ required: true, message: 'Redemption Settlement is required' }],
@@ -324,7 +323,7 @@ function handleCopyFromClassList() {
     'morningstarFundId', 'morningstarSecId', 'morningstarPerformanceId',
     'cusip', 'valorCode', 'lipperCode', 'bloombergTicker', 'bbgIdEquity', 'sedol',
     'dealingFrequency', 'distributionPolicy', 'unitPrecision', 'navPrecision',
-    'dealingCutOff', 'businessDayDefinition', 'businessCalendar',
+    'dealingCutOff', 'cutoffTime', 'businessDayDefinition', 'businessCalendar',
     'subscriptionSettlement', 'redemptionSettlement',
     'minimumInitialSubscription', 'minimumSubsequentSubscription',
     'minimumRedemption', 'minimumHolding', 'redemptionCharge',
@@ -395,11 +394,16 @@ const [Drawer, drawerApi] = useVbenDrawer({
             }
           }
 
-          // Convert time strings "HH:mm" → dayjs for TimePicker
-          const timeFields = ['dealingCutOff', 'valuationPoint'];
-          for (const key of timeFields) {
-            if (d[key] && typeof d[key] === 'string') {
-              d[key] = dayjs(d[key], 'HH:mm');
+          // Convert composite time+tz strings "HH:mm CCC" → separate _time (dayjs) and _tz (string) for UI
+          const compositeTimeFields = ['dealingCutOff', 'valuationPoint', 'cutoffTime'];
+          for (const key of compositeTimeFields) {
+            const raw = d[key];
+            if (raw && typeof raw === 'string') {
+              // Support formats: "18:12 HKG", "18:12", or legacy "18:12" from old separate fields
+              const parts = raw.trim().split(/\s+/);
+              d[`${key}_time`] = dayjs(parts[0], 'HH:mm');
+              d[`${key}_tz`] = parts[1] || undefined;
+              delete d[key];
             }
           }
 
@@ -470,12 +474,15 @@ async function handleConfirm() {
       submitData.pricingMethodology = submitData.pricingMethodology.join(',');
     }
 
-    // Convert dayjs time → "HH:mm" string for backend
-    const timeFields = ['dealingCutOff', 'valuationPoint'];
-    for (const key of timeFields) {
-      if (submitData[key] && dayjs.isDayjs(submitData[key])) {
-        submitData[key] = submitData[key].format('HH:mm');
-      }
+    // Composite time+tz fields: combine _time (dayjs) + _tz (string) → "HH:mm CCC"
+    const compositeTimeFields = ['dealingCutOff', 'valuationPoint', 'cutoffTime'];
+    for (const key of compositeTimeFields) {
+      const time = submitData[`${key}_time`];
+      const tz = submitData[`${key}_tz`];
+      const timeStr = time && dayjs.isDayjs(time) ? time.format('HH:mm') : '';
+      submitData[key] = [timeStr, tz].filter(Boolean).join(' ');
+      delete submitData[`${key}_time`];
+      delete submitData[`${key}_tz`];
     }
 
     if (isUpdate.value) {
@@ -797,19 +804,29 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem label="Performance Fee(%)" name="performanceFee">
-                    <Input v-model:value="formData.performanceFee" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem label="Financial Year End">
-                    <Select v-model:value="formData.financialYearEnd" :options="financialYearEndOptions" />
-                  </FormItem>
-                </Col>
-              </Row>
-            </CollapsePanel>
+               <Row :gutter="16">
+                 <Col :span="12">
+                   <FormItem label="Performance Fee(%)" name="performanceFee">
+                     <Input v-model:value="formData.performanceFee" />
+                   </FormItem>
+                 </Col>
+                 <Col :span="12">
+                   <FormItem label="Financial Year End">
+                     <Select v-model:value="formData.financialYearEnd" :options="financialYearEndOptions" />
+                   </FormItem>
+                 </Col>
+               </Row>
+               <Row :gutter="16">
+                 <Col :span="12">
+                   <FormItem label="Cutoff Time" name="cutoffTime">
+                     <div class="flex gap-2">
+                       <TimePicker v-model:value="formData.cutoffTime_time" format="HH:mm" :allow-clear="true" class="flex-1" />
+                       <Select v-model:value="formData.cutoffTime_tz" :options="tzCountryOptions" show-search option-filter-prop="label" class="w-[140px]" placeholder="TZ" />
+                     </div>
+                   </FormItem>
+                 </Col>
+               </Row>
+             </CollapsePanel>
 
             <!-- Dealing & Valuation -->
             <CollapsePanel id="section-dealing" key="dealing" :header="$t('pages.productCenter.dealingAndValuation')">
@@ -825,30 +842,24 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.dealingCutOff') + ' (' + $t('pages.productCenter.selectCountry') + ')'" name="dealingCutOff">
-                     <TimePicker v-model:value="formData.dealingCutOff" format="HH:mm" :allow-clear="true" class="w-full" />
+               <Row :gutter="16">
+                 <Col :span="12">
+                   <FormItem :label="$t('pages.productCenter.dealingCutOff')" name="dealingCutOff">
+                     <div class="flex gap-2">
+                       <TimePicker v-model:value="formData.dealingCutOff_time" format="HH:mm" :allow-clear="true" class="flex-1" />
+                       <Select v-model:value="formData.dealingCutOff_tz" :options="tzCountryOptions" show-search option-filter-prop="label" class="w-[140px]" placeholder="TZ" />
+                     </div>
                    </FormItem>
                  </Col>
                  <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.dealingCutOff') + ' (TZ)'" name="dealingCutOffTz">
-                    <Select v-model:value="formData.dealingCutOffTz" :options="tzCountryOptions" show-search option-filter-prop="label" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.valuationPoint') + ' (' + $t('pages.productCenter.selectCountry') + ')'" name="valuationPoint">
-                     <TimePicker v-model:value="formData.valuationPoint" format="HH:mm" :allow-clear="true" class="w-full" />
+                   <FormItem :label="$t('pages.productCenter.valuationPoint')" name="valuationPoint">
+                     <div class="flex gap-2">
+                       <TimePicker v-model:value="formData.valuationPoint_time" format="HH:mm" :allow-clear="true" class="flex-1" />
+                       <Select v-model:value="formData.valuationPoint_tz" :options="tzCountryOptions" show-search option-filter-prop="label" class="w-[140px]" placeholder="TZ" />
+                     </div>
                    </FormItem>
                  </Col>
-                 <Col :span="12">
-                   <FormItem label="Valuation Point (TZ)" name="valuationPointTz">
-                    <Select v-model:value="formData.valuationPointTz" :options="tzCountryOptions" show-search option-filter-prop="label" />
-                  </FormItem>
-                </Col>
-              </Row>
+               </Row>
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem label="Business Day Definition" name="businessDayDefinition">
