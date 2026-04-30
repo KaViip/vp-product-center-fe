@@ -8,6 +8,8 @@ import { Page, useVbenDrawer, useVbenModal } from '@vben/common-ui';
 
 import { Popconfirm, Space, Tag } from 'antdv-next';
 
+import { $t } from '#/locales';
+
 import { useVbenVxeGrid, vxeCheckboxChecked } from '#/adapter/vxe-table';
 import {
   productCenterDataExport,
@@ -116,9 +118,9 @@ function handleMultiDelete() {
   const rows = tableApi.grid.getCheckboxRecords();
   const ids = rows.map((row: ProductCenterData) => row.productClassId);
   window.modal.confirm({
-    title: 'Confirm',
+    title: $t('pages.common.tip'),
     okType: 'danger',
-    content: `Are you sure you want to delete ${ids.length} selected record(s)?`,
+    content: $t('pages.common.confirmDelete', [ids.length]),
     onOk: async () => {
       await productCenterDataRemove(ids);
       await tableApi.query();
@@ -158,21 +160,21 @@ const statusColorMap: Record<string, string> = {
 
 <template>
   <Page :auto-content-height="true">
-    <BasicTable table-title="Fund - Operational Team" @cell-dblclick="handleCellDblclick">
+    <BasicTable :table-title="$t('pages.productCenter.operationalTeamTitle')" @cell-dblclick="handleCellDblclick">
       <template #toolbar-tools>
         <Space>
           <a-button type="primary" @click="handleAdd">
-            Add
+            {{ $t('pages.common.add') }}
           </a-button>
           <a-button @click="handleImport">
-            Import
+            {{ $t('pages.common.import') }}
           </a-button>
           <a-button
             :loading="exportLoading"
             :disabled="exportLoading"
             @click="handleExport"
           >
-            Export
+            {{ $t('pages.common.export') }}
           </a-button>
           <a-button
             :disabled="!vxeCheckboxChecked(tableApi)"
@@ -180,7 +182,7 @@ const statusColorMap: Record<string, string> = {
             type="primary"
             @click="handleMultiDelete"
           >
-            Delete
+            {{ $t('pages.common.delete') }}
           </a-button>
         </Space>
       </template>
@@ -192,21 +194,21 @@ const statusColorMap: Record<string, string> = {
       <template #action="{ row }">
         <Space>
           <action-button @click.stop="handleDetail(row)">
-            Detail
+            {{ $t('pages.common.detail') }}
           </action-button>
           <action-button @click.stop="handleEdit(row)">
-            Edit
+            {{ $t('pages.common.edit') }}
           </action-button>
           <action-button @click.stop="handleCopy(row)">
-            Copy
+            {{ $t('pages.common.copy') }}
           </action-button>
           <Popconfirm
             placement="left"
-            title="Are you sure to delete this share class?"
+            :title="$t('pages.common.confirmDeleteSingle')"
             @confirm="handleDelete(row)"
           >
             <action-button danger @click.stop="">
-              Delete
+              {{ $t('pages.common.delete') }}
             </action-button>
           </Popconfirm>
         </Space>

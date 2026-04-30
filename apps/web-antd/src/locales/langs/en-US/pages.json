@@ -3,6 +3,10 @@
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
+    "detail": "Detail",
+    "copy": "Copy",
+    "confirmDelete": "Are you sure you want to delete {0} selected record(s)?",
+    "confirmDeleteSingle": "Are you sure to delete this item?",
     "more": "More",
     "search": "Search",
     "reset": "Reset",
@@ -24,5 +28,9 @@
     "disable": "Off",
     "beforeCloseTip": "You have unsaved changes. Are you sure you want to exit?",
     "cancel": "Cancel"
+  },
+  "productCenter": {
+    "productTeamTitle": "Product Center - Product Team",
+    "operationalTeamTitle": "Product Center - Operational Team"
   }
 }

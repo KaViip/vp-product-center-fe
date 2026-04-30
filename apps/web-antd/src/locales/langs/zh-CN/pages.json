@@ -3,6 +3,10 @@
     "add": "新增",
     "edit": "编辑",
     "delete": "删除",
+    "detail": "详情",
+    "copy": "复制",
+    "confirmDelete": "确定要删除选中的 {0} 条记录吗？",
+    "confirmDeleteSingle": "确定要删除吗？",
     "more": "更多",
     "search": "搜索",
     "reset": "重置",
@@ -24,5 +28,9 @@
     "disable": "禁用",
     "beforeCloseTip": "您有未保存的更改，确认要退出吗？",
     "cancel": "取消"
+  },
+  "productCenter": {
+    "productTeamTitle": "产品中心 - 产品团队",
+    "operationalTeamTitle": "产品中心 - 运营团队"
   }
 }
