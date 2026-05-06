@@ -217,8 +217,9 @@ const timeValidator = (_rule: any, value: string) => {
   return Promise.resolve();
 };
 
-const rules = {
+const rules: Record<string, any[]> = {
   fundCode: [{ required: true, message: 'Fund Code is required' }],
+  vpfsClassId: [{ required: true, message: 'VPFS Class ID is required' }],
   shareClassNameEnOfficialName: [
     { required: true, message: 'Share Class Name (EN) is required' },
     { max: 200, message: 'Must be at most 200 characters' },
@@ -640,7 +641,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.vpfsClassId')">
+                  <FormItem :label="$t('pages.productCenter.form.vpfsClassId')" name="vpfsClassId">
                     <Input v-model:value="formData.vpfsClassId" :disabled="isUpdate" />
                   </FormItem>
                 </Col>
