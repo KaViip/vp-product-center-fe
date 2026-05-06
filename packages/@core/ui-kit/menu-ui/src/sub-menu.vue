@@ -43,7 +43,7 @@ const hasChildren = computed(() => {
     :query="menu.query"
   >
     <template #title>
-      <span>{{ menu.name }}</span>
+      <span>{{ $t(menu.name) || menu.name }}</span>
     </template>
   </MenuItem>
   <SubMenuComp
@@ -62,7 +62,7 @@ const hasChildren = computed(() => {
       />
     </template>
     <template #title>
-      <span>{{ menu.name }}</span>
+      <span>{{ $t(menu.name) || menu.name }}</span>
     </template>
     <template v-for="childItem in menu.children || []" :key="childItem.path">
       <SubMenu :menu="childItem" />
