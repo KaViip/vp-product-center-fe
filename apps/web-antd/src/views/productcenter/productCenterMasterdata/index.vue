@@ -4,11 +4,14 @@ import type { VbenFormProps } from '@vben/common-ui';
 import type { VxeGridProps } from '#/adapter/vxe-table';
 import type { ProductCenterMasterdata } from '#/api/productcenter/productCenterMasterdata/model';
 
+import { watch } from 'vue';
+
 import { Page, useVbenDrawer } from '@vben/common-ui';
 
 import { Popconfirm, Space, Tag } from 'antdv-next';
 
 import { $t } from '#/locales';
+import { useI18n } from '@vben/locales';
 
 import { useVbenVxeGrid, vxeCheckboxChecked } from '#/adapter/vxe-table';
 import {
@@ -18,7 +21,7 @@ import {
 } from '#/api/productcenter/productCenterMasterdata';
 import { useBlobExport } from '#/utils/file/export';
 
-import { columns, querySchema } from './data';
+import { getColumns, querySchema } from './data';
 import productCenterDetailDrawer from '../product-center-detail-drawer.vue';
 import productCenterMasterdataModal from './product-center-masterdata-modal.vue';
 import productCenterMasterdataImportModal from './product-center-masterdata-import-modal.vue';
@@ -47,7 +50,7 @@ const gridOptions: VxeGridProps = {
     reserve: true,
     trigger: 'default',
   },
-  columns,
+  columns: getColumns(),
   height: 'auto',
   keepSource: true,
   pagerConfig: {
@@ -85,6 +88,12 @@ function handleCellDblclick({ row }: { row: ProductCenterMasterdata }) {
 const [BasicTable, tableApi] = useVbenVxeGrid({
   formOptions,
   gridOptions,
+});
+
+// 切換語言時刷新列表表頭
+const { locale } = useI18n();
+watch(locale, () => {
+  (tableApi.grid as any).reloadColumn(getColumns());
 });
 
 const [FundFormDrawer, productCenterMasterdataModalApi] = useVbenDrawer({

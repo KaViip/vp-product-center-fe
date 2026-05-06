@@ -65,7 +65,8 @@ export const querySchema: FormSchemaGetter = () => [
   },
 ];
 
-export const columns: VxeGridProps['columns'] = [
+export function getColumns(): VxeGridProps['columns'] {
+  return [
   { type: 'checkbox', width: 60 },
   {
     field: 'fundCode',
@@ -126,4 +127,5 @@ export const columns: VxeGridProps['columns'] = [
     resizable: false,
     width: 'auto',
   },
-];
+  ];
+}

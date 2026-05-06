@@ -11,7 +11,6 @@ import { cloneDeep } from '@vben/utils';
 
 import {
   Anchor,
-  Button,
   Collapse,
   CollapsePanel,
   Col,
@@ -48,25 +47,24 @@ const scrollContainerRef = ref<HTMLElement | null>(null);
 const classListData = ref<ProductCenterData[]>([]);
 const fundCodeOptions = ref<{ label: string; value: string }[]>([]);
 
-const classListColumns: any[] = [
-  { title: 'Share Class Name (EN)', dataIndex: 'shareClassNameEnOfficialName', key: 'en' },
-  { title: 'Share Class Name (TC)', dataIndex: 'shareClassNameTcOfficialName', key: 'tc' },
-  { title: 'VPFS Class ID', dataIndex: 'vpfsClassId', key: 'vpfs' },
-  { title: 'Class Currency', dataIndex: 'classCurrency', key: 'ccy' },
-  { title: 'Status', dataIndex: 'fundClassStatus', key: 'status' },
+const classListColumns = computed<any[]>(() => [
+  { title: $t('pages.productCenter.form.shareClassNameEn'), dataIndex: 'shareClassNameEnOfficialName', key: 'en' },
+  { title: $t('pages.productCenter.form.shareClassNameTc'), dataIndex: 'shareClassNameTcOfficialName', key: 'tc' },
+  { title: $t('pages.productCenter.form.vpfsClassId'), dataIndex: 'vpfsClassId', key: 'vpfs' },
+  { title: $t('pages.productCenter.form.classCurrency'), dataIndex: 'classCurrency', key: 'ccy' },
+  { title: $t('pages.productCenter.form.fundClassStatus'), dataIndex: 'fundClassStatus', key: 'status' },
   {
-    title: 'Action',
+    title: $t('pages.productCenter.action'),
     key: 'action',
     width: 80,
     align: 'center',
     customRender: ({ record }: { record: ProductCenterData }) =>
-      h(Button, {
-        type: 'link',
-        size: 'small',
+      h('a', {
+        style: 'color: #1677ff; cursor: pointer; font-size: 13px;',
         onClick: () => handleCopyFromClassList(record),
-      }, () => 'Copy'),
+      }, 'Copy'),
   },
-];
+]);
 
 const title = computed(() => {
   if (isCopy.value) return $t('pages.productCenter.copyShareClass');
@@ -596,6 +594,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
 
             <!-- Class Info -->
             <CollapsePanel id="section-class-info" key="class-info" :header="$t('pages.productCenter.classInfo')">
+              <!-- 1. Share Class Name (EN) / Share Class Name (TC) -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.shareClassNameEn')" name="shareClassNameEnOfficialName">
@@ -608,6 +607,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 2. Share Class Name (SC) / VPFS Class ID -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.shareClassNameSc')" name="shareClassNameScOfficialName">
@@ -620,6 +620,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 3. ISIN Code / CUSIP -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.isinCode')" name="isinCode">
@@ -632,6 +633,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 4. Bloomberg Ticker / BBG ID Equity -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.bloombergTicker')">
@@ -644,6 +646,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 5. SEDOL / Morningstar Fund ID -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.sedol')" name="sedol">
@@ -656,6 +659,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 6. Morningstar Sec ID / Morningstar Performance ID -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.morningstarSecId')">
@@ -668,6 +672,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 7. Stock Code / Valor Code -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.stockCode')" name="stockCode">
@@ -680,6 +685,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 8. Lipper Code / Fund Class Status -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.lipperCode')">
@@ -692,6 +698,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 9. Class Currency / End of IOP Date -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.classCurrency')" name="classCurrency">
@@ -700,129 +707,152 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.endOfIopDate')">
-                    <DatePicker v-model:value="formData.endOfIopDate" class="w-full" value-format="YYYY/MM/DD" />
+                    <DatePicker v-model:value="formData.endOfIopDate" style="width: 100%" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 10. Launch Date / Cutoff Time -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.launchDate')" name="launchDate">
-                    <DatePicker v-model:value="formData.launchDate" class="w-full" value-format="YYYY/MM/DD" />
+                    <DatePicker v-model:value="formData.launchDate" style="width: 100%" value-format="YYYY/MM/DD" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.cutoffTime')" name="cutoffTime">
+                    <div style="display: flex; gap: 8px;">
+                      <TimePicker v-model:value="formData.cutoffTime_time" format="HH:mm" :allow-clear="true" style="flex: 1; min-width: 0" />
+                      <Select v-model:value="formData.cutoffTime_tz" :options="tzCountryOptions" show-search option-filter-prop="label" style="width: 110px" placeholder="TZ" />
+                    </div>
+                  </FormItem>
+                </Col>
+              </Row>
+              <!-- 11. Business Day Definition / Business Calendar -->
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.businessDayDefinition')" name="businessDayDefinition">
+                    <Input v-model:value="formData.businessDayDefinition" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.businessCalendar')" name="businessCalendar">
+                    <Select v-model:value="formData.businessCalendar" :options="businessCalendarOptions" mode="multiple" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <!-- 12. Distribution Frequency / Hedged -->
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.distributionPolicy')" name="distributionPolicy">
+                    <Select v-model:value="formData.distributionPolicy" :options="distributionPolicyOptions" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.hedged')" name="hedged">
+                    <Select v-model:value="formData.hedged" :options="yesNoOptions" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <!-- 13. Hedging Currency / Unit Precision -->
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.hedgingCurrency')">
+                    <Select v-model:value="formData.hedgingCurrency" :options="currencyOptions" show-search option-filter-prop="label" :disabled="!formData.hedged" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.unitPrecision')" name="unitPrecision">
+                    <Select v-model:value="formData.unitPrecision" :options="unitPrecisionOptions" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <!-- 14. NAV Precision / Subscription Settlement(T+) -->
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.navPrecision')" name="navPrecision">
+                    <Select v-model:value="formData.navPrecision" :options="navPrecisionOptions" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.subscriptionSettlement')" name="subscriptionSettlement">
+                    <Input v-model:value="formData.subscriptionSettlement" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <!-- 15. Redemption Settlement(T+) / Min Initial Subscription -->
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.redemptionSettlement')" name="redemptionSettlement">
+                    <Input v-model:value="formData.redemptionSettlement" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.minimumInitialSubscription')" name="minimumInitialSubscription">
+                    <Input v-model:value="formData.minimumInitialSubscription" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <!-- 16. Min Subsequent Subscription / Minimum Redemption -->
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.minimumSubsequentSubscription')" name="minimumSubsequentSubscription">
+                    <Input v-model:value="formData.minimumSubsequentSubscription" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.minimumRedemption')" name="minimumRedemption">
+                    <Input v-model:value="formData.minimumRedemption" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <!-- 17. Minimum Holding / Redemption Charge -->
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.minimumHolding')">
+                    <Input v-model:value="formData.minimumHolding" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.redemptionCharge')">
+                    <Input v-model:value="formData.redemptionCharge" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <!-- 18. Management Fee(%) / Performance Fee(%) -->
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.managementFee')" name="managementFee">
+                    <Input v-model:value="formData.managementFee" />
+                  </FormItem>
+                </Col>
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.performanceFee')" name="performanceFee">
+                    <Input v-model:value="formData.performanceFee" />
+                  </FormItem>
+                </Col>
+              </Row>
+              <!-- 19. Financial Year End / Latest TER Date -->
+              <Row :gutter="16">
+                <Col :span="12">
+                  <FormItem :label="$t('pages.productCenter.form.financialYearEnd')">
+                    <Select v-model:value="formData.financialYearEnd" :options="financialYearEndOptions" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.latestTerDate')">
-                    <DatePicker v-model:value="formData.latestTerDate" class="w-full" picker="month" value-format="YYYY/MM" />
+                    <DatePicker v-model:value="formData.latestTerDate" style="width: 100%" picker="month" value-format="YYYY/MM" />
                   </FormItem>
                 </Col>
               </Row>
+              <!-- 20. Latest TER Rate(%) -->
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.latestTerRate')" name="latestTerRate">
                     <Input v-model:value="formData.latestTerRate" />
                   </FormItem>
                 </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.distributionPolicy')" name="distributionPolicy">
-                    <Select v-model:value="formData.distributionPolicy" :options="distributionPolicyOptions" />
-                  </FormItem>
-                </Col>
               </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.hedged')" name="hedged">
-                    <Select v-model:value="formData.hedged" :options="yesNoOptions" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.hedgingCurrency')">
-                    <Select v-model:value="formData.hedgingCurrency" :options="currencyOptions" show-search option-filter-prop="label" :disabled="!formData.hedged" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.unitPrecision')" name="unitPrecision">
-                    <Select v-model:value="formData.unitPrecision" :options="unitPrecisionOptions" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.navPrecision')" name="navPrecision">
-                    <Select v-model:value="formData.navPrecision" :options="navPrecisionOptions" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.subscriptionSettlement')" name="subscriptionSettlement">
-                    <Input v-model:value="formData.subscriptionSettlement" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.redemptionSettlement')" name="redemptionSettlement">
-                    <Input v-model:value="formData.redemptionSettlement" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.minimumInitialSubscription')" name="minimumInitialSubscription">
-                    <Input v-model:value="formData.minimumInitialSubscription" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.minimumSubsequentSubscription')" name="minimumSubsequentSubscription">
-                    <Input v-model:value="formData.minimumSubsequentSubscription" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.minimumRedemption')" name="minimumRedemption">
-                    <Input v-model:value="formData.minimumRedemption" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.minimumHolding')">
-                    <Input v-model:value="formData.minimumHolding" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.redemptionCharge')">
-                    <Input v-model:value="formData.redemptionCharge" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.managementFee')" name="managementFee">
-                    <Input v-model:value="formData.managementFee" />
-                  </FormItem>
-                </Col>
-              </Row>
-               <Row :gutter="16">
-                 <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.form.performanceFee')" name="performanceFee">
-                     <Input v-model:value="formData.performanceFee" />
-                   </FormItem>
-                 </Col>
-                 <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.form.financialYearEnd')">
-                     <Select v-model:value="formData.financialYearEnd" :options="financialYearEndOptions" />
-                   </FormItem>
-                 </Col>
-               </Row>
-               <Row :gutter="16">
-                 <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.form.cutoffTime')" name="cutoffTime">
-                     <div class="flex gap-2">
-                       <TimePicker v-model:value="formData.cutoffTime_time" format="HH:mm" :allow-clear="true" class="flex-1" />
-                       <Select v-model:value="formData.cutoffTime_tz" :options="tzCountryOptions" show-search option-filter-prop="label" class="w-[140px]" placeholder="TZ" />
-                     </div>
-                   </FormItem>
-                 </Col>
-               </Row>
-             </CollapsePanel>
+            </CollapsePanel>
 
             <!-- Dealing & Valuation -->
             <CollapsePanel id="section-dealing" key="dealing" :header="$t('pages.productCenter.dealingAndValuation')">
@@ -840,37 +870,25 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
                <Row :gutter="16">
                  <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.form.dealingCutOff')" name="dealingCutOff">
-                     <div class="flex gap-2">
-                       <TimePicker v-model:value="formData.dealingCutOff_time" format="HH:mm" :allow-clear="true" class="flex-1" />
-                       <Select v-model:value="formData.dealingCutOff_tz" :options="tzCountryOptions" show-search option-filter-prop="label" class="w-[140px]" placeholder="TZ" />
-                     </div>
-                   </FormItem>
+                    <FormItem :label="$t('pages.productCenter.form.dealingCutOff')" name="dealingCutOff">
+                      <div style="display: flex; gap: 8px;">
+                        <TimePicker v-model:value="formData.dealingCutOff_time" format="HH:mm" :allow-clear="true" style="flex: 1; min-width: 0" />
+                        <Select v-model:value="formData.dealingCutOff_tz" :options="tzCountryOptions" show-search option-filter-prop="label" style="width: 110px" placeholder="TZ" />
+                      </div>
+                    </FormItem>
                  </Col>
                  <Col :span="12">
-                   <FormItem :label="$t('pages.productCenter.form.valuationPoint')" name="valuationPoint">
-                     <div class="flex gap-2">
-                       <TimePicker v-model:value="formData.valuationPoint_time" format="HH:mm" :allow-clear="true" class="flex-1" />
-                       <Select v-model:value="formData.valuationPoint_tz" :options="tzCountryOptions" show-search option-filter-prop="label" class="w-[140px]" placeholder="TZ" />
-                     </div>
-                   </FormItem>
+                    <FormItem :label="$t('pages.productCenter.form.valuationPoint')" name="valuationPoint">
+                      <div style="display: flex; gap: 8px;">
+                        <TimePicker v-model:value="formData.valuationPoint_time" format="HH:mm" :allow-clear="true" style="flex: 1; min-width: 0" />
+                        <Select v-model:value="formData.valuationPoint_tz" :options="tzCountryOptions" show-search option-filter-prop="label" style="width: 110px" placeholder="TZ" />
+                      </div>
+                    </FormItem>
                  </Col>
                </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.businessDayDefinition')" name="businessDayDefinition">
-                    <Input v-model:value="formData.businessDayDefinition" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.businessCalendar')" name="businessCalendar">
-                    <Select v-model:value="formData.businessCalendar" :options="businessCalendarOptions" mode="multiple" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.contractNoteDeliveryDay')">
+               <Row :gutter="16">
+                 <Col :span="12">
+                   <FormItem :label="$t('pages.productCenter.form.contractNoteDeliveryDay')">
                     <Input v-model:value="formData.contractNoteDeliveryDay" />
                   </FormItem>
                 </Col>
