@@ -1,4 +1,9 @@
 {
+  "routes": {
+    "productCenter": "產品中心",
+    "productCenter_masterData": "產品團隊",
+    "productCenter_data": "營運團隊"
+  },
   "common": {
     "add": "新增",
     "edit": "編輯",

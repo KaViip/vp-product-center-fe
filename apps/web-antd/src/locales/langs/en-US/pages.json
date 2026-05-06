@@ -1,4 +1,9 @@
 {
+  "routes": {
+    "productCenter": "Product Center",
+    "productCenter_masterData": "Product Team",
+    "productCenter_data": "Operational Team"
+  },
   "common": {
     "add": "Add",
     "edit": "Edit",

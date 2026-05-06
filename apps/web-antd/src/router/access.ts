@@ -119,7 +119,7 @@ function backMenuToVbenMenu(
         hideInMenu: menu.hidden,
         icon: menu.meta?.icon,
         keepAlive: !menu.meta?.noCache,
-        title: menu.meta?.title,
+        title: $t(menu.meta?.title as string) || menu.meta?.title,
       },
       name: menu.name,
       path: menu.path,
