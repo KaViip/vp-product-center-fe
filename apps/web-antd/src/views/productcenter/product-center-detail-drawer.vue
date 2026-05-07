@@ -2,7 +2,7 @@
 import type { ProductCenterData } from '#/api/productcenter/productCenterData/model';
 import type { ProductCenterMasterdata } from '#/api/productcenter/productCenterMasterdata/model';
 
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
 import { $t } from '@vben/locales';
@@ -23,6 +23,7 @@ import {
 
 import { productCenterDataInfo, productCenterDataList } from '#/api/productcenter/productCenterData';
 import { productCenterMasterdataInfo } from '#/api/productcenter/productCenterMasterdata';
+import { dictDataInfo } from '#/api/system/dict/dict-data';
 
 type DetailMode = 'fund' | 'shareClass';
 
@@ -34,6 +35,19 @@ const shareClassData = ref<Partial<ProductCenterData>>({});
 const shareClassList = ref<ProductCenterData[]>([]);
 const scrollContainerRef = ref<HTMLElement | null>(null);
 const activeCollapseKeys = ref<string[]>(['core', 'parties', 'strategy', 'registration', 'fund-info', 'class-info', 'dealing']);
+const regionLabelMap = ref<Record<number, string>>({});
+
+// Load region dict once for label mapping
+onMounted(async () => {
+  try {
+    const data = await dictDataInfo('sys_product_center_region');
+    const map: Record<number, string> = {};
+    for (const item of data) {
+      map[item.dictCode] = item.dictLabel;
+    }
+    regionLabelMap.value = map;
+  } catch { /* ignore */ }
+});
 
 // ─── Field Definitions (data-driven) ───
 
@@ -204,7 +218,10 @@ function formatValue(value: any, type?: string): string {
     return '-';
   }
   if (type === 'region') {
-    if (Array.isArray(value)) return value.join(', ') || '-';
+    if (Array.isArray(value)) {
+      const labels = value.map((code: number) => regionLabelMap.value[code] || String(code));
+      return labels.join(', ') || '-';
+    }
     return String(value);
   }
   return String(value);
