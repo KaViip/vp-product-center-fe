@@ -365,7 +365,7 @@ const statusColorMap: Record<string, string> = {
 <template>
   <Drawer :footer="false" :title="$t('pages.productCenter.detailDrawerTitle')" :class="'w-[85%]'">
     <Spin :spinning="loading" class="h-full">
-      <div class="flex h-full gap-4 overflow-x-hidden">
+      <div class="flex h-full gap-4">
         <div class="flex-1 overflow-y-auto">
           <Tabs v-model:activeKey="activeTab">
             <!-- ═══════════════════════════════════════════════ -->

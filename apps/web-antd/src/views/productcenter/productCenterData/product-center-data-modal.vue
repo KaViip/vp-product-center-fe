@@ -289,6 +289,19 @@ const rules: Record<string, any[]> = {
   valuationDeliveryTimeT: [{ validator: integerValidator }],
 };
 
+// Re-validate composite time+tz fields when tz changes
+watch(() => [
+  formData.value.dealingCutOff_tz,
+  formData.value.valuationPoint_tz,
+  formData.value.cutoffTime_tz,
+], () => {
+  formRef.value?.validateFields([
+    'dealingCutOff_time',
+    'valuationPoint_time',
+    'cutoffTime_time',
+  ]).catch(() => {});
+});
+
 // Auto-detect Hedged from Share Class Name (EN)
 watch(() => formData.value.shareClassNameEnOfficialName, (val) => {
   if (val && /\bhedged\b/i.test(val)) {
@@ -565,8 +578,8 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
 <template>
   <Drawer :title="title" :class="'w-[85%]'" :footer="true">
     <Spin :spinning="loading" class="h-full">
-      <div class="flex h-full gap-4 overflow-x-hidden">
-        <div class="flex-1 min-w-0">
+      <div class="flex h-full gap-4">
+        <div class="flex-1 min-w-0 overflow-x-hidden">
           <Form
             ref="formRef"
             :model="formData"
