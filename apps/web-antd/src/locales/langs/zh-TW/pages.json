@@ -61,6 +61,7 @@
     "selectFundCode": "請選擇基金代碼",
     "updatedSuccessfully": "更新成功",
     "addedSuccessfully": "新增成功",
+    "pleaseFixErrors": "請修正表單中的錯誤後再提交",
     "mustBeUnique": "必須唯一！",
     "fundCodeShareClassUnique": "基金代碼 + 份額類別名稱(EN) + VPFS類別ID 必須唯一！",
     "selectExcel": "選擇Excel",

@@ -353,6 +353,11 @@ async function handleConfirm() {
     drawerApi.lock(true);
     const valid = await formRef.value?.validate();
     if (valid?.errorFields) {
+      const firstField = valid.errorFields[0]?.name?.[0];
+      if (firstField) {
+        formRef.value?.scrollToField(firstField, { behavior: 'smooth', scrollMode: 'if-needed' });
+      }
+      window.message.error($t('pages.productCenter.pleaseFixErrors'));
       return;
     }
 

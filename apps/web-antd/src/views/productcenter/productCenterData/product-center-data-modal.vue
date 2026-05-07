@@ -243,30 +243,30 @@ const rules: Record<string, any[]> = {
   businessCalendar: [{ required: true, message: 'Business Calendar is required' }],
   dealingFrequency: [{ required: true, message: 'Dealing Frequency is required' }],
   valuationFrequency: [{ required: true, message: 'Valuation Frequency is required' }],
-  dealingCutOff: [{
-    validator: (_rule: any, _value: any, callback: (error?: Error) => void) => {
-      const time = formData.value.dealingCutOff_time;
+  dealingCutOff_time: [{
+    required: true,
+    validator: (_rule: any, value: any, callback: (error?: Error) => void) => {
       const tz = formData.value.dealingCutOff_tz;
-      if (time && tz) callback();
-      else if (!time && !tz) callback(new Error('Dealing Cut-off is required'));
+      if (value && tz) callback();
+      else if (!value && !tz) callback(new Error('Dealing Cut-off is required'));
       else callback(new Error('Please fill both time and timezone'));
     },
   }],
-  valuationPoint: [{
-    validator: (_rule: any, _value: any, callback: (error?: Error) => void) => {
-      const time = formData.value.valuationPoint_time;
+  valuationPoint_time: [{
+    required: true,
+    validator: (_rule: any, value: any, callback: (error?: Error) => void) => {
       const tz = formData.value.valuationPoint_tz;
-      if (time && tz) callback();
-      else if (!time && !tz) callback(new Error('Valuation Point is required'));
+      if (value && tz) callback();
+      else if (!value && !tz) callback(new Error('Valuation Point is required'));
       else callback(new Error('Please fill both time and timezone'));
     },
   }],
-  cutoffTime: [{
-    validator: (_rule: any, _value: any, callback: (error?: Error) => void) => {
-      const time = formData.value.cutoffTime_time;
+  cutoffTime_time: [{
+    required: true,
+    validator: (_rule: any, value: any, callback: (error?: Error) => void) => {
       const tz = formData.value.cutoffTime_tz;
-      if (time && tz) callback();
-      else if (!time && !tz) callback(new Error('Cutoff Time is required'));
+      if (value && tz) callback();
+      else if (!value && !tz) callback(new Error('Cutoff Time is required'));
       else callback(new Error('Please fill both time and timezone'));
     },
   }],
@@ -464,6 +464,11 @@ async function handleConfirm() {
     drawerApi.lock(true);
     const valid = await formRef.value?.validate();
     if (valid?.errorFields) {
+      const firstField = valid.errorFields[0]?.name?.[0];
+      if (firstField) {
+        formRef.value?.scrollToField(firstField, { behavior: 'smooth', scrollMode: 'if-needed' });
+      }
+      window.message.error($t('pages.productCenter.pleaseFixErrors'));
       return;
     }
 
@@ -745,7 +750,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
                 <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.cutoffTime')" name="cutoffTime">
+                  <FormItem :label="$t('pages.productCenter.form.cutoffTime')" name="cutoffTime_time">
                     <div style="display: flex; gap: 8px;">
                       <TimePicker v-model:value="formData.cutoffTime_time" format="HH:mm" :allow-clear="true" style="width: 110px" />
                       <Select v-model:value="formData.cutoffTime_tz" :options="tzCountryOptions" show-search option-filter-prop="label" style="flex: 1; min-width: 0" placeholder="TZ" />
@@ -896,7 +901,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
                <Row :gutter="16">
                  <Col :span="12">
-                    <FormItem :label="$t('pages.productCenter.form.dealingCutOff')" name="dealingCutOff">
+                     <FormItem :label="$t('pages.productCenter.form.dealingCutOff')" name="dealingCutOff_time">
                        <div style="display: flex; gap: 8px;">
                          <TimePicker v-model:value="formData.dealingCutOff_time" format="HH:mm" :allow-clear="true" style="width: 110px" />
                          <Select v-model:value="formData.dealingCutOff_tz" :options="tzCountryOptions" show-search option-filter-prop="label" style="flex: 1; min-width: 0" placeholder="TZ" />
@@ -904,7 +909,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                     </FormItem>
                  </Col>
                  <Col :span="12">
-                    <FormItem :label="$t('pages.productCenter.form.valuationPoint')" name="valuationPoint">
+                     <FormItem :label="$t('pages.productCenter.form.valuationPoint')" name="valuationPoint_time">
                        <div style="display: flex; gap: 8px;">
                          <TimePicker v-model:value="formData.valuationPoint_time" format="HH:mm" :allow-clear="true" style="width: 110px" />
                          <Select v-model:value="formData.valuationPoint_tz" :options="tzCountryOptions" show-search option-filter-prop="label" style="flex: 1; min-width: 0" placeholder="TZ" />

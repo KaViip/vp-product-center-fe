@@ -61,6 +61,7 @@
     "selectFundCode": "Select Fund Code",
     "updatedSuccessfully": "Updated successfully",
     "addedSuccessfully": "Added successfully",
+    "pleaseFixErrors": "Please fix the form errors before submitting",
     "mustBeUnique": "must be unique!",
     "fundCodeShareClassUnique": "Fund Code + Share Class Name (EN) + VPFS Class ID must be unique!",
     "selectExcel": "Select Excel",
