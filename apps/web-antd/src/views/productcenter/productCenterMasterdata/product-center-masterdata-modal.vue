@@ -445,8 +445,8 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
 <template>
   <Drawer :title="title" :class="'w-[85%]'" :footer="true">
     <Spin :spinning="loading" class="h-full">
-      <div class="flex h-full gap-4">
-        <div class="flex-1">
+<div class="flex h-full gap-4 overflow-x-hidden">
+<div class="flex-1 min-w-0">
           <Form
             ref="formRef"
             :model="formData"
