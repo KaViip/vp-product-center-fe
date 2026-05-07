@@ -518,12 +518,13 @@ async function handleConfirm() {
       delete submitData[`${key}_tz`];
     }
 
-    if (isUpdate.value) {
-      await productCenterDataUpdate(submitData);
-      window.message.success($t('pages.productCenter.updatedSuccessfully'));
-    } else {
+    if (!isUpdate.value) {
+      delete submitData.productClassId;
       await productCenterDataAdd(submitData);
       window.message.success($t('pages.productCenter.addedSuccessfully'));
+    } else {
+      await productCenterDataUpdate(submitData);
+      window.message.success($t('pages.productCenter.updatedSuccessfully'));
     }
     emit('reload');
     drawerApi.close();
