@@ -158,13 +158,25 @@ async function handleExport() {
   const rows = tableApi.grid.getCheckboxRecords();
   const fileName = buildExportFileName('FundInfo');
   if (rows.length > 0) {
-    // 勾選了行 → 按主鍵導出
+    // 勾選了行 → 確認後按主鍵導出
     const fundCodes = rows.map((row: ProductCenterMasterdata) => row.fundCode);
-    exportBlob({ data: { fundCodes }, fileName });
+    window.modal.confirm({
+      title: $t('pages.common.tip'),
+      content: $t('pages.common.confirmExportSelected', [fundCodes.length]),
+      onOk: async () => {
+        exportBlob({ data: { fundCodes }, fileName });
+      },
+    });
   } else {
-    // 未勾選 → 按搜索條件導出全部
-    const formValues = await tableApi.formApi.getValues();
-    exportBlob({ data: formValues, fileName });
+    // 未勾選 → 確認後按搜索條件導出全部
+    window.modal.confirm({
+      title: $t('pages.common.tip'),
+      content: $t('pages.common.confirmExportAll'),
+      onOk: async () => {
+        const formValues = await tableApi.formApi.getValues();
+        exportBlob({ data: formValues, fileName });
+      },
+    });
   }
 }
 
