@@ -32,7 +32,9 @@
     "enable": "On",
     "disable": "Off",
     "beforeCloseTip": "You have unsaved changes. Are you sure you want to exit?",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "confirmExportSelected": "Are you sure you want to export the selected {0} record(s)?",
+    "confirmExportAll": "Are you sure you want to export all data?"
   },
   "productCenter": {
     "productTeamTitle": "Product Center - Product Team",

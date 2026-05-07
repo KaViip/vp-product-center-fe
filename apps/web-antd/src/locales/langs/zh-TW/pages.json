@@ -32,7 +32,9 @@
     "enable": "啟用",
     "disable": "禁用",
     "beforeCloseTip": "您有未保存的更改，確認要退出嗎？",
-    "cancel": "取消"
+    "cancel": "取消",
+    "confirmExportSelected": "確定要導出選中的 {0} 條記錄嗎？",
+    "confirmExportAll": "確定要導出全部數據嗎？"
   },
   "productCenter": {
     "productTeamTitle": "產品中心 - 產品團隊",
