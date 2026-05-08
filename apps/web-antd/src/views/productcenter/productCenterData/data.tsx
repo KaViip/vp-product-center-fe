@@ -120,7 +120,7 @@ export function getColumns(): VxeGridProps['columns'] {
     slots: { default: 'action' },
     title: $t('pages.productCenter.action'),
     resizable: false,
-    width: 'auto',
+    minWidth: 240,
   },
 ];
 }
