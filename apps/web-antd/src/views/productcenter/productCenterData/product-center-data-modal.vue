@@ -518,6 +518,13 @@ async function handleConfirm() {
       delete submitData[`${key}_tz`];
     }
 
+    // Month-picker fields: "YYYY/MM" → "YYYY/MM/01" for backend date parsing
+    for (const key of monthFields) {
+      if (submitData[key] && typeof submitData[key] === 'string') {
+        submitData[key] = `${submitData[key]}/01`;
+      }
+    }
+
     if (!isUpdate.value) {
       delete submitData.productClassId;
       await productCenterDataAdd(submitData);
