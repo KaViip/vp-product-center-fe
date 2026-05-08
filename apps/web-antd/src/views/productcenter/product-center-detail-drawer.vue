@@ -340,7 +340,8 @@ const [Drawer, drawerApi] = useVbenDrawer({
         // Also load share classes for this fund
         try {
           const result = await productCenterDataList({ pageNum: 1, pageSize: 999, fundCode: data.fundCode });
-          shareClassList.value = result.rows || [];
+          // Strip 'children' to prevent antdv-next Table from rendering tree expand icons
+          shareClassList.value = (result.rows || []).map(({ children, ...rest }: any) => rest);
         } catch {
           shareClassList.value = [];
         }
@@ -363,7 +364,8 @@ const [Drawer, drawerApi] = useVbenDrawer({
           // Load all share classes for this fund (for the Product Team tab)
           try {
             const result = await productCenterDataList({ pageNum: 1, pageSize: 999, fundCode: shareClass.fundCode });
-            shareClassList.value = result.rows || [];
+            // Strip 'children' to prevent antdv-next Table from rendering tree expand icons
+            shareClassList.value = (result.rows || []).map(({ children, ...rest }: any) => rest);
           } catch {
             shareClassList.value = [];
           }

@@ -326,7 +326,9 @@ watch(() => formData.value.fundCode, async (fundCode) => {
   }
   // Load class list for the selected fund
   try {
-    classListData.value = (await productCenterDataList({ pageNum: 1, pageSize: 999, fundCode })).rows || [];
+    const rows = (await productCenterDataList({ pageNum: 1, pageSize: 999, fundCode })).rows || [];
+    // Strip 'children' to prevent antdv-next Table from rendering tree expand icons
+    classListData.value = rows.map(({ children, ...rest }: any) => rest);
   } catch {
     classListData.value = [];
   }
