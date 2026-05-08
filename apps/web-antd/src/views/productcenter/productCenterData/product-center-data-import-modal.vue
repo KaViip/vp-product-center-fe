@@ -107,11 +107,8 @@ async function handleConfirm() {
     currentStep.value = 2;
     importing.value = true;
     try {
-      const data = {
-        file: fileList.value[0]!.originFileObj as Blob,
-        importMode: importMode.value,
-      };
-      const result = await productCenterDataImport(data);
+      const file = fileList.value[0]!.originFileObj as File;
+      const result = await productCenterDataImport(file);
       importResult.value = result as any;
       emit('reload');
     } catch (error: any) {

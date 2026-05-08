@@ -589,13 +589,13 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
               <Row :gutter="16">
                 <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.restrictionInvestorNationality')">
-                    <Input v-model:value="formData.restrictionInvestorNationality" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.restrictionInvestorResidency')">
-                    <Input v-model:value="formData.restrictionInvestorResidency" />
+<FormItem :label="$t('pages.productCenter.form.restrictionInvestorNationality')">
+<Input v-model:value="formData.restrictionOnInvestorSNationality" />
+</FormItem>
+</Col>
+<Col :span="colSpan">
+<FormItem :label="$t('pages.productCenter.form.restrictionInvestorResidency')">
+<Input v-model:value="formData.restrictionOnInvestorSResidency" />
                   </FormItem>
                 </Col>
               </Row>

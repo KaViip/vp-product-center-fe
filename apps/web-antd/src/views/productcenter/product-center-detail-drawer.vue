@@ -82,8 +82,8 @@ const coreFields: FieldDef[] = [
   { label: $t('pages.productCenter.form.operationStartDate'), key: 'operationStartDate', type: 'date' },
   { label: $t('pages.productCenter.form.listingDate'), key: 'listingDate', type: 'date' },
   { label: $t('pages.productCenter.form.terminationDate'), key: 'terminationDate', type: 'date' },
-  { label: "Restriction on Investor's Nationality", key: 'restrictionInvestorNationality' },
-  { label: "Restriction on Investor's Residency", key: 'restrictionInvestorResidency' },
+  { label: "Restriction on Investor's Nationality", key: 'restrictionOnInvestorSNationality' },
+  { label: "Restriction on Investor's Residency", key: 'restrictionOnInvestorSResidency' },
 ];
 
 const partyFields: FieldDef[] = [
