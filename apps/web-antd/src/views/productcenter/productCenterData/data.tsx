@@ -62,6 +62,7 @@ export function getColumns(): VxeGridProps['columns'] {
     field: 'fundCode',
     title: $t('pages.productCenter.fundCode'),
     minWidth: 100,
+    treeNode: true,
   },
   {
     field: 'fundNameEn',

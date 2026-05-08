@@ -57,7 +57,7 @@ const gridOptions: VxeGridProps = {
     ajax: {
       query: async (_params, formValues = {}) => {
         const data = await productCenterDataTreeList(formValues);
-        return { rows: data, total: data.length };
+        return { rows: data };
       },
     },
   },
