@@ -51,6 +51,7 @@ export interface ProductCenterMasterdata {
   investmentMarketFocus?: string;
   investmentStrategy?: string;
   assetAllocationTable?: string;
+  assetAllocationImage?: string;
   hedgingPolicyFund?: string;
   benchmarkCode?: string;
   regionDictCodes?: number[];

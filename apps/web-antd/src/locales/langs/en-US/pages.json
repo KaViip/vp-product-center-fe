@@ -155,6 +155,7 @@
       "investmentObjective": "Investment Objective",
       "investmentStrategy": "Investment Strategy",
       "assetAllocationTable": "Asset Allocation Table",
+      "assetAllocationImage": "Asset Allocation Image",
       "hedgingPolicyFund": "Hedging Policy (Fund)",
       "benchmark": "Benchmark",
       "benchmarkCode": "Benchmark Code",
