@@ -76,26 +76,6 @@ const gridOptions: VxeGridProps = {
     keyField: 'treeId',
     isHover: true,
   },
-  rowStyle: ({ row }) => {
-    if (!row.productClassId) {
-      return { fontWeight: 600, backgroundColor: '#f8fafc' };
-    }
-  },
-  spanMethod: ({ row, _columns, columnIndex }) => {
-    // Parent row (fund level): merge all non-fixed columns into one spanning from fundCode to the last data column
-    if (!row.productClassId) {
-      if (columnIndex === 0) {
-        // Hide checkbox cell
-        return { rowspan: 0, colspan: 0 };
-      }
-      if (columnIndex === 1) {
-        // Fund code cell spans all non-fixed columns (skip checkbox at 0 and action at the end)
-        return { rowspan: 1, colspan: 10 };
-      }
-      // All other cells in this range are covered by the merge
-      return { rowspan: 0, colspan: 0 };
-    }
-  },
   id: 'fund-operational-team-index',
 };
 
