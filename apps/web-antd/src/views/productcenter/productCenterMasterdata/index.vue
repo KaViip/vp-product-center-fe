@@ -164,7 +164,7 @@ async function handleExport() {
       title: $t('pages.common.tip'),
       content: $t('pages.common.confirmExportSelected', [fundCodes.length]),
       onOk: async () => {
-        exportBlob({ data: { fundCodes }, fileName });
+        exportBlob({ data: { fundCodes: fundCodes.join(',') }, fileName });
       },
     });
   } else {

@@ -16,8 +16,8 @@ import { useI18n } from '@vben/locales';
 import { useVbenVxeGrid, vxeCheckboxChecked } from '#/adapter/vxe-table';
 import {
   productCenterDataExport,
-  productCenterDataList,
   productCenterDataRemove,
+  productCenterDataTreeList,
 } from '#/api/productcenter/productCenterData';
 import { useBlobExport } from '#/utils/file/export';
 
@@ -53,20 +53,18 @@ const gridOptions: VxeGridProps = {
   columns: getColumns(),
   height: 'auto',
   keepSource: true,
-  pagerConfig: {
-    pageSize: 10,
-    pageSizes: [10, 20, 50, 100],
-  },
   proxyConfig: {
     ajax: {
-      query: async ({ page }, formValues = {}) => {
-        return await productCenterDataList({
-          pageNum: page.currentPage,
-          pageSize: page.pageSize,
-          ...formValues,
-        });
+      query: async (_params, formValues = {}) => {
+        const data = await productCenterDataTreeList(formValues);
+        return { rows: data, total: data.length };
       },
     },
+  },
+  treeConfig: {
+    transform: false,
+    rowField: 'treeId',
+    parentField: 'parentId',
   },
   headerCellConfig: {
     height: 44,
@@ -75,7 +73,7 @@ const gridOptions: VxeGridProps = {
     height: 48,
   },
   rowConfig: {
-    keyField: 'productClassId',
+    keyField: 'treeId',
     isHover: true,
   },
   id: 'fund-operational-team-index',
@@ -125,7 +123,8 @@ async function handleDelete(row: ProductCenterData) {
 
 function handleMultiDelete() {
   const rows = tableApi.grid.getCheckboxRecords();
-  const ids = rows.map((row: ProductCenterData) => row.productClassId);
+  const ids = rows.filter((row: ProductCenterData) => row.productClassId).map((row: ProductCenterData) => row.productClassId);
+  if (ids.length === 0) return;
   window.modal.confirm({
     title: $t('pages.common.tip'),
     okType: 'danger',
@@ -159,12 +158,12 @@ async function handleExport() {
   const fileName = buildExportFileName('ProductCenterDataInfo');
   if (rows.length > 0) {
     // 勾選了行 → 確認後按主鍵導出
-    const productClassIds = rows.map((row: ProductCenterData) => row.productClassId);
+    const productClassIds = rows.filter((row: ProductCenterData) => row.productClassId).map((row: ProductCenterData) => row.productClassId);
     window.modal.confirm({
       title: $t('pages.common.tip'),
       content: $t('pages.common.confirmExportSelected', [productClassIds.length]),
       onOk: async () => {
-        exportBlob({ data: { productClassIds }, fileName });
+        exportBlob({ data: { productClassIds: productClassIds.join(',') }, fileName });
       },
     });
   } else {
@@ -221,7 +220,7 @@ const statusColorMap: Record<string, string> = {
         </Tag>
       </template>
       <template #action="{ row }">
-        <Space>
+        <Space v-if="row.productClassId">
           <action-button @click.stop="handleDetail(row)">
             {{ $t('pages.common.detail') }}
           </action-button>
