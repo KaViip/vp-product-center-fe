@@ -161,9 +161,11 @@ async function handleAutocomplete(field: string, keyword: string) {
 
 const AUTOCOMPLETE_FIELDS = [
   'fundManager',
+  'subManager',
   'investmentAdvisor',
   'trusteeAdministrator',
   'custodianPrimeBroker',
+  'subCustodian',
   'auditor',
   'benchmark',
 ];
@@ -594,7 +596,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
 <Input v-model:value="formData.restrictionOnInvestorSNationality" />
 </FormItem>
 </Col>
-<Col :span="colSpan">
+<Col :span="12">
 <FormItem :label="$t('pages.productCenter.form.restrictionInvestorResidency')">
 <Input v-model:value="formData.restrictionOnInvestorSResidency" />
                   </FormItem>
@@ -618,7 +620,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.subManager')">
-                    <Input v-model:value="formData.subManager" />
+                    <AutoComplete v-model:value="formData.subManager" v-bind="getAutocompleteProps('subManager')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -642,7 +644,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               <Row :gutter="16">
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.subCustodian')">
-                    <Input v-model:value="formData.subCustodian" />
+                    <AutoComplete v-model:value="formData.subCustodian" v-bind="getAutocompleteProps('subCustodian')" />
                   </FormItem>
                 </Col>
                 <Col :span="12">
@@ -696,19 +698,15 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 <Col :span="24">
                   <FormItem :label="$t('pages.productCenter.form.assetAllocationTable')" name="assetAllocationTable">
                     <Input v-model:value="formData.assetAllocationTable" type="textarea" :rows="4" />
-                  </FormItem>
-                </Col>
-              </Row>
-              <Row :gutter="16">
-                <Col :span="24">
-                  <FormItem :label="$t('pages.productCenter.form.assetAllocationImage')">
-                    <FileUpload
-                      v-model:value="formData.assetAllocationImage"
-                      :accept="'image/jpeg,image/jpg,image/png,image/heic,image/heif'"
-                      :max-size="10"
-                      :max-count="1"
-                      :help-message="true"
-                    />
+                    <div class="mt-3">
+                      <FileUpload
+                        v-model:value="formData.assetAllocationImage"
+                        :accept="'image/jpeg,image/jpg,image/png,image/heic,image/heif'"
+                        :max-size="10"
+                        :max-count="1"
+                        :help-message="true"
+                      />
+                    </div>
                   </FormItem>
                 </Col>
               </Row>

@@ -520,6 +520,7 @@ const statusColorMap: Record<string, string> = {
                       :row-key="(record: ProductCenterData) => record.productClassId ?? record.vpfsClassId"
                       size="small"
                       :pagination="false"
+                      :expandable="{ childrenColumnName: '_children' }"
                       bordered
                       :scroll="{ x: 960 }"
                     >
