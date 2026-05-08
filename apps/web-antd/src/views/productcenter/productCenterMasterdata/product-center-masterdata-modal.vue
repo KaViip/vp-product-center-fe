@@ -23,6 +23,8 @@ import {
   Spin,
 } from 'antdv-next';
 
+import { FileUpload } from '#/components/upload';
+
 import {
   productCenterMasterdataAdd,
   productCenterMasterdataAutocomplete,
@@ -245,7 +247,6 @@ const rules = {
     { max: 2000, message: 'Must be at most 2000 characters' },
   ],
   assetAllocationTable: [
-    { required: true, message: 'Asset Allocation is required' },
     { max: 4000, message: 'Must be at most 4000 characters' },
   ],
   giinNumber: [{ validator: giinValidator }],
@@ -362,6 +363,13 @@ async function handleConfirm() {
     }
 
     const excludeFundCode = isUpdate.value ? formData.value.fundCode : undefined;
+
+    // Asset Allocation: at least one of text or image is required
+    if (!formData.value.assetAllocationTable && !formData.value.assetAllocationImage) {
+      window.message.error('Asset Allocation Table or Image is required');
+      return;
+    }
+
     const uniqueFields = [
       { field: 'fundCode', label: 'Fund Code', value: formData.value.fundCode },
       { field: 'fundNameEn', label: 'Fund Name (EN)', value: formData.value.fundNameEn },
@@ -400,13 +408,6 @@ const anchorItems = computed(() => [
   { href: '#section-strategy', title: $t('pages.productCenter.investmentStrategy') },
   { href: '#section-registration', title: $t('pages.productCenter.foreignRegistration') },
 ]);
-
-// TODO(v2): Enable when Asset Allocation file upload is implemented
-// function onAssetUploadSuccess(_file: any, response: { url: string }) {
-//   const current = formData.value.assetAllocationTable || '';
-//   const imageMarkdown = `![image](${response.url})`;
-//   formData.value.assetAllocationTable = current ? `${current}\n${imageMarkdown}` : imageMarkdown;
-// }
 
 function handleAnchorClick(e: Event, link: { href: string; title: string }) {
   e.preventDefault();
@@ -695,21 +696,19 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 <Col :span="24">
                   <FormItem :label="$t('pages.productCenter.form.assetAllocationTable')" name="assetAllocationTable">
                     <Input v-model:value="formData.assetAllocationTable" type="textarea" :rows="4" />
-                    <!-- TODO(v2): Add file upload alongside text input -->
-                    <!-- <div class="mt-3">
-                      <FileUpload
-                        :accept="'image/jpeg,image/jpg,image/png,image/heic,image/heif'"
-                        :max-size="10"
-                        :max-count="5"
-                        :enable-drag-upload="true"
-                        :show-success-msg="false"
-                        :help-message="false"
-                        @success="onAssetUploadSuccess"
-                      />
-                      <div class="mt-1 text-xs text-gray-400">
-                        Supports JPEG, JPG, PNG, HEIC, HEIF. Max 10MB each, up to 5 images.
-                      </div>
-                    </div> -->
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row :gutter="16">
+                <Col :span="24">
+                  <FormItem :label="$t('pages.productCenter.form.assetAllocationImage')">
+                    <FileUpload
+                      v-model:value="formData.assetAllocationImage"
+                      :accept="'image/jpeg,image/jpg,image/png,image/heic,image/heif'"
+                      :max-size="10"
+                      :max-count="1"
+                      :help-message="true"
+                    />
                   </FormItem>
                 </Col>
               </Row>

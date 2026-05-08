@@ -23,6 +23,7 @@ import {
 
 import { productCenterDataInfo, productCenterDataList } from '#/api/productcenter/productCenterData';
 import { productCenterMasterdataInfo } from '#/api/productcenter/productCenterMasterdata';
+import { ossInfo } from '#/api/system/oss';
 import { dictDataInfo } from '#/api/system/dict/dict-data';
 
 type DetailMode = 'fund' | 'shareClass';
@@ -36,6 +37,24 @@ const shareClassList = ref<ProductCenterData[]>([]);
 const scrollContainerRef = ref<HTMLElement | null>(null);
 const activeCollapseKeys = ref<string[]>(['core', 'parties', 'strategy', 'registration', 'fund-info', 'class-info', 'dealing']);
 const regionLabelMap = ref<Record<number, string>>({});
+const assetAllocationImageUrl = ref('');
+
+async function resolveImageUrl(ossId: string | undefined) {
+  if (!ossId) {
+    assetAllocationImageUrl.value = '';
+    return;
+  }
+  try {
+    const files = await ossInfo(ossId);
+    if (files && files.length > 0) {
+      assetAllocationImageUrl.value = files[0]!.url;
+    } else {
+      assetAllocationImageUrl.value = '';
+    }
+  } catch {
+    assetAllocationImageUrl.value = '';
+  }
+}
 
 // Load region dict once for label mapping
 onMounted(async () => {
@@ -291,6 +310,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
       fundData.value = {};
       shareClassData.value = {};
       shareClassList.value = [];
+      assetAllocationImageUrl.value = '';
       return;
     }
 
@@ -353,6 +373,9 @@ const [Drawer, drawerApi] = useVbenDrawer({
       fundData.value = {};
       shareClassData.value = {};
     } finally {
+      // Resolve asset allocation image URL from ossId
+      await resolveImageUrl(fundData.value?.assetAllocationImage);
+
       loading.value = false;
 
       // Resolve scroll container for Anchor scroll-spy
@@ -438,6 +461,21 @@ const statusColorMap: Record<string, string> = {
                       :span="2"
                     >
                       {{ getFieldValue(fundData, field) }}
+                    </DescriptionsItem>
+                    <DescriptionsItem
+                      v-if="fundData.assetAllocationImage"
+                      :label="$t('pages.productCenter.form.assetAllocationImage')"
+                      :span="2"
+                    >
+                      <img
+                        v-if="assetAllocationImageUrl"
+                        :src="assetAllocationImageUrl"
+                        :alt="$t('pages.productCenter.form.assetAllocationImage')"
+                        style="max-width: 100%; max-height: 400px; border-radius: 6px;"
+                      />
+                      <a v-else :href="`/resource/oss/download/${fundData.assetAllocationImage}`" target="_blank">
+                        {{ $t('pages.productCenter.form.assetAllocationImage') }}
+                      </a>
                     </DescriptionsItem>
                   </Descriptions>
                 </CollapsePanel>
