@@ -49,7 +49,8 @@ export interface ProductCenterData {
   managementFee?: number;
   performanceFee?: number;
   ter?: number;
-  terDate?: string;
+  latestTerDate?: string;
+  latestTerRate?: number;
   financialYearEnd?: string;
   contractNoteDeliveryDay?: string;
   pricingMethodology?: string;
@@ -61,6 +62,10 @@ export interface ProductCenterData {
   createTime?: string;
   uploadTime?: string;
   uploadBy?: string;
+  // Tree fields
+  treeId?: string;
+  parentId?: string;
+  children?: ProductCenterData[];
 }
 
 export interface ProductCenterDataQuery extends PageQuery {
@@ -69,11 +74,10 @@ export interface ProductCenterDataQuery extends PageQuery {
   fundManager?: string;
   fundType?: string;
   fundName?: string;
-  shareClassNameEn?: string;
-  shareClassNameTc?: string;
-  shareClassNameSc?: string;
+  shareClassName?: string;
   classCurrency?: string;
   fundClassStatus?: string;
+  productClassIds?: string;
 }
 
 export interface ImportResult {

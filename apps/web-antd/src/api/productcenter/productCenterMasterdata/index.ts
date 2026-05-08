@@ -1,11 +1,11 @@
 import type { IDS, PageQuery, PageResult } from '#/api/common';
-import type { ImportResult, ProductCenterMasterdata, ProductCenterMasterdataQuery } from './model';
+import type { ProductCenterMasterdata, ProductCenterMasterdataQuery } from './model';
 
 import { commonExport, ContentTypeEnum } from '#/api/helper';
 import { alovaInstance } from '#/utils/http';
 
 enum Api {
-  autocomplete = '/productcenter/productCenterMasterdata/autocomplete',
+  suggestions = '/productcenter/productCenterMasterdata/suggestions',
   export = '/productcenter/productCenterMasterdata/export',
   importData = '/productcenter/productCenterMasterdata/importData',
   importTemplate = '/productcenter/productCenterMasterdata/importTemplate',
@@ -41,22 +41,37 @@ export function productCenterMasterdataImportTemplate() {
   return commonExport(Api.importTemplate, {});
 }
 
-export interface ProductCenterMasterdataImportParam {
-  file: Blob | File;
-  importMode?: string;
-}
-
-export function productCenterMasterdataImport(data: ProductCenterMasterdataImportParam) {
-  return alovaInstance.post<ImportResult>(Api.importData, data, {
+export function productCenterMasterdataImport(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return alovaInstance.post<{ code: number; msg: string }>(Api.importData, formData, {
     headers: { 'Content-Type': ContentTypeEnum.FORM_DATA },
     isTransformResponse: false,
   });
 }
 
-export function productCenterMasterdataAutocomplete(field: string, keyword: string) {
-  return alovaInstance.get<string[]>(Api.autocomplete, {
-    params: { field, keyword },
+export type MasterdataSuggestionField =
+  | 'fundManager'
+  | 'subManager'
+  | 'investmentAdvisor'
+  | 'trusteeAdministrator'
+  | 'custodianPrimeBroker'
+  | 'subCustodian'
+  | 'auditor'
+  | 'investmentStrategy';
+
+export function productCenterMasterdataSuggestions(
+  field: MasterdataSuggestionField,
+  keyword?: string,
+  limit = 20,
+) {
+  return alovaInstance.get<string[]>(Api.suggestions, {
+    params: { field, keyword, limit },
   });
+}
+
+export function productCenterMasterdataAutocomplete(field: string, keyword: string) {
+  return productCenterMasterdataSuggestions(field as MasterdataSuggestionField, keyword);
 }
 
 export async function productCenterMasterdataCheckUnique(

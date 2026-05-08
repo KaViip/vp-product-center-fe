@@ -1,5 +1,5 @@
 import type { IDS, PageQuery, PageResult } from '#/api/common';
-import type { ImportResult, ProductCenterData, ProductCenterDataQuery } from './model';
+import type { ProductCenterData, ProductCenterDataQuery } from './model';
 
 import { commonExport, ContentTypeEnum } from '#/api/helper';
 import { alovaInstance } from '#/utils/http';
@@ -9,11 +9,21 @@ enum Api {
   importData = '/productcenter/productCenterData/importData',
   importTemplate = '/productcenter/productCenterData/importTemplate',
   list = '/productcenter/productCenterData/list',
+  treeList = '/productcenter/productCenterData/tree-list',
+  classList = '/productcenter/productCenterData/class-list',
   root = '/productcenter/productCenterData',
 }
 
 export function productCenterDataList(params?: ProductCenterDataQuery) {
   return alovaInstance.get<PageResult<ProductCenterData>>(Api.list, { params });
+}
+
+export function productCenterDataTreeList(params?: Omit<ProductCenterDataQuery, 'pageNum' | 'pageSize'>) {
+  return alovaInstance.get<ProductCenterData[]>(Api.treeList, { params });
+}
+
+export function productCenterDataClassList(fundCode: string) {
+  return alovaInstance.get<ProductCenterData[]>(`${Api.classList}/${fundCode}`);
 }
 
 export function productCenterDataInfo(productClassId: string | number) {
@@ -40,13 +50,10 @@ export function productCenterDataImportTemplate() {
   return commonExport(Api.importTemplate, {});
 }
 
-export interface ProductCenterDataImportParam {
-  file: Blob | File;
-  importMode?: string;
-}
-
-export function productCenterDataImport(data: ProductCenterDataImportParam) {
-  return alovaInstance.post<ImportResult>(Api.importData, data, {
+export function productCenterDataImport(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return alovaInstance.post<{ code: number; msg: string }>(Api.importData, formData, {
     headers: { 'Content-Type': ContentTypeEnum.FORM_DATA },
     isTransformResponse: false,
   });

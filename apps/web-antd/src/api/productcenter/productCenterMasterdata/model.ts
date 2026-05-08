@@ -37,8 +37,8 @@ export interface ProductCenterMasterdata {
   terminationDate?: string;
   giinNumber?: string;
   leiNumber?: string;
-  restrictionInvestorNationality?: string;
-  restrictionInvestorResidency?: string;
+  restrictionOnInvestorSNationality?: string;
+  restrictionOnInvestorSResidency?: string;
   countryAvailableForSale?: string;
   subManager?: string;
   investmentAdvisor?: string;
@@ -72,6 +72,7 @@ export interface ProductCenterMasterdataQuery extends PageQuery {
   fundManager?: string;
   restrictionInvestorNationality?: string;
   restrictionInvestorResidency?: string;
+  fundCodes?: string;
   regionDictCodes?: number[];
 }
 
