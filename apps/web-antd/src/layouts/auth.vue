@@ -16,6 +16,7 @@ const logoDark = computed(() => preferences.logo.sourceDark);
     :app-name="appName"
     :logo="logo"
     :logo-dark="logoDark"
+    slogan-image="/logo_full.png"
     :page-description="$t('authentication.pageDesc')"
     :page-title="$t('authentication.pageTitle')"
   >
@@ -23,3 +24,21 @@ const logoDark = computed(() => preferences.logo.sourceDark);
     <!-- <template #toolbar></template> -->
   </AuthPageLayout>
 </template>
+
+<style scoped>
+:deep(img[alt][class*='animate-float']) {
+  width: 25%;
+  height: auto;
+  object-fit: contain;
+}
+
+:deep(.text-1xl) {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+}
+
+:deep(.text-1xl + .mt-2) {
+  font-size: 1rem;
+}
+</style>
