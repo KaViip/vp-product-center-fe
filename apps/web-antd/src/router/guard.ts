@@ -110,10 +110,17 @@ function setupAccessGuard(router: Router) {
     accessStore.setAccessMenus(accessibleMenus);
     accessStore.setAccessRoutes(accessibleRoutes);
     accessStore.setIsAccessChecked(true);
-    const redirectPath = (from.query.redirect ??
+
+    let redirectPath = (from.query.redirect ??
       (to.path === preferences.app.defaultHomePath
         ? userInfo.homePath || preferences.app.defaultHomePath
         : to.fullPath)) as string;
+
+    // Fallback: 如果目标路由不存在（如 defaultHomePath 被禁用），跳转到第一个可访问菜单
+    const resolved = router.resolve(decodeURIComponent(redirectPath));
+    if (resolved.name === 'FallbackNotFound' && accessibleMenus.length > 0) {
+      redirectPath = accessibleMenus[0].path || redirectPath;
+    }
 
     return {
       ...router.resolve(decodeURIComponent(redirectPath)),
