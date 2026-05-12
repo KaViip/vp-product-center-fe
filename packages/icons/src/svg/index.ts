@@ -16,6 +16,7 @@ const SvgTopiamIcon = createIconifyIcon('svg:topiam');
 const SvgWechatIcon = createIconifyIcon('svg:wechat');
 const SvgQQIcon = createIconifyIcon('svg:qq');
 const SvgSnailJobIcon = createIconifyIcon('svg:snail-job');
+const SvgFeishuIcon = createIconifyIcon('svg:feishu');
 
 export {
   SvgAntdvLogoIcon,
@@ -27,6 +28,7 @@ export {
   SvgCakeIcon,
   SvgCardIcon,
   SvgDownloadIcon,
+  SvgFeishuIcon,
   SvgMaxKeyIcon,
   SvgQQIcon,
   SvgSnailJobIcon,
