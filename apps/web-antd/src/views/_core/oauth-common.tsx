@@ -63,43 +63,43 @@ export async function handleAuthBinding(source: string) {
  * 添加账号绑定只需要在这里增加即可
  */
 export const accountBindList: BindItem[] = [
-  {
-    avatar: (
-      <span
-        class={cn('icon-[simple-icons--gitee]', 'size-6')}
-        style={{ color: '#c71d23' }}
-      />
-    ),
-    description: '绑定Gitee账号',
-    source: 'gitee',
-    title: 'Gitee',
-  },
-  {
-    avatar: (
-      <span class={cn('icon-[fa--github-alt]', 'text-[#333]', 'size-6')} />
-    ),
-    description: '绑定Github账号',
-    source: 'github',
-    title: 'Github',
-  },
-  {
-    avatar: <VbenIcon icon={'svg:max-key'} />,
-    description: '绑定MaxKey账号',
-    source: 'maxkey',
-    title: 'MaxKey',
-  },
-  {
-    avatar: <VbenIcon icon={'svg:topiam'} />,
-    description: '绑定topiam账号',
-    source: 'topiam',
-    title: 'Topiam',
-  },
-  {
-    avatar: <VbenIcon icon={'svg:wechat'} />,
-    description: '绑定wechat账号',
-    source: 'wechat',
-    title: 'Wechat',
-  },
+  // {
+  //   avatar: (
+  //     <span
+  //       class={cn('icon-[simple-icons--gitee]', 'size-6')}
+  //       style={{ color: '#c71d23' }}
+  //     />
+  //   ),
+  //   description: '绑定Gitee账号',
+  //   source: 'gitee',
+  //   title: 'Gitee',
+  // },
+  // {
+  //   avatar: (
+  //     <span class={cn('icon-[fa--github-alt]', 'text-[#333]', 'size-6')} />
+  //   ),
+  //   description: '绑定Github账号',
+  //   source: 'github',
+  //   title: 'Github',
+  // },
+  // {
+  //   avatar: <VbenIcon icon={'svg:max-key'} />,
+  //   description: '绑定MaxKey账号',
+  //   source: 'maxkey',
+  //   title: 'MaxKey',
+  // },
+  // {
+  //   avatar: <VbenIcon icon={'svg:topiam'} />,
+  //   description: '绑定topiam账号',
+  //   source: 'topiam',
+  //   title: 'Topiam',
+  // },
+  // {
+  //   avatar: <VbenIcon icon={'svg:wechat'} />,
+  //   description: '绑定wechat账号',
+  //   source: 'wechat',
+  //   title: 'Wechat',
+  // },
   {
     avatar: <VbenIcon icon={'svg:feishu'} />,
     description: '绑定飞书账号',
