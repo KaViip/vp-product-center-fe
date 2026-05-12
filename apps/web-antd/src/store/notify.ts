@@ -52,11 +52,11 @@ export const useNotifyStore = defineStore(
         if (!message) return;
         console.log(`接收到消息: ${message}`);
 
-        window.notification.success({
-          description: message,
-          duration: 3,
-          title: $t('component.notice.received'),
-        });
+        // window.notification.success({
+        //   description: message,
+        //   duration: 3,
+        //   title: $t('component.notice.received'),
+        // });
 
         notificationList.value.unshift({
           // avatar: `https://api.multiavatar.com/${random(0, 10_000)}.png`, 随机头像
