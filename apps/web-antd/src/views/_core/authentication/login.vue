@@ -177,7 +177,7 @@ async function handleAccountLogin(values: LoginAndRegisterParams) {
     :show-code-login="false"
     :show-qrcode-login="false"
     :show-register="false"
-    :show-third-party-login="false"
+    :show-third-party-login="true"
     @submit="handleAccountLogin"
   >
     <!-- 可通过show-third-party-login控制是否显示第三方登录 -->
