@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>飞书 SSO 后端对接文档 — Value Partners Product Center</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --text: #172033;
+      --muted: #64748b;
+      --border: #d9e2ef;
+      --accent: #2563eb;
+      --accent-soft: #eaf1ff;
+      --code-bg: #0f172a;
+      --code-text: #e5e7eb;
+      --inline-code-bg: #eef4ff;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, rgba(37,99,235,0.12), transparent 34rem), var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.72;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page {
+      display: grid;
+      grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+      gap: 2rem;
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .toc {
+      position: sticky;
+      top: 2rem;
+      align-self: start;
+      max-height: calc(100vh - 4rem);
+      overflow: auto;
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.86);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+    .toc-title {
+      margin: 0 0 0.85rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .toc a {
+      display: block;
+      padding: 0.42rem 0.5rem;
+      border-radius: 10px;
+      color: #334155;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+    .toc a:hover { background: var(--accent-soft); color: var(--accent); text-decoration: none; }
+    .toc .sub { padding-left: 1.15rem; color: var(--muted); font-size: 0.84rem; }
+    main {
+      min-width: 0;
+      padding: 2.25rem 3rem;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      margin: -0.25rem 0 2rem;
+      padding: 2rem;
+      border: 1px solid #cfe0ff;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #eff6ff 0%, #ffffff 70%);
+    }
+    .eyebrow {
+      margin: 0 0 0.45rem;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .subtitle { max-width: 46rem; margin: 0.8rem 0 0; color: var(--muted); font-size: 1.05rem; }
+    h1, h2, h3 { color: #0f172a; line-height: 1.2; }
+    h1 { max-width: 54rem; margin: 0; font-size: clamp(2.2rem, 5vw, 4rem); letter-spacing: -0.045em; }
+    h2 {
+      margin-top: 3rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 1.65rem;
+      letter-spacing: -0.025em;
+    }
+    h3 { margin-top: 2rem; font-size: 1.18rem; }
+    p, li { color: #334155; }
+    ul, ol { padding-left: 1.35rem; }
+    li + li { margin-top: 0.35rem; }
+    code {
+      padding: 0.12rem 0.34rem;
+      border-radius: 7px;
+      background: var(--inline-code-bg);
+      color: #1746a2;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.9em;
+    }
+    pre {
+      margin: 1rem 0 1.35rem;
+      padding: 1.1rem 1.25rem;
+      overflow: auto;
+      border: 1px solid #1f2a44;
+      border-radius: 16px;
+      background: var(--code-bg);
+      color: var(--code-text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    pre code {
+      display: block;
+      min-width: max-content;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font-size: 0.88rem;
+      line-height: 1.65;
+      white-space: pre;
+    }
+    blockquote {
+      margin: 1.5rem 0;
+      padding: 1rem 1.2rem;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 14px 14px 0;
+      background: var(--panel-soft);
+      color: var(--muted);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 0.65rem 0.9rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      color: #0f172a;
+      font-weight: 700;
+      background: var(--panel-soft);
+      border-top: 1px solid var(--border);
+    }
+    td { color: #334155; }
+    tr:last-child td { border-bottom: none; }
+    .notice {
+      margin: 1.5rem 0;
+      padding: 1rem 1.2rem;
+      border: 1px solid #fde68a;
+      border-radius: 14px;
+      background: #fffbeb;
+      color: #78350f;
+    }
+    .notice strong { color: #92400e; }
+    .doc-footer {
+      margin-top: 3rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    @media (max-width: 980px) {
+      .page { display: block; padding: 1rem; }
+      .toc { position: static; max-height: none; margin-bottom: 1rem; }
+      main { padding: 1.25rem; border-radius: 18px; }
+      .hero { padding: 1.25rem; }
+    }
+    @media print {
+      body { background: #ffffff; }
+      .page { display: block; max-width: none; padding: 0; }
+      .toc { display: none; }
+      main { padding: 0; border: 0; box-shadow: none; }
+      pre { white-space: pre-wrap; border-color: #d1d5db; background: #f8fafc; color: #111827; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <aside class="toc" aria-label="Table of contents">
+    <p class="toc-title">Contents</p>
+    <a href="#overview">概述</a>
+    <a href="#architecture">整体架构</a>
+    <a class="sub" href="#flow">登录流程</a>
+    <a class="sub" href="#frontend-changes">前端改动（已完成）</a>
+    <a href="#feishu-setup">一、飞书开放平台配置</a>
+    <a href="#justauth-config">二、后端 JustAuth 配置</a>
+    <a href="#callback-logic">三、回调处理逻辑</a>
+    <a class="sub" href="#auto-create">自动创建账号</a>
+    <a class="sub" href="#default-role">默认角色配置</a>
+    <a href="#api-contract">四、前后端接口契约</a>
+    <a class="sub" href="#binding-api">auth/binding/{source}</a>
+    <a class="sub" href="#login-api">auth/login（社交登录）</a>
+    <a class="sub" href="#callback-api">auth/social/callback（绑定）</a>
+    <a href="#checklist">五、对接检查清单</a>
+    <a href="#testing">六、联调测试步骤</a>
+    <a href="#faq">七、常见问题</a>
+  </aside>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Backend Integration Guide</p>
+      <h1 id="top">飞书 SSO 后端对接文档</h1>
+      <p class="subtitle">Value Partners Product Center — 飞书单点登录后端对接指南，涵盖飞书开放平台配置、JustAuth 集成、回调逻辑、接口契约和联调测试。</p>
+    </section>
+
+    <h2 id="overview">概述</h2>
+    <p>本文档面向后端开发团队，说明如何为 Value Partners Product Center 系统接入飞书（Feishu/Lark）SSO 单点登录。</p>
+    <p><strong>前端已完成的工作：</strong></p>
+    <ul>
+      <li>登录页已添加飞书登录入口（蓝色飞书图标）</li>
+      <li>OAuth 跳转、回调处理、账号绑定 UI 均已就绪</li>
+      <li>前端使用 <code>source = "FEISHU"</code> 标识飞书来源</li>
+    </ul>
+    <p><strong>后端需要完成的工作：</strong></p>
+    <ol>
+      <li>飞书开放平台创建企业自建应用</li>
+      <li>JustAuth 配置飞书 OAuth 参数</li>
+      <li>回调逻辑中实现自动创建账号 + 分配默认角色</li>
+      <li>创建"访客"默认角色</li>
+    </ol>
+
+    <h2 id="architecture">整体架构</h2>
+
+    <h3 id="flow">登录流程</h3>
+    <pre><code>用户点击飞书图标
+    ↓
+前端调用 GET /auth/binding/FEISHU
+    ↓
+后端返回飞书授权 URL
+    ↓
+前端 window.location.href 跳转到飞书
+    ↓
+用户在飞书登录并授权
+    ↓
+飞书回调 /social-callback?code=xxx&amp;state=xxx&amp;source=FEISHU
+    ↓
+前端提取 code/state/source，调用 authLogin({ grantType:'social', socialCode, socialState, source:'FEISHU' })
+    ↓
+后端处理：
+  1. 用 code 换 access_token
+  2. 用 access_token 获取飞书用户信息
+  3. 查 sys_user 是否有匹配账号
+     ├── 有 → 直接登录，返回 token
+     └── 没有 → 自动创建 sys_user + 分配默认角色 → 返回 token
+    ↓
+前端登录成功，跳转到首页</code></pre>
+
+    <h3 id="frontend-changes">前端改动（已完成）</h3>
+    <table>
+      <thead><tr><th>文件</th><th>改动</th></tr></thead>
+      <tbody>
+        <tr><td><code>oauth-common.tsx</code></td><td><code>accountBindList</code> 新增飞书条目，<code>source: 'FEISHU'</code></td></tr>
+        <tr><td><code>login.vue</code></td><td><code>show-third-party-login</code> 从 <code>false</code> 改为 <code>true</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="feishu-setup">一、飞书开放平台配置</h2>
+
+    <h3>1.1 创建应用</h3>
+    <ol>
+      <li>登录 <a href="https://open.feishu.cn" target="_blank">飞书开放平台</a></li>
+      <li>进入「开发者后台」→「创建企业自建应用」</li>
+      <li>填写应用名称（如 <code>Value Partners Product Center</code>）和描述</li>
+      <li>记录 <strong>App ID</strong> 和 <strong>App Secret</strong></li>
+    </ol>
+
+    <h3>1.2 配置安全设置</h3>
+    <p>在应用详情页 →「安全设置」中添加重定向 URL：</p>
+    <pre><code>https://你的域名/social-callback</code></pre>
+
+    <h3>1.3 申请权限范围</h3>
+    <p>在「权限管理」中申请以下权限：</p>
+    <table>
+      <thead><tr><th>权限</th><th>scope</th><th>用途</th></tr></thead>
+      <tbody>
+        <tr><td>获取用户基本信息</td><td>默认</td><td>姓名、头像、open_id</td></tr>
+        <tr><td>获取用户邮箱</td><td><code>contact:user.email:readonly</code></td><td>用于匹配系统账号</td></tr>
+        <tr><td>获取用户手机号</td><td><code>contact:user.phone:readonly</code></td><td>备选匹配方式</td></tr>
+        <tr><td>获取用户工号</td><td><code>contact:user.employee_id:readonly</code></td><td>备选匹配方式</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.4 发布应用</h3>
+    <p>配置完成后，提交应用审核并发布。发布后组织内用户才能使用。</p>
+
+    <div class="notice">
+      <strong>⚠️ 注意：</strong>重定向 URL 必须与后端 JustAuth 配置中的 <code>redirect-uri</code> 一致。本地开发可用 <code>http://localhost:5666/social-callback</code>。
+    </div>
+
+    <h2 id="justauth-config">二、后端 JustAuth 配置</h2>
+
+    <p>ruoyi-plus 后端已集成 JustAuth，只需在配置文件中添加飞书配置。</p>
+
+    <h3>2.1 application.yml 配置</h3>
+    <pre><code>justauth:
+  type:
+    FEISHU:
+      client-id: 你的飞书App_ID
+      client-secret: 你的飞书App_Secret
+      redirect-uri: https://你的域名/auth/callback/feishu</code></pre>
+
+    <h3>2.2 关键参数说明</h3>
+    <table>
+      <thead><tr><th>参数</th><th>说明</th><th>示例</th></tr></thead>
+      <tbody>
+        <tr><td><code>client-id</code></td><td>飞书 App ID</td><td><code>cli_a5xxxxxxxxxxxxx</code></td></tr>
+        <tr><td><code>client-secret</code></td><td>飞书 App Secret</td><td><code>xxxxxxxxxxxxxxxxxxxxxx</code></td></tr>
+        <tr><td><code>redirect-uri</code></td><td>OAuth 回调地址（后端接收飞书回调的地址）</td><td><code>https://your-domain/auth/callback/feishu</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="notice">
+      <strong>⚠️ source 名称必须为 <code>FEISHU</code>（大写）</strong>，与前端 <code>oauth-common.tsx</code> 中配置的 <code>source: 'FEISHU'</code> 保持一致。
+    </div>
+
+    <h3>2.3 飞书 OAuth2 端点</h3>
+    <p>JustAuth 已内置飞书支持，以下是飞书的 OAuth2 端点供参考：</p>
+    <table>
+      <thead><tr><th>端点</th><th>URL</th></tr></thead>
+      <tbody>
+        <tr><td>授权</td><td><code>https://open.feishu.cn/open-apis/authen/v1/authorize</code></td></tr>
+        <tr><td>获取 Token</td><td><code>https://open.feishu.cn/open-apis/authen/v2/oauth/token</code></td></tr>
+        <tr><td>获取用户信息</td><td><code>https://open.feishu.cn/open-apis/authen/v1/user_info</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="callback-logic">三、回调处理逻辑</h2>
+
+    <p>后端在收到飞书回调后，需要完成以下步骤：</p>
+
+    <h3>3.1 标准流程</h3>
+    <pre><code>1. 接收飞书回调的 code 参数
+2. 用 code + App ID + App Secret 调用飞书 Token API 换取 access_token
+3. 用 access_token 调用飞书 User Info API 获取用户信息
+4. 用飞书用户信息匹配/创建系统账号
+5. 返回系统 token 给前端</code></pre>
+
+    <h3>3.2 飞书返回的用户信息</h3>
+    <pre><code>{
+  "name": "张三",
+  "en_name": "Zhang San",
+  "avatar_url": "https://www.feishu.cn/avatar/...",
+  "open_id": "ou_caecc734c2e3328a...",
+  "union_id": "on_d89jhsdhjsajkda7828...",
+  "email": "zhangsan@valuepartners.com",
+  "enterprise_email": "zhangsan@valuepartners.com",
+  "user_id": "5d9bdxxx",
+  "mobile": "+86130002883xx",
+  "tenant_key": "736588c92lxf175d",
+  "employee_no": "EMP001"
+}</code></pre>
+
+    <h3 id="auto-create">3.3 自动创建账号逻辑</h3>
+    <p>建议在社交登录回调处理中实现以下逻辑：</p>
+    <pre><code>// 伪代码
+AuthUser feishuUser = justAuth回调获取的飞书用户;
+String email = feishuUser.getEmail();
+String name = feishuUser.getNickname();
+String avatar = feishuUser.getAvatar();
+String openId = feishuUser.getUuid();
+
+// 1. 查找社交绑定记录
+SysSocialUser socialUser = socialUserMapper.selectBySourceAndUuid("FEISHU", openId);
+if (socialUser != null) {
+    // 已绑定，直接用关联的系统用户登录
+    return login(socialUser.getUserId());
+}
+
+// 2. 查找是否有匹配邮箱的系统用户
+SysUser existingUser = userMapper.selectByEmail(email);
+if (existingUser != null) {
+    // 匹配到已有用户，自动绑定并登录
+    createSocialBinding("FEISHU", openId, existingUser.getUserId());
+    return login(existingUser.getUserId());
+}
+
+// 3. 没有匹配，自动创建新用户
+SysUser newUser = new SysUser();
+newUser.setUserName(email);
+newUser.setNickName(name);
+newUser.setEmail(email);
+newUser.setAvatar(avatar);
+newUser.setPassword(随机密码);  // SSO 用户不需要密码
+newUser.setStatus("0");  // 正常状态
+userMapper.insert(newUser);
+
+// 4. 分配默认角色（访客）
+userRoleMapper.insert(newUser.getUserId(), 访客角色Id);
+
+// 5. 创建社交绑定
+createSocialBinding("FEISHU", openId, newUser.getUserId());
+
+// 6. 登录
+return login(newUser.getUserId());</code></pre>
+
+    <h3 id="default-role">3.4 默认角色配置</h3>
+    <p>在 <code>sys_role</code> 表中创建"访客"角色：</p>
+    <table>
+      <thead><tr><th>字段</th><th>值</th></tr></thead>
+      <tbody>
+        <tr><td>role_name</td><td>访客</td></tr>
+        <tr><td>role_key</td><td>guest</td></tr>
+        <tr><td>role_sort</td><td>99</td></tr>
+        <tr><td>status</td><td>0（正常）</td></tr>
+      </tbody>
+    </table>
+    <p>访客角色的菜单权限（<code>sys_role_menu</code>）只分配查看权限：</p>
+    <table>
+      <thead><tr><th>权限码</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><code>productcenter:productCenterMasterdata:list</code></td><td>Product Team 列表查看</td></tr>
+        <tr><td><code>productcenter:productCenterMasterdata:query</code></td><td>Product Team 详情查看</td></tr>
+        <tr><td><code>productcenter:productCenterData:list</code></td><td>Operational Team 列表查看</td></tr>
+        <tr><td><code>productcenter:productCenterData:query</code></td><td>Operational Team 详情查看</td></tr>
+      </tbody>
+    </table>
+    <p><strong>不分配</strong>：add、edit、remove、export、import 权限。</p>
+
+    <h2 id="api-contract">四、前后端接口契约</h2>
+
+    <p>以下接口已存在于 ruoyi-plus 中，前端飞书 SSO 复用这些接口，<strong>不需要新增接口</strong>。</p>
+
+    <h3 id="binding-api">4.1 获取授权跳转 URL</h3>
+    <pre><code>GET /auth/binding/FEISHU?domain=xxx&amp;tenantId=xxx
+
+Response: "https://open.feishu.cn/open-apis/authen/v1/authorize?..."</code></pre>
+    <p>后端根据 <code>FEISHU</code> source 查找 JustAuth 配置，生成飞书授权 URL 返回给前端。</p>
+
+    <h3 id="login-api">4.2 社交登录</h3>
+    <pre><code>POST /auth/login
+Content-Type: application/json
+
+{
+  "grantType": "social",
+  "socialCode": "飞书回调返回的code",
+  "socialState": "飞书回调返回的state",
+  "source": "FEISHU",
+  "tenantId": "000000"
+}
+
+Response:
+{
+  "code": 200,
+  "msg": "操作成功",
+  "data": {
+    "access_token": "eyJhbGciOiJIUzI1NiJ9..."
+  }
+}</code></pre>
+    <p>后端用 <code>socialCode</code> 和 <code>source</code> 完成飞书 OAuth 流程，匹配/创建用户，返回系统 token。</p>
+
+    <h3 id="callback-api">4.3 已登录用户绑定社交账号</h3>
+    <pre><code>POST /auth/social/callback
+Content-Type: application/json
+Header: Authorization: Bearer {access_token}
+
+{
+  "socialCode": "飞书回调返回的code",
+  "socialState": "飞书回调返回的state",
+  "source": "FEISHU",
+  "tenantId": "000000"
+}</code></pre>
+    <p>已登录用户在「个人中心 → 账号绑定」中绑定飞书账号。</p>
+
+    <h2 id="checklist">五、对接检查清单</h2>
+    <table>
+      <thead><tr><th>#</th><th>检查项</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>飞书开放平台创建企业自建应用</td><td>☐</td></tr>
+        <tr><td>2</td><td>配置重定向 URL（<code>/social-callback</code>）</td><td>☐</td></tr>
+        <tr><td>3</td><td>申请用户信息权限（邮箱、手机号）</td><td>☐</td></tr>
+        <tr><td>4</td><td>application.yml 添加 FEISHU JustAuth 配置</td><td>☐</td></tr>
+        <tr><td>5</td><td>JustAuth source 名称确认为 <code>FEISHU</code>（大写）</td><td>☐</td></tr>
+        <tr><td>6</td><td>实现社交登录回调逻辑（自动创建账号）</td><td>☐</td></tr>
+        <tr><td>7</td><td>创建"访客"角色，分配只读权限</td><td>☐</td></tr>
+        <tr><td>8</td><td>社交绑定表支持 FEISHU source</td><td>☐</td></tr>
+        <tr><td>9</td><td>应用发布并通过审核</td><td>☐</td></tr>
+        <tr><td>10</td><td>端到端联调测试通过</td><td>☐</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="testing">六、联调测试步骤</h2>
+
+    <h3>6.1 本地测试</h3>
+    <ol>
+      <li>后端启动，配置飞书 JustAuth 参数</li>
+      <li>前端 <code>pnpm dev</code> 启动</li>
+      <li>登录页点击飞书图标</li>
+      <li>应跳转到飞书授权页面</li>
+      <li>登录并授权后，应回调到 <code>/social-callback</code></li>
+      <li>验证：首次登录自动创建账号，分配访客角色</li>
+      <li>验证：再次登录直接进入系统</li>
+    </ol>
+
+    <h3>6.2 测试场景</h3>
+    <table>
+      <thead><tr><th>场景</th><th>预期结果</th></tr></thead>
+      <tbody>
+        <tr><td>首次飞书登录（无系统账号）</td><td>自动创建账号 + 访客角色 + 登录成功</td></tr>
+        <tr><td>再次飞书登录</td><td>直接登录，不重复创建</td></tr>
+        <tr><td>已登录绑定飞书</td><td>个人中心绑定成功</td></tr>
+        <tr><td>管理员手动提权后登录</td><td>显示对应菜单和权限</td></tr>
+        <tr><td>飞书账号无权限</td><td>只能查看，不能增删改</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="faq">七、常见问题</h2>
+    <table>
+      <thead><tr><th>问题</th><th>原因</th><th>解决方案</th></tr></thead>
+      <tbody>
+        <tr><td>点击飞书图标无反应</td><td>后端未配置 FEISHU JustAuth</td><td>检查 application.yml 配置</td></tr>
+        <tr><td>飞书授权后白屏</td><td>回调地址不匹配</td><td>确认 redirect-uri 与飞书安全设置一致</td></tr>
+        <tr><td>回调报错 invalid code</td><td>授权码过期（5分钟）</td><td>重新授权</td></tr>
+        <tr><td>登录后无菜单</td><td>访客角色未分配菜单权限</td><td>检查 sys_role_menu 配置</td></tr>
+        <tr><td>头像不显示</td><td>飞书头像 URL 可能需要翻墙</td><td>后端下载头像上传到 OSS</td></tr>
+        <tr><td>source 不匹配</td><td>前后端 source 大小写不一致</td><td>确认统一使用 <code>FEISHU</code>（大写）</td></tr>
+      </tbody>
+    </table>
+
+    <div class="doc-footer">
+      <p>文檔生成時間：2026-05-12 &nbsp;|&nbsp; 前端分支：<code>feature/feishu-sso</code> &nbsp;|&nbsp; GitHub：<a href="https://github.com/KaViip/vp-product-center-fe">KaViip/vp-product-center-fe</a></p>
+    </div>
+  </main>
+</div>
+</body>
+</html>
