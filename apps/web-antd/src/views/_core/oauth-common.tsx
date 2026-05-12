@@ -101,12 +101,7 @@ export const accountBindList: BindItem[] = [
     title: 'Wechat',
   },
   {
-    avatar: (
-      <span
-        class={cn('icon-[simple-icons--feishu]', 'size-6')}
-        style={{ color: '#3370ff' }}
-      />
-    ),
+    avatar: <VbenIcon icon={'svg:feishu'} />,
     description: '绑定飞书账号',
     source: 'FEISHU',
     title: 'Feishu',
