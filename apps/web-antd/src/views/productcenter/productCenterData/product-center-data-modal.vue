@@ -379,7 +379,7 @@ function transformShareClassData(d: Record<string, any>) {
   }
 
   // Trim fee fields to max 2 decimal places
-  const feeFields = ['managementFee', 'performanceFee'];
+  const feeFields = ['managementFee', 'performanceFee', 'latestTerRate'];
   for (const key of feeFields) {
     if (d[key] != null) {
       d[key] = String(Number.parseFloat(Number(d[key]).toFixed(2)));
