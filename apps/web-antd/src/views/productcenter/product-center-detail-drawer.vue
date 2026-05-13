@@ -74,7 +74,7 @@ interface FieldDef {
   label: string;
   key: string;
   span?: number;
-  type?: 'date' | 'yesno' | 'array' | 'region';
+  type?: 'date' | 'month' | 'yesno' | 'array' | 'region';
 }
 
 // Product Team tab fields
@@ -201,7 +201,7 @@ const dealingFields: FieldDef[] = [
   { label: $t('pages.productCenter.form.securityLending'), key: 'securityLending', type: 'yesno' },
   { label: $t('pages.productCenter.form.ter'), key: 'ter' },
   { label: $t('pages.productCenter.form.latestTerRate'), key: 'latestTerRate' },
-  { label: $t('pages.productCenter.form.latestTerDate'), key: 'latestTerDate', type: 'date' },
+  { label: $t('pages.productCenter.form.latestTerDate'), key: 'latestTerDate', type: 'month' },
 ];
 
 // Share class list table columns (fund mode → Operational Team tab)
@@ -223,6 +223,12 @@ function formatValue(value: any, type?: string): string {
   if (type === 'yesno') {
     if (value === 'Y' || value === true) return 'Yes';
     if (value === 'N' || value === false) return 'No';
+    return String(value);
+  }
+  if (type === 'month') {
+    if (typeof value === 'string') {
+      return value.substring(0, 7);
+    }
     return String(value);
   }
   if (type === 'date') {

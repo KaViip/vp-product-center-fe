@@ -351,12 +351,8 @@ watch(() => formData.value.fundCode, async (fundCode) => {
 // Transform raw API data into form-ready format (dayjs, arrays, composite time split, fee trim)
 function transformShareClassData(d: Record<string, any>) {
   // Convert date strings → dayjs for DatePicker
-  const dateFields = ['endOfIopDate', 'launchDate'];
-  const monthFields = ['latestTerDate'];
+  const dateFields = ['endOfIopDate', 'launchDate', 'latestTerDate'];
   for (const key of dateFields) {
-    if (d[key]) d[key] = dayjs(d[key]);
-  }
-  for (const key of monthFields) {
     if (d[key]) d[key] = dayjs(d[key]);
   }
 
@@ -887,7 +883,7 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                 </Col>
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.latestTerDate')">
-                    <DatePicker v-model:value="formData.latestTerDate" style="width: 100%" picker="month" value-format="YYYY/MM" />
+                    <DatePicker v-model:value="formData.latestTerDate" style="width: 100%" picker="month" value-format="YYYY/MM/DD" />
                   </FormItem>
                 </Col>
               </Row>
