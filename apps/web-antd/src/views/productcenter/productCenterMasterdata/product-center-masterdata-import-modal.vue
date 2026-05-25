@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { UploadFile } from 'antdv-next';
 
-import { ref, watch } from 'vue';
+import { h, ref, watch } from 'vue';
 
 import { useVbenDrawer } from '@vben/common-ui';
 import { $t } from '@vben/locales';
@@ -9,6 +9,7 @@ import { $t } from '@vben/locales';
 import { InboxOutlined } from '@antdv-next/icons';
 import * as XLSX from 'xlsx';
 import {
+  Alert,
   Button,
   Result,
   Select,
@@ -16,6 +17,7 @@ import {
   Spin,
   Steps,
   Table,
+  Tag,
   UploadDragger,
 } from 'antdv-next';
 
@@ -24,6 +26,7 @@ import {
   productCenterMasterdataImport,
 } from '#/api/productcenter/productCenterMasterdata';
 import { useBlobExport } from '#/utils/file/export';
+import { validateExcelData, getCellError, PRODUCT_TEAM_RULES, type ValidationError } from '../import-validation';
 
 const emit = defineEmits<{ reload: [] }>();
 
@@ -37,6 +40,7 @@ const previewColumns = ref<{ title: string; dataIndex: string; key: string; elli
 const sheetNames = ref<string[]>([]);
 const selectedSheet = ref<string>('');
 const workbookCache = ref<XLSX.WorkBook | null>(null);
+const validationErrors = ref<ValidationError[]>([]);
 
 const importModeOptions = [
   { label: $t('pages.productCenter.addData'), value: 'add data' },
@@ -76,7 +80,7 @@ function renderSheet(sheetName: string) {
     previewColumns.value = [];
     return;
   }
-  const json: Record<string, any>[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+  const json: Record<string, any>[] = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false, dateNF: 'yyyy/mm/dd' });
 
   if (json.length === 0) {
     previewData.value = [];
@@ -91,9 +95,18 @@ function renderSheet(sheetName: string) {
     key: k,
     width: 150,
     ellipsis: true,
+    customRender: ({ record, text }: any) => {
+      const err = getCellError(validationErrors.value, record._row, k);
+      if (err) {
+        return h('div', { class: 'cell-error', title: err.message }, String(text ?? ''));
+      }
+      return String(text ?? '');
+    },
   }));
   previewData.value = json.map((row, i) => ({ _row: i + 1, ...row }));
   previewColumns.value.unshift({ title: '#', dataIndex: '_row', key: '_row', width: 50, fixed: 'left' });
+
+  validationErrors.value = validateExcelData(previewData.value, PRODUCT_TEAM_RULES, importMode.value !== 'add data');
 }
 
 async function handleConfirm() {
@@ -105,6 +118,14 @@ async function handleConfirm() {
   }
 
   if (currentStep.value === 1) {
+    if (previewData.value.length === 0) {
+      window.message.error('No data found in the Excel file. Please check and re-upload.');
+      return;
+    }
+    if (validationErrors.value.length > 0) {
+      window.message.error(`Found ${validationErrors.value.length} validation error(s). Please fix in Excel and re-upload.`);
+      return;
+    }
     currentStep.value = 2;
     importing.value = true;
     try {
@@ -144,13 +165,14 @@ function handleReset() {
   sheetNames.value = [];
   selectedSheet.value = '';
   workbookCache.value = null;
+  validationErrors.value = [];
 }
 </script>
 
 <template>
   <Drawer
     :title="$t('pages.productCenter.importFundData')"
-    :class="'w-[70%]'"
+    :class="'w-[90%]'"
     :footer="true"
     :confirm-text="currentStep === 2 ? $t('pages.productCenter.done') : currentStep === 1 ? $t('pages.productCenter.importBtn') : $t('pages.productCenter.nextStep')"
     :cancel-text="currentStep > 0 && currentStep < 2 ? $t('pages.productCenter.previous') : $t('pages.common.cancel')"
@@ -213,6 +235,22 @@ function handleReset() {
         size="small"
         bordered
       />
+      <Alert v-if="validationErrors.length > 0" type="error" style="margin-top: 12px">
+        <template #message>
+          <span>{{ validationErrors.length }} validation error(s) found. Please fix in Excel and re-upload.</span>
+        </template>
+        <template #description>
+          <div class="error-list">
+            <div v-for="err in validationErrors.slice(0, 50)" :key="`${err.row}-${err.column}`" style="padding: 2px 0; line-height: 1.6;">
+              <Tag color="red" style="margin-right: 8px; font-size: 11px;">Row {{ err.row }}</Tag>
+              <strong>{{ err.column }}</strong>: {{ err.message }}
+            </div>
+            <div v-if="validationErrors.length > 50" style="color: #999; font-size: 12px; padding-top: 4px;">
+              ... and {{ validationErrors.length - 50 }} more errors
+            </div>
+          </div>
+        </template>
+      </Alert>
       <p class="text-xs text-gray-400">
         {{ $t('pages.productCenter.previewTip') }}
       </p>
@@ -237,3 +275,22 @@ function handleReset() {
     </div>
   </Drawer>
 </template>
+
+<style scoped>
+.cell-error {
+  background-color: #fff1f0;
+  border: 1px solid #ffa39e;
+  padding: 2px 6px;
+  border-radius: 2px;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.error-list {
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+</style>
