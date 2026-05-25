@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Composite Time+TZ Fields - Backend Integration Guide</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.7; color: #333; max-width: 960px; margin: 0 auto; padding: 32px 24px; background: #fafafa; }
+  h1 { font-size: 1.6rem; margin-bottom: 8px; color: #1a1a2e; border-bottom: 3px solid #3370ff; padding-bottom: 12px; }
+  .subtitle { color: #666; margin-bottom: 32px; font-size: 0.95rem; }
+  h2 { font-size: 1.3rem; margin: 32px 0 16px; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
+  h2::before { content: ''; display: inline-block; width: 4px; height: 24px; background: #3370ff; border-radius: 2px; }
+  h3 { font-size: 1.1rem; margin: 20px 0 10px; color: #444; }
+  p { margin: 8px 0; }
+  code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em; color: #c7254e; }
+  pre { background: #1e1e2e; color: #cdd6f4; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 12px 0; font-size: 0.88rem; line-height: 1.6; }
+  pre code { background: none; color: inherit; padding: 0; }
+  .keyword { color: #cba6f7; }
+  .string { color: #a6e3a1; }
+  .comment { color: #6c7086; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  th { background: #3370ff; color: #fff; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 0.9rem; }
+  td { padding: 10px 16px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f5f7ff; }
+  .note { background: #fff8e1; border-left: 4px solid #ffc107; padding: 14px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+  .note strong { color: #e65100; }
+  .important { background: #ffebee; border-left: 4px solid #f44336; padding: 14px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+  .important strong { color: #c62828; }
+  .tip { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 14px 18px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+  .tip strong { color: #2e7d32; }
+  .field-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+  .field-card .field-name { font-weight: 700; font-size: 1.05rem; color: #3370ff; margin-bottom: 4px; }
+  .field-card .field-detail { color: #555; font-size: 0.9rem; }
+  .section-box { background: #fff; border-radius: 8px; padding: 24px; margin: 16px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .toc { background: #fff; border-radius: 8px; padding: 20px 28px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin: 6px 0; }
+  .toc a { color: #3370ff; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+  .badge-required { background: #ffebee; color: #c62828; }
+  .badge-optional { background: #e3f2fd; color: #1565c0; }
+  .badge-string { background: #f3e5f5; color: #7b1fa2; }
+  hr { border: none; border-top: 1px solid #e0e0e0; margin: 32px 0; }
+</style>
+</head>
+<body>
+
+<h1>Composite Time+TZ Fields — Backend Integration Guide</h1>
+<p class="subtitle">cutoffTime, dealingCutOff, valuationPoint | Value Partners Product Center | Last updated: 2026-05-14</p>
+
+<div class="toc">
+  <strong>Table of Contents</strong>
+  <ol>
+    <li><a href="#overview">Overview — What Are Composite Fields?</a></li>
+    <li><a href="#fields">Field Reference</a></li>
+    <li><a href="#storage">Storage Format</a></li>
+    <li><a href="#read">Read (API Response) — Backend → Frontend</a></li>
+    <li><a href="#write">Write (API Request) — Frontend → Backend</a></li>
+    <li><a href="#import-export">Import &amp; Export</a></li>
+    <li><a href="#validation">Validation Rules</a></li>
+    <li><a href="#summary">Summary &amp; Checklist</a></li>
+  </ol>
+</div>
+
+<!-- Section 1: Overview -->
+<h2 id="overview">1. Overview — What Are Composite Fields?</h2>
+<div class="section-box">
+  <p>The three fields <code>cutoffTime</code>, <code>dealingCutOff</code>, and <code>valuationPoint</code> each store <strong>two pieces of information in a single string</strong>:</p>
+  <ul style="margin: 12px 0 12px 24px;">
+    <li><strong>Time</strong> — e.g. <code>16:00</code> (HH:mm, 24-hour format)</li>
+    <li><strong>Timezone/Country Code</strong> — e.g. <code>HKG</code> (ISO 3166-1 alpha-3 country code)</li>
+  </ul>
+  <p>They are combined into a <strong>single string with a space separator</strong>:</p>
+  <pre><code><span class="string">"16:00 HKG"</span>
+<span class="string">"09:30 IRL"</span>
+<span class="string">"15:00 SGP"</span></code></pre>
+
+  <div class="important">
+    <strong>Key Rule:</strong> The backend stores and returns these as a <strong>single VARCHAR/string field</strong>. Do NOT split into separate columns. Do NOT add a separator other than a single space.
+  </div>
+</div>
+
+<!-- Section 2: Field Reference -->
+<h2 id="fields">2. Field Reference</h2>
+
+<div class="field-card">
+  <div class="field-name">dealingCutOff <span class="badge badge-required">Required</span> <span class="badge badge-string">String</span></div>
+  <div class="field-detail">
+    <strong>Label:</strong> Dealing Cut-off<br>
+    <strong>Description:</strong> The cut-off time for dealing (trading) in the fund<br>
+    <strong>Example:</strong> <code>"16:00 HKG"</code><br>
+    <strong>DB Column:</strong> <code>dealing_cut_off VARCHAR(20)</code>
+  </div>
+</div>
+
+<div class="field-card">
+  <div class="field-name">valuationPoint <span class="badge badge-required">Required</span> <span class="badge badge-string">String</span></div>
+  <div class="field-detail">
+    <strong>Label:</strong> Valuation Point<br>
+    <strong>Description:</strong> The time at which the fund's NAV is calculated<br>
+    <strong>Example:</strong> <code>"18:00 IRL"</code><br>
+    <strong>DB Column:</strong> <code>valuation_point VARCHAR(20)</code>
+  </div>
+</div>
+
+<div class="field-card">
+  <div class="field-name">cutoffTime <span class="badge badge-required">Required</span> <span class="badge badge-string">String</span></div>
+  <div class="field-detail">
+    <strong>Label:</strong> Cutoff Time<br>
+    <strong>Description:</strong> The general cutoff time for the share class<br>
+    <strong>Example:</strong> <code>"15:30 SGP"</code><br>
+    <strong>DB Column:</strong> <code>cutoff_time VARCHAR(20)</code>
+  </div>
+</div>
+
+<!-- Section 3: Storage Format -->
+<h2 id="storage">3. Storage Format</h2>
+<div class="section-box">
+  <h3>3.1 Format Specification</h3>
+  <table>
+    <tr><th>Part</th><th>Format</th><th>Example</th><th>Notes</th></tr>
+    <tr><td>Time</td><td><code>HH:mm</code></td><td><code>16:00</code></td><td>24-hour, zero-padded, colon-separated</td></tr>
+    <tr><td>Separator</td><td>Single space</td><td><code> </code></td><td>Exactly one space character</td></tr>
+    <tr><td>Timezone</td><td>ISO 3166-1 alpha-3</td><td><code>HKG</code></td><td>3-letter uppercase country code</td></tr>
+    <tr><td><strong>Full value</strong></td><td><code>HH:mm CCC</code></td><td><code>"16:00 HKG"</code></td><td>Stored as a single VARCHAR string</td></tr>
+  </table>
+
+  <h3>3.2 Valid Country Codes (TZ options)</h3>
+  <table>
+    <tr><th>Code</th><th>Country</th></tr>
+    <tr><td><code>HKG</code></td><td>Hong Kong</td></tr>
+    <tr><td><code>IRL</code></td><td>Ireland</td></tr>
+    <tr><td><code>CHN</code></td><td>China</td></tr>
+    <tr><td><code>AUS</code></td><td>Australia</td></tr>
+    <tr><td><code>CAN</code></td><td>Canada</td></tr>
+    <tr><td><code>FRA</code></td><td>France</td></tr>
+    <tr><td><code>DEU</code></td><td>Germany</td></tr>
+    <tr><td><code>JPN</code></td><td>Japan</td></tr>
+    <tr><td><code>LUX</code></td><td>Luxembourg</td></tr>
+    <tr><td><code>SGP</code></td><td>Singapore</td></tr>
+    <tr><td><code>CHE</code></td><td>Switzerland</td></tr>
+    <tr><td><code>TWN</code></td><td>Taiwan</td></tr>
+    <tr><td><code>GBR</code></td><td>United Kingdom</td></tr>
+    <tr><td><code>USA</code></td><td>United States</td></tr>
+  </table>
+
+  <h3>3.3 Null / Empty Handling</h3>
+  <div class="note">
+    <strong>Note:</strong> If the user does not fill in the field, the frontend sends <strong><code>null</code></strong> (not an empty string). The backend should store <code>NULL</code> in the database.
+  </div>
+</div>
+
+<!-- Section 4: Read -->
+<h2 id="read">4. Read (API Response) — Backend → Frontend</h2>
+<div class="section-box">
+  <p>When the backend returns data (GET list/detail), return the field as a <strong>single string</strong>:</p>
+
+  <h3>4.1 Response Format</h3>
+  <pre><code>{
+  <span class="string">"dealingCutOff"</span>: <span class="string">"16:00 HKG"</span>,
+  <span class="string">"valuationPoint"</span>: <span class="string">"18:00 IRL"</span>,
+  <span class="string">"cutoffTime"</span>: <span class="string">"15:30 SGP"</span>
+}</code></pre>
+
+  <h3>4.2 What the Frontend Does</h3>
+  <p>The frontend automatically splits the string into two parts for the form UI:</p>
+  <pre><code><span class="comment">// Frontend transformShareClassData() — reading for edit form</span>
+<span class="keyword">const</span> raw = <span class="string">"16:00 HKG"</span>;
+<span class="keyword">const</span> parts = raw.trim().split(<span class="string">/\s+/</span>);
+<span class="comment">// parts[0] = "16:00" → displayed in TimePicker</span>
+<span class="comment">// parts[1] = "HKG"  → displayed in Select dropdown</span>
+
+dealingCutOff_time = dayjs(<span class="string">"16:00"</span>, <span class="string">"HH:mm"</span>);
+dealingCutOff_tz   = <span class="string">"HKG"</span>;</code></pre>
+
+  <h3>4.3 Null Response</h3>
+  <p>If the value is NULL in the database, return <code>null</code> (or omit the field):</p>
+  <pre><code>{
+  <span class="string">"dealingCutOff"</span>: <span class="keyword">null</span>,
+  <span class="string">"valuationPoint"</span>: <span class="keyword">null</span>,
+  <span class="string">"cutoffTime"</span>: <span class="keyword">null</span>
+}</code></pre>
+</div>
+
+<!-- Section 5: Write -->
+<h2 id="write">5. Write (API Request) — Frontend → Backend</h2>
+<div class="section-box">
+  <p>When the frontend submits data (POST/PUT), it sends the field as a <strong>single string</strong>:</p>
+
+  <h3>5.1 Request Format</h3>
+  <pre><code>{
+  <span class="string">"dealingCutOff"</span>: <span class="string">"16:00 HKG"</span>,
+  <span class="string">"valuationPoint"</span>: <span class="string">"18:00 IRL"</span>,
+  <span class="string">"cutoffTime"</span>: <span class="string">"15:30 SGP"</span>
+}</code></pre>
+
+  <div class="important">
+    <strong>Backend: DO NOT parse or transform this value.</strong> Store it directly as-is into the VARCHAR column. No date parsing, no timezone conversion.
+  </div>
+
+  <h3>5.2 What the Frontend Does Before Sending</h3>
+  <pre><code><span class="comment">// Frontend submit handler — combines two form fields into one string</span>
+<span class="keyword">const</span> timeStr = dayjs(dealingCutOff_time).format(<span class="string">"HH:mm"</span>); <span class="comment">// e.g. "16:00"</span>
+<span class="keyword">const</span> tz      = dealingCutOff_tz;                          <span class="comment">// e.g. "HKG"</span>
+submitData.dealingCutOff = [timeStr, tz].filter(Boolean).join(<span class="string">" "</span>);
+<span class="comment">// Result: "16:00 HKG"</span>
+
+<span class="comment">// _time and _tz are removed before sending</span>
+<span class="keyword">delete</span> submitData.dealingCutOff_time;
+<span class="keyword">delete</span> submitData.dealingCutOff_tz;</code></pre>
+
+  <h3>5.3 Null Request</h3>
+  <p>If both time and tz are empty, the frontend sends <code>null</code>:</p>
+  <pre><code>{
+  <span class="string">"dealingCutOff"</span>: <span class="keyword">null</span>
+}</code></pre>
+</div>
+
+<!-- Section 6: Import & Export -->
+<h2 id="import-export">6. Import &amp; Export</h2>
+<div class="section-box">
+  <h3>6.1 Export (Backend → Excel)</h3>
+  <p>Export the field as a single column with the full composite value:</p>
+  <table>
+    <tr><th>Column Header</th><th>Example Value</th></tr>
+    <tr><td>Dealing Cut-off</td><td><code>16:00 HKG</code></td></tr>
+    <tr><td>Valuation Point</td><td><code>18:00 IRL</code></td></tr>
+    <tr><td>Cutoff Time</td><td><code>15:30 SGP</code></td></tr>
+  </table>
+
+  <h3>6.2 Import (Excel → Backend)</h3>
+  <p>Users fill the same format in Excel. The backend should:</p>
+  <ol style="margin: 8px 0 8px 24px;">
+    <li>Read the cell value as a string</li>
+    <li>Trim whitespace</li>
+    <li>Validate format: <code>^(\d{2}:\d{2})\s+([A-Z]{3})$</code></li>
+    <li>Store as-is into the database</li>
+  </ol>
+
+  <div class="note">
+    <strong>Note:</strong> If the user enters <code>16:00HKG</code> (missing space) or <code>16:00 Hong Kong</code> (full name), the import should reject the row with a validation error.
+  </div>
+
+  <h3>6.3 Validation Regex for Import</h3>
+  <pre><code><span class="comment">// Java regex for validating imported value</span>
+<span class="keyword">private static final</span> String TIME_TZ_PATTERN = <span class="string">"^(\\d{2}:\\d{2})\\s+([A-Z]{3})$"</span>;
+
+<span class="comment">// Valid:  "16:00 HKG", "09:30 IRL", "15:00 SGP"</span>
+<span class="comment">// Invalid: "16:00HKG", "16:00 Hong Kong", "1600 HKG", ""</span></code></pre>
+</div>
+
+<!-- Section 7: Validation -->
+<h2 id="validation">7. Validation Rules</h2>
+<div class="section-box">
+  <table>
+    <tr><th>Rule</th><th>Details</th></tr>
+    <tr><td>Time format</td><td><code>HH:mm</code> — 24-hour, zero-padded, colon separator</td></tr>
+    <tr><td>Country code</td><td>Must be one of the 14 valid codes (see §3.2)</td></tr>
+    <tr><td>Both parts required</td><td>If time is filled, tz must also be filled (and vice versa)</td></tr>
+    <tr><td>Separator</td><td>Exactly one space between time and country code</td></tr>
+    <tr><td>Max length</td><td><code>VARCHAR(20)</code> — sufficient for <code>"HH:mm CCC"</code> (9 chars)</td></tr>
+    <tr><td>Nullable</td><td>Yes — if the field is not applicable</td></tr>
+  </table>
+
+  <div class="tip">
+    <strong>Frontend Validation:</strong> The frontend already enforces "both time and tz must be filled together, or both empty". If only one is filled, the form shows an error and blocks submission.
+  </div>
+</div>
+
+<!-- Section 8: Summary -->
+<h2 id="summary">8. Summary &amp; Checklist</h2>
+<div class="section-box">
+  <table>
+    <tr><th>#</th><th>Action Required</th><th>Status</th></tr>
+    <tr><td>1</td><td>Store composite value as single VARCHAR — <strong>do NOT split into two columns</strong></td><td>⬜</td></tr>
+    <tr><td>2</td><td>Return composite value as single string in API response</td><td>⬜</td></tr>
+    <tr><td>3</td><td>Accept composite value as single string in POST/PUT request</td><td>⬜</td></tr>
+    <tr><td>4</td><td>Export to Excel as single column with format <code>HH:mm CCC</code></td><td>⬜</td></tr>
+    <tr><td>5</td><td>Import from Excel: validate format <code>^(\d{2}:\d{2})\s+([A-Z]{3})$</code></td><td>⬜</td></tr>
+    <tr><td>6</td><td>Return <code>null</code> for empty values (not empty string)</td><td>⬜</td></tr>
+  </table>
+
+  <h3>Quick Reference</h3>
+  <pre><code><span class="comment">// ✅ Correct — single string</span>
+{ <span class="string">"dealingCutOff"</span>: <span class="string">"16:00 HKG"</span> }
+{ <span class="string">"dealingCutOff"</span>: <span class="keyword">null</span> }
+
+<span class="comment">// ❌ Wrong — split into two fields</span>
+{ <span class="string">"dealingCutOffTime"</span>: <span class="string">"16:00"</span>, <span class="string">"dealingCutOffTz"</span>: <span class="string">"HKG"</span> }
+
+<span class="comment">// ❌ Wrong — wrong format</span>
+{ <span class="string">"dealingCutOff"</span>: <span class="string">"16:00HKG"</span> }         <span class="comment">// missing space</span>
+{ <span class="string">"dealingCutOff"</span>: <span class="string">"16:00 Hong Kong"</span> }  <span class="comment">// not country code</span>
+{ <span class="string">"dealingCutOff"</span>: <span class="string">""</span> }                  <span class="comment">// empty string, should be null</span></code></pre>
+</div>
+
+<hr>
+<p style="text-align: center; color: #999; font-size: 0.85rem;">Generated for Value Partners Product Center — Backend Integration</p>
+
+</body>
+</html>
