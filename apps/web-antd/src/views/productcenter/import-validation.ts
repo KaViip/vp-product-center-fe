@@ -195,6 +195,7 @@ export const OPERATIONAL_TEAM_RULES: ValidationRuleMap = {
   Class_Currency: { type: 'enum', values: ['EUR', 'HKD', 'CNH', 'SGD', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'NZD', 'CNY', 'RMB', 'JPY'] },
   Distribution_Policy: { type: 'enum', values: ['Monthly', 'Quarterly', 'Annually', 'N/A'] },
   Hedged: { type: 'enum', values: ['true', 'false', 'TRUE', 'FALSE'] },
+  Hedging_Currency: { type: 'enum', values: ['EUR', 'HKD', 'CNH', 'SGD', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'NZD', 'CNY', 'RMB', 'JPY'] },
   Security_Lending: { type: 'enum', values: ['true', 'false', 'TRUE', 'FALSE'] },
   Unit_Precision: { type: 'integer' },
   NAV_Precision: { type: 'integer' },
