@@ -211,7 +211,6 @@ export const OPERATIONAL_TEAM_RULES: ValidationRuleMap = {
   Dealing_Frequency: { type: 'enum', values: ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'] },
   Valuation_Frequency: { type: 'enum', values: ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'] },
   Pricing_Methodology: { type: 'enumList', values: ['Amortization', 'Cost', 'Mark to Market'] },
-  Financial_Year_End: { type: 'enum', values: ['31-March', '30-June', '31-December'] },
   Sub_unit_rounding: { type: 'enum', values: ['Round Up', 'Round Down'] },
   Red_unit_rounding: { type: 'enum', values: ['Round Up', 'Round Down'] },
   Management_Fee: { type: 'decimal2' },
