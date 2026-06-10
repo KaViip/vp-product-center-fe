@@ -245,7 +245,17 @@ export const PRODUCT_TEAM_RULES: ValidationRuleMap = {
       'Other Mutual Fund',
     ],
   },
+  'domicile Jurisdiction': {
+    type: 'enum',
+    values: ['HK', 'IE', 'KY', 'CN', 'SG', 'LU', 'GB', 'US', 'CH', 'DE', 'FR', 'JP', 'BM', 'VG', 'AU', 'NL', 'TW', 'MO', 'MY', 'KR', 'IN', 'IT', 'ES', 'SE', 'FI', 'DK', 'NO'],
+  },
+  'base Currency': { type: 'enum', values: ['HKD', 'USD', 'EUR', 'CNY', 'CNH', 'GBP', 'JPY', 'SGD', 'CHF', 'AUD', 'CAD', 'NZD', 'RMB'] },
   'fund Status': { type: 'enum', values: ['In Offering', 'Active', 'In Liquidation', 'Liquidated'] },
+  'primary Regulator': { type: 'required' },
+  'fund Manager': { type: 'required' },
+  'fund Manager LEI': { type: 'regex', pattern: /^[A-Z0-9]{20}$/ },
+  'giin Number': { type: 'regex', pattern: /^[A-Z0-9]{6}\.[A-Z0-9]{5}\.[A-Z0-9]{2}\.[A-Z0-9]{2}$/ },
+  'lei Number': { type: 'regex', pattern: /^[A-Z0-9]{20}$/ },
   'primary Instrument Type': {
     type: 'enum',
     values: ['Alternative (Private) Assets', 'Commodities', 'Digital Assets', 'Equity', 'Fixed Income', 'Money Market (Liquidity)', 'Multi-Assets'],
