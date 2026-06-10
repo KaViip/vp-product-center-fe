@@ -208,10 +208,12 @@
       "valuationPoint": "Valuation Point",
       "businessDayDefinition": "Business Day Definition",
       "businessCalendar": "Business Calendar",
-      "contractNoteDeliveryDay": "Contract Note Del. Day(T+)",
+      "contractNoteDeliveryDay": "Contract Note Delivery Day(T+)",
       "pricingMethodology": "Pricing Methodology",
       "valuationDeliveryTime": "Valuation Delivery Time(T+)",
       "securityLending": "Security Lending",
+      "subUnitRounding": "Sub Unit Rounding",
+      "redUnitRounding": "Red Unit Rounding",
       "ter": "TER",
       "fundNameChinese": "Fund Name (Chinese)"
     }

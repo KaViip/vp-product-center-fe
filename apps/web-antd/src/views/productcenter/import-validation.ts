@@ -13,9 +13,28 @@ export interface ValidationError {
   message: string;
 }
 
+const MONTH_MAP: Record<string, number> = {
+  Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+  Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12,
+};
+
 function normalizeDate(raw: string): string | null {
   if (!raw || !raw.trim()) return null;
   const s = raw.trim();
+
+  // DD-MMM-YYYY (e.g. 05-May-2025)
+  const ddMmmYyyy = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(s);
+  if (ddMmmYyyy) {
+    const d = Number(ddMmmYyyy[1]);
+    const m = MONTH_MAP[ddMmmYyyy[2].charAt(0).toUpperCase() + ddMmmYyyy[2].slice(1).toLowerCase()];
+    const y = Number(ddMmmYyyy[3]);
+    if (m) {
+      const date = new Date(y, m - 1, d);
+      if (date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d) {
+        return `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}`;
+      }
+    }
+  }
 
   // YYYY/MM/DD or YYYY-MM-DD
   if (/^\d{4}[\/-]\d{1,2}[\/-]\d{1,2}$/.test(s)) {
@@ -145,6 +164,10 @@ export function validateExcelData(
     for (const [column, rule] of Object.entries(rules)) {
       if (skipRequired && rule.type === 'required') continue;
       const value = (row[column] ?? '').toString();
+      if (value.trim() === '-') {
+        row[column] = null;
+        continue;
+      }
       const error = validateCell(value, column, rule);
       if (error) {
         errors.push({ row: rowNum, column, value, message: error });
@@ -153,6 +176,13 @@ export function validateExcelData(
         if (normalized) {
           row[column] = normalized;
         }
+      }
+    }
+
+    for (const key of Object.keys(row)) {
+      if (key === '_row' || rules[key]) continue;
+      if (row[key] != null && String(row[key]).trim() === '-') {
+        row[key] = null;
       }
     }
   }
@@ -174,9 +204,9 @@ export const OPERATIONAL_TEAM_RULES: ValidationRuleMap = {
   'Share_Class_Name_(EN)_Official_Name': { type: 'required' },
   Fund_Class_Status: { type: 'enum', values: ['Active', 'Inactive', 'Terminated'] },
   Class_Currency: { type: 'enum', values: ['EUR', 'HKD', 'CNH', 'SGD', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'NZD', 'CNY', 'RMB', 'JPY'] },
-  Distribution_Policy: { type: 'enum', values: ['Annually', 'Semi-Annually', 'Quarterly', 'Monthly', 'Daily'] },
-  Hedged: { type: 'enum', values: ['Y', 'N'] },
-  Security_Lending: { type: 'enum', values: ['Y', 'N'] },
+  Distribution_Policy: { type: 'enum', values: ['Monthly', 'Quarterly', 'Annually', 'N/A'] },
+  Hedged: { type: 'enum', values: ['true', 'false', 'TRUE', 'FALSE'] },
+  Security_Lending: { type: 'enum', values: ['true', 'false', 'TRUE', 'FALSE'] },
   Unit_Precision: { type: 'integer' },
   NAV_Precision: { type: 'integer' },
   ISIN_Code: { type: 'regex', pattern: /^[A-Z]{2}[A-Z0-9]{10}$/ },
@@ -186,15 +216,11 @@ export const OPERATIONAL_TEAM_RULES: ValidationRuleMap = {
   Launch_Date: { type: 'dateFormat' },
   End_of_IOP_Date: { type: 'dateFormat' },
   Latest_TER_Date: { type: 'dateFormat' },
-  Dealing_Cut_off: { type: 'compositeTime' },
   Valuation_point: { type: 'compositeTime' },
-  Business_Calendar: {
-    type: 'enumList',
-    values: ['Hong Kong', 'Ireland', 'China', 'Australia', 'Canada', 'France', 'Germany', 'Japan', 'Luxembourg', 'Singapore', 'Switzerland', 'Taiwan', 'United Kingdom', 'United States'],
-  },
+  Sub_unit_rounding: { type: 'enum', values: ['Round Up', 'Round Down'] },
+  Red_unit_rounding: { type: 'enum', values: ['Round Up', 'Round Down'] },
   Management_Fee: { type: 'decimal2' },
   Performance_Fee: { type: 'decimal2' },
-  TER: { type: 'decimal2' },
   Latest_TER_Rate: { type: 'decimal2' },
   Minimum_initial_subscription: { type: 'numeric' },
   Minimum_Subsequent_Subscription: { type: 'numeric' },
@@ -203,7 +229,6 @@ export const OPERATIONAL_TEAM_RULES: ValidationRuleMap = {
   Redemption_Charge: { type: 'numeric' },
   Subscription_Settlement: { type: 'integer' },
   Redemption_Settlement: { type: 'integer' },
-  Contract_note_delivery_day: { type: 'integer' },
 };
 
 export const PRODUCT_TEAM_RULES: ValidationRuleMap = {

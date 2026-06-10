@@ -208,10 +208,12 @@
       "valuationPoint": "估值点",
       "businessDayDefinition": "营业日定义",
       "businessCalendar": "营业日历",
-      "contractNoteDeliveryDay": "成交单交付日(T+)",
+      "contractNoteDeliveryDay": "合同通知交付日（T+X）",
       "pricingMethodology": "定价方法",
       "valuationDeliveryTime": "估值交付时间(T+)",
       "securityLending": "证券借贷",
+      "subUnitRounding": "申购单位舍入",
+      "redUnitRounding": "赎回单位舍入",
       "ter": "TER",
       "fundNameChinese": "基金中文名称"
     }

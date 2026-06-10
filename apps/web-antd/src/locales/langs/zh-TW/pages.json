@@ -208,10 +208,12 @@
       "valuationPoint": "估值點",
       "businessDayDefinition": "營業日定義",
       "businessCalendar": "營業日曆",
-      "contractNoteDeliveryDay": "成交單交付日(T+)",
+      "contractNoteDeliveryDay": "合同通知交付日（T+X）",
       "pricingMethodology": "定價方法",
       "valuationDeliveryTime": "估值交付時間(T+)",
       "securityLending": "證券借貸",
+      "subUnitRounding": "申購單位捨入",
+      "redUnitRounding": "贖回單位捨入",
       "ter": "TER",
       "fundNameChinese": "基金中文名稱"
     }

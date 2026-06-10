@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Validation Specification — Product Center</title>
+<style>
+  :root { --accent: #1677ff; --bg: #f8f9fa; --border: #e2e6ea; --header-bg: #1a1a2e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #333; line-height: 1.6; background: #fff; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 40px 32px; }
+  h1 { font-size: 28px; font-weight: 700; color: var(--header-bg); margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 600; color: var(--header-bg); margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+  h3 { font-size: 17px; font-weight: 600; color: var(--header-bg); margin: 24px 0 12px; }
+  .subtitle { color: #666; font-size: 14px; margin-bottom: 32px; }
+  .meta { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin-bottom: 32px; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 24px; font-size: 13px; }
+  th { background: var(--header-bg); color: #fff; padding: 10px 12px; text-align: left; font-weight: 500; white-space: nowrap; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: #f0f4ff; }
+  code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 12px; font-family: 'SF Mono', Monaco, Consolas, monospace; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-right: 4px; }
+  .tag-req { background: #fee2e2; color: #dc2626; }
+  .tag-opt { background: #e8f5e9; color: #388e3c; }
+  .tag-unique { background: #fff3e0; color: #e65100; }
+  .enum-list { font-size: 12px; color: #555; line-height: 1.5; }
+  .enum-list span { display: inline-block; background: #f5f5f5; padding: 1px 6px; border-radius: 3px; margin: 2px 2px; font-family: monospace; }
+  .note { background: #e6f7ff; border: 1px solid #91d5ff; border-radius: 6px; padding: 12px 16px; margin: 16px 0; font-size: 13px; }
+  .note::before { content: '\2139\FE0F '; }
+  .warning { background: #fff1f0; border: 1px solid #ffa39e; border-radius: 6px; padding: 12px 16px; margin: 16px 0; font-size: 13px; }
+  .warning::before { content: '\26A0\FE0F '; }
+  .section-intro { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px 16px; margin: 16px 0 24px; border-radius: 4px; font-size: 14px; }
+  .diff { background: #fffde7; }
+  .toc { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin-bottom: 32px; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc ul { list-style: none; padding-left: 0; }
+  .toc > ul > li { font-weight: 600; margin-top: 8px; }
+  .toc > ul > li:first-child { margin-top: 0; }
+  .toc ul ul { padding-left: 20px; }
+  .toc ul ul li { font-weight: 400; margin: 2px 0; }
+  @media print { body { font-size: 11px; } .container { padding: 20px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Field Validation Specification — Product Center</h1>
+<p class="subtitle">Frontend field constraints, validation rules, and enum values for backend alignment</p>
+
+<div class="meta">
+  <strong>Project:</strong> Value Partners — Fund Product Center<br>
+  <strong>Date:</strong> 2026-06-10<br>
+  <strong>Modules:</strong> Product Team (Fund Masterdata) &amp; Operational Team (Share Class Data)<br>
+  <strong>Scope:</strong> Form validation, Excel import validation, enum constraints, data format conventions
+</div>
+
+<div class="toc">
+  <strong>Table of Contents</strong>
+  <ul>
+    <li><a href="#sec1">1. General Conventions</a>
+      <ul>
+        <li><a href="#sec1-1">1.1 Date Format</a></li>
+        <li><a href="#sec1-2">1.2 Composite Time+TZ Format</a></li>
+        <li><a href="#sec1-3">1.3 Boolean Fields</a></li>
+        <li><a href="#sec1-4">1.4 Multi-Select Fields (Comma-Separated)</a></li>
+        <li><a href="#sec1-5">1.5 Decimal Precision</a></li>
+        <li><a href="#sec1-6">1.6 Excel Import Notes</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec2">2. Product Team — Fund Masterdata</a>
+      <ul>
+        <li><a href="#sec2-1">2.1 Form Validation Rules</a></li>
+        <li><a href="#sec2-2">2.2 Unique Constraints</a></li>
+        <li><a href="#sec2-3">2.3 Enum Values</a></li>
+        <li><a href="#sec2-4">2.4 Excel Import Column Mapping &amp; Validation</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec3">3. Operational Team — Share Class Data</a>
+      <ul>
+        <li><a href="#sec3-1">3.1 Form Validation Rules</a></li>
+        <li><a href="#sec3-2">3.2 Unique Constraints</a></li>
+        <li><a href="#sec3-3">3.3 Enum Values</a></li>
+        <li><a href="#sec3-4">3.4 Composite Time+TZ Fields</a></li>
+        <li><a href="#sec3-5">3.5 Excel Import Column Mapping &amp; Validation</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec4">4. Cross-Reference Summary</a>
+      <ul>
+        <li><a href="#sec4-1">4.1 Remaining Differences</a></li>
+        <li><a href="#sec4-2">4.2 Backend Action Items</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec5">5. Backend Validation Requirements</a>
+      <ul>
+        <li><a href="#sec5-1">5.1 Product Team</a></li>
+        <li><a href="#sec5-2">5.2 Operational Team</a></li>
+        <li><a href="#sec5-3">5.3 Data Types Summary</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec6">6. Change Log — 2026-06-10</a>
+      <ul>
+        <li><a href="#sec6-1">6.1 Frontend Changes (Already Done)</a></li>
+        <li><a href="#sec6-2">6.2 Backend Actions Required</a></li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<!-- ============================== 1. General ============================== -->
+
+<h2 id="sec1">1. General Conventions</h2>
+
+<h3 id="sec1-1">1.1 Date Format</h3>
+<p>All date fields use <code>YYYY/MM/DD</code> format (e.g. <code>2026/05/16</code>).</p>
+<p><strong>Exception:</strong> <code>latestTerDate</code> uses month picker (<code>picker="month"</code>) but still submits <code>YYYY/MM/DD</code> (day=01).</p>
+<p>Excel import accepts 6 formats (auto-normalized to <code>YYYY/MM/DD</code>):</p>
+<table>
+  <tr><th>Priority</th><th>Format</th><th>Example</th><th>Note</th></tr>
+  <tr><td>1</td><td>DD-MMM-YYYY</td><td>05-May-2025</td><td>3-letter month (Jan–Dec)</td></tr>
+  <tr><td>2</td><td>YYYY/MM/DD</td><td>2026/05/16</td><td>Preferred</td></tr>
+  <tr><td>3</td><td>YYYY-MM-DD</td><td>2026-05-16</td><td>ISO variant</td></tr>
+  <tr><td>4</td><td>DD/MM/YYYY</td><td>16/05/2026</td><td>HK client priority</td></tr>
+  <tr><td>5</td><td>MM/DD/YYYY</td><td>05/16/2026</td><td>Fallback</td></tr>
+  <tr><td>6</td><td>M/D/YY</td><td>5/16/26</td><td>Excel auto-format</td></tr>
+</table>
+<div class="warning">Ambiguous dates (e.g. 05/06/2026) are resolved as DD/MM/YYYY first (HK preference). If parsing fails, fallback to MM/DD/YYYY.</div>
+
+<h3 id="sec1-2">1.2 Composite Time+TZ Format</h3>
+<p><strong>Storage format:</strong> <code>HH:mm CCC</code> — single string, e.g. <code>16:00 HKG</code>.</p>
+<p><strong>Form:</strong> TimePicker (<code>HH:mm</code>) + Select (3-letter code). Both required.</p>
+<p><strong>Valid timezone codes:</strong></p>
+<div class="enum-list">
+  <span>GMT</span> <span>HKG</span> <span>IRL</span> <span>CHN</span> <span>AUS</span> <span>CAN</span> <span>FRA</span> <span>DEU</span> <span>JPN</span> <span>LUX</span> <span>SGP</span> <span>CHE</span> <span>TWN</span> <span>GBR</span> <span>USA</span>
+</div>
+
+<h3 id="sec1-3">1.3 Boolean Fields</h3>
+<table>
+  <tr><th>Context</th><th>True</th><th>False</th></tr>
+  <tr><td>Form dropdown</td><td><code>true</code> (label: Yes)</td><td><code>false</code> (label: No)</td></tr>
+  <tr><td>Excel import</td><td><code>"true"</code> / <code>"TRUE"</code></td><td><code>"false"</code> / <code>"FALSE"</code></td></tr>
+</table>
+
+<h3 id="sec1-4">1.4 Multi-Select Fields</h3>
+<p>Stored as comma-separated strings, split/join on form submit/backfill.</p>
+<table>
+  <tr><th>Field</th><th>Module</th><th>Example</th></tr>
+  <tr><td><code>businessCalendar</code></td><td>Operational</td><td><code>"Hong Kong,Taiwan,Japan"</code></td></tr>
+  <tr><td><code>pricingMethodology</code></td><td>Operational</td><td><code>"Amortization,Mark to Market"</code></td></tr>
+</table>
+
+<h3 id="sec1-5">1.5 Numeric Types</h3>
+<table>
+  <tr><th>Type</th><th>Regex</th><th>Example</th></tr>
+  <tr><td>Integer (non-negative)</td><td><code>/^\d+$/</code></td><td>5, 100</td></tr>
+  <tr><td>Decimal 2dp (non-negative)</td><td><code>/^\d+(\.\d{1,2})?$/</code></td><td>1.50, 0.25</td></tr>
+  <tr><td>Numeric (non-negative)</td><td>Number(x) &gt;= 0</td><td>1000, 99.999</td></tr>
+</table>
+
+<h3 id="sec1-6">1.6 Excel Import Notes</h3>
+<div class="note">
+  <strong>Parsing:</strong> <code>{ defval: '', raw: false, dateNF: 'yyyy/mm/dd' }</code> — all values as text (preserves leading zeros in codes).<br>
+  <strong>Required validation:</strong> only enforced for <code>importMode === 'add data'</code>; skipped for update modes.<br>
+  <strong>Date auto-normalize:</strong> passed dates are standardized to <code>YYYY/MM/DD</code> before sending to backend.<br>
+  <strong>Dash skip:</strong> a single <code>-</code> in any optional field is converted to <code>null</code> (skips validation). Required fields still reject <code>-</code>.
+</div>
+
+<!-- ============================== 2. Product Team ============================== -->
+
+<h2 id="sec2">2. Product Team — Fund Masterdata</h2>
+<p><strong>API:</strong> <code>/productcenter/productCenterMasterdata</code> | <strong>PK:</strong> <code>fundCode</code> (VARCHAR 20)</p>
+
+<h3 id="sec2-1">2.1 Form Validation Rules</h3>
+<p>Collapse sections: Core Fund Identity, Key Parties, Investment Strategy, Foreign Registration.</p>
+
+<table>
+  <tr><th>#</th><th>Field</th><th>Label (EN)</th><th>Type</th><th>Required</th><th>Constraints</th><th>Control</th></tr>
+  <tr><td>1</td><td><code>fundCode</code></td><td>Fund Code</td><td>String</td><td><span class="tag tag-req">Required</span> <span class="tag tag-unique">Unique</span></td><td>Max 20 chars</td><td>Input (disabled on edit)</td></tr>
+  <tr><td>2</td><td><code>fundNameEn</code></td><td>Fund Name (EN)</td><td>String</td><td><span class="tag tag-req">Required</span> <span class="tag tag-unique">Unique</span></td><td>Max 200 chars</td><td>Input</td></tr>
+  <tr><td>3</td><td><code>fundNameTc</code></td><td>Fund Name (TC)</td><td>String</td><td><span class="tag tag-req">Required</span> <span class="tag tag-unique">Unique</span></td><td>Max 200 chars</td><td>Input</td></tr>
+  <tr><td>4</td><td><code>fundNameSc</code></td><td>Fund Name (SC)</td><td>String</td><td><span class="tag tag-req">Required</span> <span class="tag tag-unique">Unique</span></td><td>Max 200 chars</td><td>Input</td></tr>
+  <tr><td>5</td><td><code>fundType</code></td><td>Fund Type</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>9 values, see §2.3</td><td>Select</td></tr>
+  <tr><td>6</td><td><code>umbrellaOfcName</code></td><td>Umbrella / OFC Name</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>7</td><td><code>subFundCode</code></td><td>Sub-Fund Code</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>8</td><td><code>domicileJurisdiction</code></td><td>Domicile / Jurisdiction</td><td>Enum (ISO 3166-1 Alpha-2)</td><td><span class="tag tag-req">Required</span></td><td>2-letter code, see §2.3</td><td>Select (searchable)</td></tr>
+  <tr><td>9</td><td><code>primaryRegulator</code></td><td>Primary Regulator</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>10</td><td><code>baseCurrency</code></td><td>Base Currency</td><td>Enum (ISO 4217)</td><td><span class="tag tag-opt">Optional</span></td><td>3-letter code, see §2.3</td><td>Select (searchable)</td></tr>
+  <tr><td>11</td><td><code>fundStatus</code></td><td>Fund Status</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>4 values, see §2.3</td><td>Select</td></tr>
+  <tr><td>12</td><td><code>applicationSubmissionDate</code></td><td>Application Submission Date</td><td>Date</td><td><span class="tag tag-opt">Optional</span></td><td>YYYY/MM/DD</td><td>DatePicker</td></tr>
+  <tr><td>13</td><td><code>authorizationDate</code></td><td>Authorization Date</td><td>Date</td><td><span class="tag tag-opt">Optional</span></td><td>YYYY/MM/DD</td><td>DatePicker</td></tr>
+  <tr><td>14</td><td><code>launchDate</code></td><td>Launch Date</td><td>Date</td><td><span class="tag tag-req">Required</span></td><td>YYYY/MM/DD</td><td>DatePicker</td></tr>
+  <tr><td>15</td><td><code>complexProduct</code></td><td>Complex Product</td><td>Boolean</td><td><span class="tag tag-req">Required</span></td><td>true / false</td><td>Select (Yes/No)</td></tr>
+  <tr><td>16</td><td><code>iopStartDate</code></td><td>IOP Start Date</td><td>Date</td><td><span class="tag tag-opt">Optional</span></td><td>YYYY/MM/DD</td><td>DatePicker</td></tr>
+  <tr><td>17</td><td><code>operationStartDate</code></td><td>Operation Start Date</td><td>Date</td><td><span class="tag tag-opt">Optional</span></td><td>YYYY/MM/DD</td><td>DatePicker</td></tr>
+  <tr><td>18</td><td><code>listingDate</code></td><td>Listing Date</td><td>Date</td><td><span class="tag tag-opt">Optional</span></td><td>YYYY/MM/DD</td><td>DatePicker</td></tr>
+  <tr><td>19</td><td><code>terminationDate</code></td><td>Termination Date</td><td>Date</td><td><span class="tag tag-opt">Optional</span></td><td>YYYY/MM/DD</td><td>DatePicker</td></tr>
+  <tr><td>20</td><td><code>leiNumber</code></td><td>LEI Number</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>Regex: <code>/^[A-Z0-9]{20}$/</code> — exactly 20 alphanumeric</td><td>Input</td></tr>
+  <tr><td>21</td><td><code>giinNumber</code></td><td>GIIN Number</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>Regex: <code>/^[A-Z0-9]{6}\.[A-Z0-9]{5}\.[A-Z0-9]{2}\.[A-Z0-9]{2}$/</code><br>Format: XXXXXX.XXXXX.XX.XX</td><td>Input</td></tr>
+  <tr><td>22</td><td><code>professionalInvestorsOnly</code></td><td>Professional Investors Only</td><td>Boolean</td><td><span class="tag tag-opt">Optional</span></td><td>true / false (clearable)</td><td>Select (Yes/No)</td></tr>
+  <tr><td>23</td><td><code>restrictionOnInvestorSNationality</code></td><td>Restriction on Investor's Nationality</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>24</td><td><code>restrictionOnInvestorSResidency</code></td><td>Restriction on Investor's Residency</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>25</td><td><code>fundManager</code></td><td>Fund Manager</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>—</td><td>AutoComplete</td></tr>
+  <tr><td>26</td><td><code>fundManagerLei</code></td><td>Fund Manager LEI</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>Regex: <code>/^[A-Z0-9]{20}$/</code></td><td>Input</td></tr>
+  <tr><td>27</td><td><code>subManager</code></td><td>Sub Manager</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>AutoComplete</td></tr>
+  <tr><td>28</td><td><code>investmentAdvisor</code></td><td>Investment Advisor</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>AutoComplete</td></tr>
+  <tr><td>29</td><td><code>trusteeAdministrator</code></td><td>Trustee / Administrator</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>AutoComplete</td></tr>
+  <tr><td>30</td><td><code>custodianPrimeBroker</code></td><td>Custodian / Prime Broker</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>AutoComplete</td></tr>
+  <tr><td>31</td><td><code>subCustodian</code></td><td>Sub Custodian</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>AutoComplete</td></tr>
+  <tr><td>32</td><td><code>auditor</code></td><td>Auditor</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>AutoComplete</td></tr>
+  <tr><td>33</td><td><code>primaryInstrumentType</code></td><td>Primary Instrument Type</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>7 values, see §2.3</td><td>Select (searchable)</td></tr>
+  <tr><td>34</td><td><code>passiveOrActiveFund</code></td><td>Passive or Active Fund</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>Active / Passive</td><td>Select</td></tr>
+  <tr><td>35</td><td><code>investmentMarketFocus</code></td><td>Investment Market Focus</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>5 values, see §2.3</td><td>Select</td></tr>
+  <tr><td>36</td><td><code>morningstarCategory</code></td><td>Morningstar Category</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>37</td><td><code>investmentObjective</code></td><td>Investment Objective</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>Max 2000 chars</td><td>Textarea</td></tr>
+  <tr><td>38</td><td><code>investmentStrategy</code></td><td>Investment Strategy</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>Max 2000 chars</td><td>Textarea</td></tr>
+  <tr><td>39</td><td><code>assetAllocationTable</code></td><td>Asset Allocation Table</td><td>String / File</td><td><span class="tag tag-opt">Conditional</span></td><td>Max 4000 chars. At least one of text or image required.</td><td>Textarea + Upload</td></tr>
+  <tr><td>40</td><td><code>hedgingPolicyFund</code></td><td>Hedging Policy (Fund)</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>3 values, see §2.3</td><td>Select</td></tr>
+  <tr><td>41</td><td><code>benchmark</code></td><td>Benchmark</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>AutoComplete</td></tr>
+  <tr><td>42</td><td><code>benchmarkCode</code></td><td>Benchmark Code</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>43</td><td><code>riskLevel</code></td><td>Risk Level</td><td>Integer</td><td><span class="tag tag-opt">Optional</span></td><td>Select: 1–5</td><td>Select</td></tr>
+  <tr><td>44</td><td><code>leverageRatioMax</code></td><td>Leverage Ratio (Max)</td><td>Integer</td><td><span class="tag tag-req">Required</span></td><td>Non-negative integer</td><td>Input</td></tr>
+  <tr><td>45</td><td><code>derivativesRatioMax</code></td><td>Derivatives Ratio (Max)</td><td>Integer</td><td><span class="tag tag-req">Required</span></td><td>Non-negative integer</td><td>Input</td></tr>
+  <tr><td>46</td><td><code>borrowingLimit</code></td><td>Borrowing Limit</td><td>Integer</td><td><span class="tag tag-req">Required</span></td><td>Non-negative integer</td><td>Input</td></tr>
+  <tr><td>47</td><td><code>stopLossLimit</code></td><td>Stop Loss Limit</td><td>Decimal 2dp</td><td><span class="tag tag-opt">Optional</span></td><td>Non-negative, max 2dp</td><td>Input</td></tr>
+  <tr><td>48</td><td><code>stopLossAlert</code></td><td>Stop Loss Alert</td><td>Decimal 2dp</td><td><span class="tag tag-opt">Optional</span></td><td>Non-negative, max 2dp</td><td>Input</td></tr>
+  <tr><td>49</td><td><code>regionDictCodes</code></td><td>Registered Regions</td><td>Array&lt;Integer&gt;</td><td><span class="tag tag-opt">Optional</span></td><td>Dict: <code>sys_product_center_region</code></td><td>Multi-Select</td></tr>
+</table>
+
+<h3 id="sec2-2">2.2 Unique Constraints</h3>
+<table>
+  <tr><th>Field</th><th>Scope</th></tr>
+  <tr><td><code>fundCode</code></td><td>Global (PK)</td></tr>
+  <tr><td><code>fundNameEn</code></td><td>Global</td></tr>
+  <tr><td><code>fundNameTc</code></td><td>Global</td></tr>
+  <tr><td><code>fundNameSc</code></td><td>Global</td></tr>
+</table>
+
+<h3 id="sec2-3">2.3 Enum Values</h3>
+
+<h4>fundType</h4>
+<div class="enum-list">
+  <span>SFC Authorized Fund（UT）</span> <span>SFC Authorized Fund（OFC）</span> <span>SFC Authorized Fund（Cayman）</span> <span>SFC Authorized Fund（ICAV）</span> <span>Private Fund（Cayman）</span> <span>Private Fund（Chinese Mainland）</span> <span>Investment Advisory（Offshore）</span> <span>Investment Advisory（Chinese Mainland）</span> <span>Other Mutual Fund</span>
+</div>
+
+<h4>fundStatus</h4>
+<div class="enum-list"><span>In Offering</span> <span>Active</span> <span>In Liquidation</span> <span>Liquidated</span></div>
+
+<h4>primaryInstrumentType</h4>
+<div class="enum-list"><span>Alternative (Private) Assets</span> <span>Commodities</span> <span>Digital Assets</span> <span>Equity</span> <span>Fixed Income</span> <span>Money Market (Liquidity)</span> <span>Multi-Assets</span></div>
+
+<h4>passiveOrActiveFund</h4>
+<div class="enum-list"><span>Active</span> <span>Passive</span></div>
+
+<h4>investmentMarketFocus</h4>
+<div class="enum-list"><span>America</span> <span>Asia Pacific</span> <span>Emerging Markets</span> <span>Europe</span> <span>Global</span></div>
+
+<h4>hedgingPolicyFund</h4>
+<div class="enum-list"><span>Hedge to Base Currency</span> <span>Optional</span> <span>N/A</span></div>
+
+<h4>domicileJurisdiction (ISO 3166-1 Alpha-2)</h4>
+<div class="enum-list">
+  <span>HK</span> <span>IE</span> <span>KY</span> <span>CN</span> <span>SG</span> <span>LU</span> <span>GB</span> <span>US</span> <span>CH</span> <span>DE</span> <span>FR</span> <span>JP</span> <span>BM</span> <span>VG</span> <span>AU</span> <span>NL</span> <span>TW</span> <span>MO</span> <span>MY</span> <span>KR</span> <span>IN</span> <span>IT</span> <span>ES</span> <span>SE</span> <span>FI</span> <span>DK</span> <span>NO</span>
+</div>
+
+<h4>baseCurrency (ISO 4217)</h4>
+<div class="enum-list"><span>HKD</span> <span>USD</span> <span>EUR</span> <span>CNY</span> <span>CNH</span> <span>GBP</span> <span>JPY</span> <span>SGD</span> <span>CHF</span> <span>AUD</span> <span>CAD</span> <span>NZD</span> <span>RMB</span></div>
+
+<h3 id="sec2-4">2.4 Excel Import Validation</h3>
+<div class="note">Excel template: <code>Fund_Product_Template.xlsx</code>. Column headers are case-sensitive. Only columns with frontend validation rules are listed below (~77 columns total).</div>
+
+<table>
+  <tr><th>#</th><th>Excel Column Header</th><th>→ Field</th><th>Required (add)</th><th>Rule</th></tr>
+  <tr><td>1</td><td><code>fund Code</code></td><td>fundCode</td><td><span class="tag tag-req">Yes</span></td><td>Non-empty</td></tr>
+  <tr><td>2</td><td><code>fund Name En</code></td><td>fundNameEn</td><td><span class="tag tag-req">Yes</span></td><td>Non-empty</td></tr>
+  <tr><td>3</td><td><code>fund Name Tc</code></td><td>fundNameTc</td><td><span class="tag tag-req">Yes</span></td><td>Non-empty</td></tr>
+  <tr><td>4</td><td><code>fund Name Sc</code></td><td>fundNameSc</td><td><span class="tag tag-req">Yes</span></td><td>Non-empty</td></tr>
+  <tr><td>5</td><td><code>fund Type</code></td><td>fundType</td><td>—</td><td>Enum (9 values)</td></tr>
+  <tr><td>6</td><td><code>fund Status</code></td><td>fundStatus</td><td>—</td><td>Enum: In Offering, Active, In Liquidation, Liquidated</td></tr>
+  <tr><td>7</td><td><code>primary Instrument Type</code></td><td>primaryInstrumentType</td><td>—</td><td>Enum (7 values)</td></tr>
+  <tr><td>8</td><td><code>passive Or Active Fund</code></td><td>passiveOrActiveFund</td><td>—</td><td>Enum: Active, Passive</td></tr>
+  <tr><td>9</td><td><code>investment Market Focus</code></td><td>investmentMarketFocus</td><td>—</td><td>Enum (5 values)</td></tr>
+  <tr><td>10</td><td><code>hedging Policy Fund</code></td><td>hedgingPolicyFund</td><td>—</td><td>Enum: Hedge to Base Currency, Optional, N/A</td></tr>
+  <tr><td>11</td><td><code>complex Product</code></td><td>complexProduct</td><td>—</td><td>Enum: true, false, TRUE, FALSE</td></tr>
+  <tr><td>12</td><td><code>professional Investors Only</code></td><td>professionalInvestorsOnly</td><td>—</td><td>Enum: true, false, TRUE, FALSE</td></tr>
+  <tr><td>13</td><td><code>launch Date</code></td><td>launchDate</td><td>—</td><td>Date format (auto-normalize)</td></tr>
+  <tr><td>14</td><td><code>application Submission Date</code></td><td>applicationSubmissionDate</td><td>—</td><td>Date format</td></tr>
+  <tr><td>15</td><td><code>authorization Date</code></td><td>authorizationDate</td><td>—</td><td>Date format</td></tr>
+  <tr><td>16</td><td><code>iop Start Date</code></td><td>iopStartDate</td><td>—</td><td>Date format</td></tr>
+  <tr><td>17</td><td><code>operation Start Date</code></td><td>operationStartDate</td><td>—</td><td>Date format</td></tr>
+  <tr><td>18</td><td><code>listing Date</code></td><td>listingDate</td><td>—</td><td>Date format</td></tr>
+  <tr><td>19</td><td><code>termination Date</code></td><td>terminationDate</td><td>—</td><td>Date format</td></tr>
+  <tr><td>20</td><td><code>leverage Ratio Max</code></td><td>leverageRatioMax</td><td>—</td><td>Non-negative integer</td></tr>
+  <tr><td>21</td><td><code>derivatives Ratio Max</code></td><td>derivativesRatioMax</td><td>—</td><td>Non-negative integer</td></tr>
+  <tr><td>22</td><td><code>borrowing Limit</code></td><td>borrowingLimit</td><td>—</td><td>Non-negative integer</td></tr>
+  <tr><td>23</td><td><code>stop Loss Limit</code></td><td>stopLossLimit</td><td>—</td><td>Non-negative, max 2dp</td></tr>
+  <tr><td>24</td><td><code>stop Loss Alert</code></td><td>stopLossAlert</td><td>—</td><td>Non-negative, max 2dp</td></tr>
+  <tr><td>25</td><td><code>risk Level</code></td><td>riskLevel</td><td>—</td><td>Non-negative integer</td></tr>
+</table>
+
+<!-- ============================== 3. Operational Team ============================== -->
+
+<h2 id="sec3">3. Operational Team — Share Class Data</h2>
+<p><strong>API:</strong> <code>/productcenter/productCenterData</code> | <strong>PK:</strong> <code>productClassId</code> (IDENTITY auto-increment)</p>
+
+<h3 id="sec3-1">3.1 Form Validation Rules</h3>
+<p>Collapse sections: Fund Info, Class List, Class Info, Dealing &amp; Valuation.</p>
+
+<table>
+  <tr><th>#</th><th>Field</th><th>Label (EN)</th><th>Type</th><th>Required</th><th>Constraints</th><th>Control</th></tr>
+  <tr><td>1</td><td><code>fundCode</code></td><td>Fund Code</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>Select from masterdata</td><td>Select (searchable, disabled on edit)</td></tr>
+  <tr><td>2</td><td><code>fundNameEn</code></td><td>Fund Name (EN)</td><td>String</td><td>—</td><td>Read-only, auto-populated</td><td>Input (disabled)</td></tr>
+  <tr><td>3</td><td><code>fundNameTc</code></td><td>Fund Name (TC)</td><td>String</td><td>—</td><td>Read-only</td><td>Input (disabled)</td></tr>
+  <tr><td>4</td><td><code>fundNameSc</code></td><td>Fund Name (SC)</td><td>String</td><td>—</td><td>Read-only</td><td>Input (disabled)</td></tr>
+  <tr><td>5</td><td><code>shareClassNameEnOfficialName</code></td><td>Share Class Name (EN)</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>Max 200 chars</td><td>Input</td></tr>
+  <tr><td>6</td><td><code>shareClassNameTcOfficialName</code></td><td>Share Class Name (TC)</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>Max 200 chars</td><td>Input</td></tr>
+  <tr><td>7</td><td><code>shareClassNameScOfficialName</code></td><td>Share Class Name (SC)</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>Max 200 chars</td><td>Input</td></tr>
+  <tr><td>8</td><td><code>vpfsClassId</code></td><td>VPFS Class ID</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>—</td><td>Input (disabled on edit)</td></tr>
+  <tr><td>9</td><td><code>isinCode</code></td><td>ISIN Code</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>Regex: <code>/^[A-Z]{2}[A-Z0-9]{10}$/</code> (12 chars)</td><td>Input</td></tr>
+  <tr><td>10</td><td><code>cusip</code></td><td>CUSIP</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>Regex: <code>/^[A-Z0-9]{9}$/</code> (9 alphanumeric)</td><td>Input</td></tr>
+  <tr><td>11</td><td><code>bloombergTicker</code></td><td>Bloomberg Ticker</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>12</td><td><code>bbgIdEquity</code></td><td>BBG ID Equity</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>13</td><td><code>sedol</code></td><td>SEDOL</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>Regex: <code>/^[A-Z0-9]{7}$/</code> (7 alphanumeric)</td><td>Input</td></tr>
+  <tr><td>14</td><td><code>morningstarFundId</code></td><td>Morningstar Fund ID</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>15</td><td><code>morningstarSecId</code></td><td>Morningstar Sec ID</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>16</td><td><code>morningstarPerformanceId</code></td><td>Morningstar Performance ID</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>17</td><td><code>stockCode</code></td><td>Stock Code</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>Regex: <code>/^\d{1,5}$/</code> (1-5 digits)</td><td>Input</td></tr>
+  <tr><td>18</td><td><code>valorCode</code></td><td>Valor Code</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>19</td><td><code>lipperCode</code></td><td>Lipper Code</td><td>String</td><td><span class="tag tag-opt">Optional</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>20</td><td><code>fundClassStatus</code></td><td>Fund Class Status</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>See §3.3</td><td>Select</td></tr>
+  <tr><td>21</td><td><code>classCurrency</code></td><td>Class Currency</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>13 currencies, see §3.3</td><td>Select (searchable)</td></tr>
+  <tr><td>22</td><td><code>endOfIopDate</code></td><td>End of IOP Date</td><td>Date</td><td><span class="tag tag-opt">Optional</span></td><td>YYYY/MM/DD</td><td>DatePicker</td></tr>
+  <tr><td>23</td><td><code>launchDate</code></td><td>Launch Date</td><td>Date</td><td><span class="tag tag-req">Required</span></td><td>YYYY/MM/DD</td><td>DatePicker</td></tr>
+  <tr><td>24</td><td><code>cutoffTime</code></td><td>Cutoff Time</td><td>Composite Time+TZ</td><td><span class="tag tag-req">Required</span></td><td>HH:mm CCC, both parts required</td><td>TimePicker + Select</td></tr>
+  <tr><td>25</td><td><code>businessDayDefinition</code></td><td>Business Day Definition</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>—</td><td>Input</td></tr>
+  <tr><td>26</td><td><code>businessCalendar</code></td><td>Business Calendar</td><td>Multi-Select</td><td><span class="tag tag-req">Required</span></td><td>Comma-sep, 8 values (see §3.3)</td><td>Multi-Select</td></tr>
+  <tr><td>27</td><td><code>distributionPolicy</code></td><td>Distribution Policy</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>See §3.3</td><td>Select</td></tr>
+  <tr><td>28</td><td><code>hedged</code></td><td>Hedged</td><td>Boolean</td><td><span class="tag tag-req">Required</span></td><td>true / false. Auto-detect from Name EN.</td><td>Select (Yes/No)</td></tr>
+  <tr><td>29</td><td><code>hedgingCurrency</code></td><td>Hedging Currency</td><td>Enum</td><td><span class="tag tag-opt">Optional</span></td><td>Same as classCurrency. Only enabled if hedged=true.</td><td>Select (conditional)</td></tr>
+  <tr><td>30</td><td><code>unitPrecision</code></td><td>Unit Precision</td><td>Integer</td><td><span class="tag tag-req">Required</span></td><td>Non-negative integer</td><td>Input</td></tr>
+  <tr><td>31</td><td><code>navPrecision</code></td><td>NAV Precision</td><td>Integer</td><td><span class="tag tag-req">Required</span></td><td>Non-negative integer</td><td>Input</td></tr>
+  <tr><td>32</td><td><code>subscriptionSettlement</code></td><td>Subscription Settlement</td><td>Integer</td><td><span class="tag tag-req">Required</span></td><td>Non-negative integer</td><td>Input</td></tr>
+  <tr><td>33</td><td><code>redemptionSettlement</code></td><td>Redemption Settlement</td><td>Integer</td><td><span class="tag tag-req">Required</span></td><td>Non-negative integer</td><td>Input</td></tr>
+  <tr><td>34</td><td><code>minimumInitialSubscription</code></td><td>Min Initial Subscription</td><td>Numeric</td><td><span class="tag tag-req">Required</span></td><td>Non-negative number</td><td>Input</td></tr>
+  <tr><td>35</td><td><code>minimumSubsequentSubscription</code></td><td>Min Subsequent Subscription</td><td>Numeric</td><td><span class="tag tag-req">Required</span></td><td>Non-negative number</td><td>Input</td></tr>
+  <tr><td>36</td><td><code>minimumRedemption</code></td><td>Minimum Redemption</td><td>Numeric</td><td><span class="tag tag-req">Required</span></td><td>Non-negative number</td><td>Input</td></tr>
+  <tr><td>37</td><td><code>minimumHolding</code></td><td>Minimum Holding</td><td>Numeric</td><td><span class="tag tag-opt">Optional</span></td><td>Non-negative number</td><td>Input</td></tr>
+  <tr><td>38</td><td><code>redemptionCharge</code></td><td>Redemption Charge</td><td>Numeric</td><td><span class="tag tag-opt">Optional</span></td><td>Non-negative number</td><td>Input</td></tr>
+  <tr><td>39</td><td><code>managementFee</code></td><td>Management Fee (%)</td><td>Decimal 2dp</td><td><span class="tag tag-opt">Optional</span></td><td>Non-negative, max 2dp</td><td>Input</td></tr>
+  <tr><td>40</td><td><code>performanceFee</code></td><td>Performance Fee (%)</td><td>Decimal 2dp</td><td><span class="tag tag-opt">Optional</span></td><td>Non-negative, max 2dp</td><td>Input</td></tr>
+  <tr><td>41</td><td><code>financialYearEnd</code></td><td>Financial Year End</td><td>Enum</td><td><span class="tag tag-opt">Optional</span></td><td>31-March, 30-June, 31-December</td><td>Select</td></tr>
+  <tr><td>42</td><td><code>latestTerDate</code></td><td>Latest TER Date</td><td>Date (month)</td><td><span class="tag tag-opt">Optional</span></td><td>YYYY/MM/DD (day=01). User picks month.</td><td>DatePicker (month)</td></tr>
+  <tr><td>43</td><td><code>latestTerRate</code></td><td>Latest TER Rate (%)</td><td>Decimal 2dp</td><td><span class="tag tag-opt">Optional</span></td><td>Non-negative, max 2dp. Backfill trimmed.</td><td>Input</td></tr>
+  <tr><td>44</td><td><code>dealingFrequency</code></td><td>Dealing Frequency</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>Daily, Weekly, Monthly, Quarterly, Yearly</td><td>Select</td></tr>
+  <tr><td>45</td><td><code>valuationFrequency</code></td><td>Valuation Frequency</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>Same as dealingFrequency</td><td>Select</td></tr>
+  <tr><td>46</td><td><code>dealingCutOff</code></td><td>Dealing Cut-off</td><td>String</td><td><span class="tag tag-req">Required</span></td><td>Free-text input (no format validation)</td><td>Input</td></tr>
+  <tr><td>47</td><td><code>valuationPoint</code></td><td>Valuation Point</td><td>Composite Time+TZ</td><td><span class="tag tag-req">Required</span></td><td>HH:mm CCC, both parts required</td><td>TimePicker + Select</td></tr>
+  <tr><td>48</td><td><code>contractNoteDeliveryDay</code></td><td>Contract Note Delivery Day(T+)</td><td>Integer</td><td><span class="tag tag-opt">Optional</span></td><td>Non-negative integer</td><td>Input</td></tr>
+  <tr><td>49</td><td><code>pricingMethodology</code></td><td>Pricing Methodology</td><td>Multi-Select</td><td><span class="tag tag-req">Required</span></td><td>Comma-sep: Amortization, Cost, Mark to Market</td><td>Multi-Select</td></tr>
+  <tr><td>50</td><td><code>valuationDeliveryTime</code></td><td>Valuation Delivery Time</td><td>Integer</td><td><span class="tag tag-opt">Optional</span></td><td>Non-negative integer</td><td>Input</td></tr>
+  <tr><td>51</td><td><code>securityLending</code></td><td>Security Lending</td><td>Boolean</td><td><span class="tag tag-opt">Optional</span></td><td>true / false, clearable</td><td>Select (Yes/No)</td></tr>
+  <tr><td>52</td><td><code>subUnitRounding</code></td><td>Sub Unit Rounding</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>Round Up / Round Down</td><td>Select</td></tr>
+  <tr><td>53</td><td><code>redUnitRounding</code></td><td>Red Unit Rounding</td><td>Enum</td><td><span class="tag tag-req">Required</span></td><td>Round Up / Round Down</td><td>Select</td></tr>
+</table>
+
+<h3 id="sec3-2">3.2 Unique Constraints</h3>
+<table>
+  <tr><th>Fields</th><th>Scope</th></tr>
+  <tr><td><code>fundCode</code> + <code>shareClassNameEnOfficialName</code></td><td>Combined unique</td></tr>
+  <tr><td><code>fundCode</code> + <code>vpfsClassId</code></td><td>Combined unique</td></tr>
+</table>
+
+<h3 id="sec3-3">3.3 Enum Values</h3>
+
+<h4>fundClassStatus</h4>
+<div class="enum-list"><span>Active</span> <span>Inactive</span> <span>Terminated</span></div>
+
+<h4>classCurrency</h4>
+<div class="enum-list"><span>EUR</span> <span>HKD</span> <span>CNH</span> <span>SGD</span> <span>USD</span> <span>CHF</span> <span>GBP</span> <span>AUD</span> <span>CAD</span> <span>NZD</span> <span>CNY</span> <span>RMB</span> <span>JPY</span></div>
+
+<h4>distributionPolicy</h4>
+<div class="enum-list"><span>Monthly</span> <span>Quarterly</span> <span>Annually</span> <span>N/A</span></div>
+
+<h4>unitPrecision</h4>
+<div class="enum-list">Non-negative integer (was: Select 2, 3, 4 — now free input)</div>
+
+<h4>navPrecision</h4>
+<div class="enum-list">Non-negative integer (was: Select 0, 2, 4 — now free input)</div>
+
+<h4>businessCalendar (Multi-Select)</h4>
+<div class="enum-list"><span>Hong Kong</span> <span>Taiwan</span> <span>Japan</span> <span>PRC - Stock Exchange</span> <span>PRC - Bank</span> <span>Ireland</span> <span>UK</span> <span>Relevant Market as per Prospectus</span></div>
+
+<h4>financialYearEnd</h4>
+<div class="enum-list"><span>31-March</span> <span>30-June</span> <span>31-December</span></div>
+
+<h4>dealingFrequency / valuationFrequency</h4>
+<div class="enum-list"><span>Daily</span> <span>Weekly</span> <span>Monthly</span> <span>Quarterly</span> <span>Yearly</span></div>
+
+<h4>pricingMethodology (Multi-Select)</h4>
+<div class="enum-list"><span>Amortization</span> <span>Cost</span> <span>Mark to Market</span></div>
+
+<h4>subUnitRounding / redUnitRounding</h4>
+<div class="enum-list"><span>Round Up</span> <span>Round Down</span></div>
+
+<h3 id="sec3-4">3.4 Composite Time+TZ Fields</h3>
+<table>
+  <tr><th>Field</th><th>Required</th><th>Form</th><th>Submitted As</th></tr>
+  <tr><td><code>valuationPoint</code></td><td><span class="tag tag-req">Required</span></td><td>TimePicker + TZ Select</td><td><code>"09:30 IRL"</code></td></tr>
+  <tr><td><code>cutoffTime</code></td><td><span class="tag tag-req">Required</span></td><td>TimePicker + TZ Select</td><td><code>"17:00 HKG"</code></td></tr>
+</table>
+<div class="note">Both parts required. Excel import validates <code>/^\d{2}:\d{2}\s+[A-Z]{3}$/</code>. <strong>Note:</strong> <code>dealingCutOff</code> was changed from composite time to free-text Input (no format validation).</div>
+
+<h3 id="sec3-5">3.5 Excel Import Validation</h3>
+<div class="note">Excel template: <code>Share_Class_Template.xlsx</code>. Column headers are case-sensitive. Only columns with frontend validation listed (~59 columns total).</div>
+
+<table>
+  <tr><th>#</th><th>Excel Column Header</th><th>→ Field</th><th>Required (add)</th><th>Rule</th></tr>
+  <tr><td>1</td><td><code>Fund_Code</code></td><td>fundCode</td><td><span class="tag tag-req">Yes</span></td><td>Non-empty</td></tr>
+  <tr><td>2</td><td><code>VPFS_Class_ID</code></td><td>vpfsClassId</td><td><span class="tag tag-req">Yes</span></td><td>Non-empty</td></tr>
+  <tr><td>3</td><td><code>Share_Class_Name_(EN)_Official_Name</code></td><td>shareClassNameEnOfficialName</td><td><span class="tag tag-req">Yes</span></td><td>Non-empty</td></tr>
+  <tr><td>4</td><td><code>Fund_Class_Status</code></td><td>fundClassStatus</td><td>—</td><td>Enum: Active, Inactive, Terminated</td></tr>
+  <tr><td>5</td><td><code>Class_Currency</code></td><td>classCurrency</td><td>—</td><td>Enum (13 currencies)</td></tr>
+  <tr><td>6</td><td><code>Distribution_Policy</code></td><td>distributionPolicy</td><td>—</td><td>Enum: Monthly, Quarterly, Annually, N/A</td></tr>
+  <tr><td>7</td><td><code>Hedged</code></td><td>hedged</td><td>—</td><td>Enum: true, false, TRUE, FALSE</td></tr>
+  <tr><td>8</td><td><code>Security_Lending</code></td><td>securityLending</td><td>—</td><td>Enum: true, false, TRUE, FALSE</td></tr>
+  <tr><td>9</td><td><code>Unit_Precision</code></td><td>unitPrecision</td><td>—</td><td>Non-negative integer</td></tr>
+  <tr><td>10</td><td><code>NAV_Precision</code></td><td>navPrecision</td><td>—</td><td>Non-negative integer</td></tr>
+  <tr><td>11</td><td><code>ISIN_Code</code></td><td>isinCode</td><td>—</td><td>Regex: <code>/^[A-Z]{2}[A-Z0-9]{10}$/</code></td></tr>
+  <tr><td>12</td><td><code>Stock_Code</code></td><td>stockCode</td><td>—</td><td>Regex: <code>/^\d{1,5}$/</code></td></tr>
+  <tr><td>13</td><td><code>SEDOL</code></td><td>sedol</td><td>—</td><td>Regex: <code>/^[A-Z0-9]{7}$/</code></td></tr>
+  <tr><td>14</td><td><code>CUSIP</code></td><td>cusip</td><td>—</td><td>Regex: <code>/^[A-Z0-9]{9}$/</code></td></tr>
+  <tr><td>15</td><td><code>Launch_Date</code></td><td>launchDate</td><td>—</td><td>Date format (auto-normalize)</td></tr>
+  <tr><td>16</td><td><code>End_of_IOP_Date</code></td><td>endOfIopDate</td><td>—</td><td>Date format</td></tr>
+  <tr><td>17</td><td><code>Latest_TER_Date</code></td><td>latestTerDate</td><td>—</td><td>Date format</td></tr>
+  <tr><td>18</td><td><code>Dealing_Cut_off</code></td><td>dealingCutOff</td><td>—</td><td>No validation (free-text)</td></tr>
+  <tr><td>19</td><td><code>Valuation_point</code></td><td>valuationPoint</td><td>—</td><td>Composite time: <code>/^\d{2}:\d{2}\s+[A-Z]{3}$/</code></td></tr>
+  <tr><td>20</td><td><code>Sub_unit_rounding</code></td><td>subUnitRounding</td><td>—</td><td>Enum: Round Up, Round Down</td></tr>
+  <tr><td>21</td><td><code>Red_unit_rounding</code></td><td>redUnitRounding</td><td>—</td><td>Enum: Round Up, Round Down</td></tr>
+  <tr><td>22</td><td><code>Management_Fee</code></td><td>managementFee</td><td>—</td><td>Non-negative, max 2dp</td></tr>
+  <tr><td>23</td><td><code>Performance_Fee</code></td><td>performanceFee</td><td>—</td><td>Non-negative, max 2dp</td></tr>
+  <tr><td>24</td><td><code>Latest_TER_Rate</code></td><td>latestTerRate</td><td>—</td><td>Non-negative, max 2dp</td></tr>
+  <tr><td>25</td><td><code>Minimum_initial_subscription</code></td><td>minimumInitialSubscription</td><td>—</td><td>Non-negative number</td></tr>
+  <tr><td>26</td><td><code>Minimum_Subsequent_Subscription</code></td><td>minimumSubsequentSubscription</td><td>—</td><td>Non-negative number</td></tr>
+  <tr><td>27</td><td><code>Minimum_Redemption</code></td><td>minimumRedemption</td><td>—</td><td>Non-negative number</td></tr>
+  <tr><td>28</td><td><code>Minimum_Holding</code></td><td>minimumHolding</td><td>—</td><td>Non-negative number</td></tr>
+  <tr><td>29</td><td><code>Redemption_Charge</code></td><td>redemptionCharge</td><td>—</td><td>Non-negative number</td></tr>
+  <tr><td>30</td><td><code>Subscription_Settlement</code></td><td>subscriptionSettlement</td><td>—</td><td>Non-negative integer</td></tr>
+  <tr><td>31</td><td><code>Redemption_Settlement</code></td><td>redemptionSettlement</td><td>—</td><td>Non-negative integer</td></tr>
+</table>
+
+<!-- ============================== 4. Summary ============================== -->
+
+<h2 id="sec4">4. Cross-Reference Summary</h2>
+
+<h3 id="sec4-1">4.1 Remaining Differences</h3>
+<div class="note">All enum values and format validation rules are now aligned between form and import. Only minor acceptable gaps remain:</div>
+
+<table>
+  <tr><th>Field</th><th>Module</th><th>Form</th><th>Import</th><th>Gap</th></tr>
+  <tr><td><code>unitPrecision</code></td><td>Operational</td><td>Input: integer</td><td>Integer (any)</td><td>Aligned.</td></tr>
+  <tr><td><code>navPrecision</code></td><td>Operational</td><td>Input: integer</td><td>Integer (any)</td><td>Aligned.</td></tr>
+  <tr><td><code>riskLevel</code></td><td>Product</td><td>Select: 1-5</td><td>Integer (any)</td><td>Import more permissive. Acceptable.</td></tr>
+  <tr><td><code>dealingCutOff</code></td><td>Operational</td><td>Input (free-text)</td><td>No validation</td><td>Aligned. Both accept any text.</td></tr>
+  <tr><td><code>businessCalendar</code></td><td>Operational</td><td>Multi-Select (8 values)</td><td>No validation</td><td>Import removed. Form-only.</td></tr>
+  <tr><td><code>contractNoteDeliveryDay</code></td><td>Operational</td><td>Input (integer)</td><td>No validation</td><td>Import removed. Form-only.</td></tr>
+  <tr><td><code>valuationDeliveryTime</code></td><td>Operational</td><td>Input (integer)</td><td>No validation</td><td>Import removed. Form-only.</td></tr>
+  <tr><td><code>ter</code></td><td>Operational</td><td>Not in form</td><td>No validation</td><td>Import removed. Field unused.</td></tr>
+</table>
+
+<h3 id="sec4-2">4.2 Backend Action Items</h3>
+
+<table>
+  <tr><th>#</th><th>Issue</th><th>Action Required</th></tr>
+  <tr><td>1</td><td><strong>CUSIP/Stock Code leading zeros lost in Excel</strong></td><td>Set Excel template columns to <strong>text format</strong> for CUSIP, Stock Code, and any code fields with leading zeros.</td></tr>
+  <tr><td>2</td><td><strong>Backend enum validation for import</strong></td><td>Validate enum values during Excel import, reject invalid values (e.g. typo "Inctive" was accepted).</td></tr>
+  <tr><td>3</td><td><strong>isinCode CHECK constraint</strong></td><td>CK_tbl_product_center_data_ISIN may block valid inserts. Review and fix CHECK constraint regex.</td></tr>
+  <tr><td>4</td><td><strong>Decimal backfill format</strong></td><td>Backend returns <code>44.00000</code> for latestTerRate. Recommend returning trimmed decimals (max 2dp).</td></tr>
+  <tr><td>5</td><td><strong>Date format in API responses</strong></td><td>Backend returns <code>"2026-05-16 00:00:00"</code>. Recommend <code>"YYYY/MM/DD"</code> or <code>"YYYY-MM-DD"</code> for date-only fields.</td></tr>
+  <tr><td>6</td><td><strong>Composite time+TZ storage</strong></td><td>Frontend sends <code>"16:00 HKG"</code> as single VARCHAR. Store as-is. See <code>docs/COMPOSITE-TIME-TZ-BACKEND-INTEGRATION.html</code>.</td></tr>
+</table>
+
+<div class="section-intro" style="margin-top: 40px;">
+  <strong>End of Document</strong><br>
+  Generated from frontend source code. All rules, regexes, and enum values extracted from codebase.
+</div>
+
+<!-- ============================== 5. Backend Validation ============================== -->
+
+<h2 id="sec5">5. Backend Validation Requirements</h2>
+<p>以下是从前端数据格式推导出的后端校验需求。后端应在 API 层和数据库层同时约束。</p>
+
+<h3 id="sec5-1">5.1 Product Team — Fund Masterdata</h3>
+
+<h4>5.1.1 Required Fields (NOT NULL)</h4>
+<div class="enum-list"><span>fundCode</span> <span>fundNameEn</span> <span>fundNameTc</span> <span>fundNameSc</span> <span>fundType</span> <span>domicileJurisdiction</span> <span>primaryRegulator</span> <span>fundStatus</span> <span>launchDate</span> <span>complexProduct</span> <span>fundManager</span> <span>fundManagerLei</span> <span>primaryInstrumentType</span> <span>investmentMarketFocus</span> <span>investmentObjective</span> <span>investmentStrategy</span> <span>passiveOrActiveFund</span> <span>hedgingPolicyFund</span> <span>leverageRatioMax</span> <span>derivativesRatioMax</span> <span>borrowingLimit</span></div>
+
+<h4>5.1.2 Unique Constraints</h4>
+<table>
+  <tr><th>Field</th><th>Constraint</th></tr>
+  <tr><td><code>fundCode</code></td><td>UNIQUE</td></tr>
+  <tr><td><code>fundNameEn</code></td><td>UNIQUE</td></tr>
+  <tr><td><code>fundNameTc</code></td><td>UNIQUE</td></tr>
+  <tr><td><code>fundNameSc</code></td><td>UNIQUE</td></tr>
+</table>
+
+<h4>5.1.3 Length Limits</h4>
+<table>
+  <tr><th>Field</th><th>Max Length</th></tr>
+  <tr><td><code>fundCode</code></td><td>20</td></tr>
+  <tr><td><code>fundNameEn</code></td><td>200</td></tr>
+  <tr><td><code>fundNameTc</code></td><td>200</td></tr>
+  <tr><td><code>fundNameSc</code></td><td>200</td></tr>
+  <tr><td><code>investmentObjective</code></td><td>2000</td></tr>
+  <tr><td><code>investmentStrategy</code></td><td>2000</td></tr>
+  <tr><td><code>assetAllocationTable</code></td><td>4000</td></tr>
+</table>
+
+<h4>5.1.4 Enum CHECK Constraints</h4>
+<table>
+  <tr><th>Field</th><th>Valid Values</th></tr>
+  <tr><td><code>fundType</code></td><td>SFC Authorized Fund（UT）, SFC Authorized Fund（OFC）, SFC Authorized Fund（Cayman）, SFC Authorized Fund（ICAV）, Private Fund（Cayman）, Private Fund（Chinese Mainland）, Investment Advisory（Offshore）, Investment Advisory（Chinese Mainland）, Other Mutual Fund</td></tr>
+  <tr><td><code>fundStatus</code></td><td>In Offering, Active, In Liquidation, Liquidated</td></tr>
+  <tr><td><code>primaryInstrumentType</code></td><td>Alternative (Private) Assets, Commodities, Digital Assets, Equity, Fixed Income, Money Market (Liquidity), Multi-Assets</td></tr>
+  <tr><td><code>passiveOrActiveFund</code></td><td>Active, Passive</td></tr>
+  <tr><td><code>investmentMarketFocus</code></td><td>America, Asia Pacific, Emerging Markets, Europe, Global</td></tr>
+  <tr><td><code>hedgingPolicyFund</code></td><td>Hedge to Base Currency, Optional, N/A</td></tr>
+  <tr><td><code>complexProduct</code></td><td>BOOLEAN (前端传 true/false)</td></tr>
+  <tr><td><code>professionalInvestorsOnly</code></td><td>BOOLEAN (前端传 true/false，允许 NULL)</td></tr>
+  <tr><td><code>riskLevel</code></td><td>1 – 5</td></tr>
+  <tr><td><code>domicileJurisdiction</code></td><td>HK, IE, KY, CN, SG, LU, GB, US, CH, DE, FR, JP, BM, VG, AU, NL, TW, MO, MY, KR, IN, IT, ES, SE, FI, DK, NO</td></tr>
+  <tr><td><code>baseCurrency</code></td><td>HKD, USD, EUR, CNY, CNH, GBP, JPY, SGD, CHF, AUD, CAD, NZD, RMB</td></tr>
+</table>
+
+<h4>5.1.5 Format Validation (Regex)</h4>
+<table>
+  <tr><th>Field</th><th>Regex</th><th>Example</th></tr>
+  <tr><td><code>leiNumber</code></td><td><code>/^[A-Z0-9]{20}$/</code></td><td>549300VIRTXBZ81J0S95</td></tr>
+  <tr><td><code>fundManagerLei</code></td><td><code>/^[A-Z0-9]{20}$/</code></td><td>同上</td></tr>
+  <tr><td><code>giinNumber</code></td><td><code>/^[A-Z0-9]{6}\.[A-Z0-9]{5}\.[A-Z0-9]{2}\.[A-Z0-9]{2}$/</code></td><td>ABC123.DEF45.GH.67</td></tr>
+</table>
+
+<h4>5.1.6 Numeric Constraints</h4>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Constraint</th></tr>
+  <tr><td><code>leverageRatioMax</code></td><td>INTEGER</td><td>&gt;= 0</td></tr>
+  <tr><td><code>derivativesRatioMax</code></td><td>INTEGER</td><td>&gt;= 0</td></tr>
+  <tr><td><code>borrowingLimit</code></td><td>INTEGER</td><td>&gt;= 0</td></tr>
+  <tr><td><code>stopLossLimit</code></td><td>DECIMAL(?,2)</td><td>&gt;= 0</td></tr>
+  <tr><td><code>stopLossAlert</code></td><td>DECIMAL(?,2)</td><td>&gt;= 0</td></tr>
+  <tr><td><code>riskLevel</code></td><td>INTEGER</td><td>1 – 5</td></tr>
+</table>
+
+<h4>5.1.7 Date Fields</h4>
+<p>前端传 <code>YYYY/MM/DD</code> 字符串。所有日期字段允许 NULL（除 <code>launchDate</code>）。</p>
+<div class="enum-list"><span>launchDate</span> <span>applicationSubmissionDate</span> <span>authorizationDate</span> <span>iopStartDate</span> <span>operationStartDate</span> <span>listingDate</span> <span>terminationDate</span></div>
+
+<hr style="margin: 40px 0;">
+
+<h3 id="sec5-2">5.2 Operational Team — Share Class Data</h3>
+
+<h4>5.2.1 Required Fields (NOT NULL)</h4>
+<div class="enum-list"><span>fundCode</span> <span>vpfsClassId</span> <span>shareClassNameEnOfficialName</span> <span>shareClassNameTcOfficialName</span> <span>shareClassNameScOfficialName</span> <span>classCurrency</span> <span>fundClassStatus</span> <span>launchDate</span> <span>distributionPolicy</span> <span>hedged</span> <span>unitPrecision</span> <span>navPrecision</span> <span>businessDayDefinition</span> <span>businessCalendar</span> <span>dealingFrequency</span> <span>valuationFrequency</span> <span>dealingCutOff</span> <span>valuationPoint</span> <span>cutoffTime</span> <span>subscriptionSettlement</span> <span>redemptionSettlement</span> <span>minimumInitialSubscription</span> <span>minimumSubsequentSubscription</span> <span>minimumRedemption</span> <span>pricingMethodology</span> <span>subUnitRounding</span> <span>redUnitRounding</span></div>
+
+<h4>5.2.2 Unique Constraints</h4>
+<table>
+  <tr><th>Fields</th><th>Constraint</th></tr>
+  <tr><td><code>fundCode</code> + <code>shareClassNameEnOfficialName</code></td><td>UNIQUE(fund_code, share_class_name_en)</td></tr>
+  <tr><td><code>fundCode</code> + <code>vpfsClassId</code></td><td>UNIQUE(fund_code, vpfs_class_id)</td></tr>
+</table>
+
+<h4>5.2.3 Length Limits</h4>
+<table>
+  <tr><th>Field</th><th>Max Length</th></tr>
+  <tr><td><code>shareClassNameEnOfficialName</code></td><td>200</td></tr>
+  <tr><td><code>shareClassNameTcOfficialName</code></td><td>200</td></tr>
+  <tr><td><code>shareClassNameScOfficialName</code></td><td>200</td></tr>
+</table>
+
+<h4>5.2.4 Enum CHECK Constraints</h4>
+<table>
+  <tr><th>Field</th><th>Valid Values</th></tr>
+  <tr><td><code>fundClassStatus</code></td><td>Active, Inactive, Terminated</td></tr>
+  <tr><td><code>classCurrency</code></td><td>EUR, HKD, CNH, SGD, USD, CHF, GBP, AUD, CAD, NZD, CNY, RMB, JPY</td></tr>
+  <tr><td><code>distributionPolicy</code></td><td>Monthly, Quarterly, Annually, N/A</td></tr>
+  <tr><td><code>hedged</code></td><td>BOOLEAN (前端传 true/false)</td></tr>
+  <tr><td><code>securityLending</code></td><td>BOOLEAN (前端传 true/false，允许 NULL)</td></tr>
+  <tr><td><code>unitPrecision</code></td><td>INTEGER >= 0 (was: 2, 3, 4 — now free input)</td></tr>
+  <tr><td><code>navPrecision</code></td><td>INTEGER >= 0 (was: 0, 2, 4 — now free input)</td></tr>
+  <tr><td><code>dealingFrequency</code></td><td>Daily, Weekly, Monthly, Quarterly, Yearly</td></tr>
+  <tr><td><code>valuationFrequency</code></td><td>Daily, Weekly, Monthly, Quarterly, Yearly</td></tr>
+  <tr><td><code>pricingMethodology</code></td><td>Amortization, Cost, Mark to Market (逗号分隔多选)</td></tr>
+  <tr><td><code>subUnitRounding</code></td><td>Round Up, Round Down</td></tr>
+  <tr><td><code>redUnitRounding</code></td><td>Round Up, Round Down</td></tr>
+  <tr><td><code>businessCalendar</code></td><td>Hong Kong, Taiwan, Japan, PRC - Stock Exchange, PRC - Bank, Ireland, UK, Relevant Market as per Prospectus (逗号分隔多选)</td></tr>
+  <tr><td><code>financialYearEnd</code></td><td>31-March, 30-June, 31-December</td></tr>
+  <tr><td><code>hedgingCurrency</code></td><td>同 classCurrency</td></tr>
+</table>
+
+<h4>5.2.5 Format Validation (Regex)</h4>
+<table>
+  <tr><th>Field</th><th>Regex</th><th>Example</th><th>Note</th></tr>
+  <tr><td><code>isinCode</code></td><td><code>/^[A-Z]{2}[A-Z0-9]{10}$/</code></td><td>HK0000123456</td><td></td></tr>
+  <tr><td><code>stockCode</code></td><td><code>/^\d{1,5}$/</code></td><td>00005</td><td>1-5位数字，保留前导零</td></tr>
+  <tr><td><code>sedol</code></td><td><code>/^[A-Z0-9]{7}$/</code></td><td>B1Y34K7</td><td></td></tr>
+  <tr><td><code>cusip</code></td><td><code>/^[A-Z0-9]{9}$/</code></td><td>17275R102</td><td>允许字母和数字，保留前导零</td></tr>
+  <tr><td><code>dealingCutOff</code></td><td>—</td><td>16:00 HKG</td><td>Free-text, no format validation (was composite time)</td></tr>
+  <tr><td><code>valuationPoint</code></td><td><code>/^\d{2}:\d{2}\s+[A-Z]{3}$/</code></td><td>09:30 IRL</td><td></td></tr>
+  <tr><td><code>cutoffTime</code></td><td><code>/^\d{2}:\d{2}\s+[A-Z]{3}$/</code></td><td>17:00 HKG</td><td></td></tr>
+</table>
+<div class="warning">Excel 导入时 CUSIP/Stock Code 的前导零依赖 Excel 列格式为文本。后端导出模板时必须将这些列设为文本格式。</div>
+
+<h4>5.2.6 Numeric Constraints</h4>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Constraint</th></tr>
+  <tr><td><code>subscriptionSettlement</code></td><td>INTEGER</td><td>&gt;= 0</td></tr>
+  <tr><td><code>redemptionSettlement</code></td><td>INTEGER</td><td>&gt;= 0</td></tr>
+  <tr><td><code>contractNoteDeliveryDay</code></td><td>INTEGER</td><td>&gt;= 0</td></tr>
+  <tr><td><code>valuationDeliveryTime</code></td><td>INTEGER</td><td>&gt;= 0</td></tr>
+  <tr><td><code>unitPrecision</code></td><td>INTEGER</td><td>&gt;= 0</td></tr>
+  <tr><td><code>navPrecision</code></td><td>INTEGER</td><td>&gt;= 0</td></tr>
+  <tr><td><code>minimumInitialSubscription</code></td><td>DECIMAL(?,?)</td><td>&gt;= 0</td></tr>
+  <tr><td><code>minimumSubsequentSubscription</code></td><td>DECIMAL(?,?)</td><td>&gt;= 0</td></tr>
+  <tr><td><code>minimumRedemption</code></td><td>DECIMAL(?,?)</td><td>&gt;= 0</td></tr>
+  <tr><td><code>minimumHolding</code></td><td>DECIMAL(?,?)</td><td>&gt;= 0</td></tr>
+  <tr><td><code>redemptionCharge</code></td><td>DECIMAL(?,?)</td><td>&gt;= 0</td></tr>
+  <tr><td><code>managementFee</code></td><td>DECIMAL(?,2)</td><td>&gt;= 0</td></tr>
+  <tr><td><code>performanceFee</code></td><td>DECIMAL(?,2)</td><td>&gt;= 0</td></tr>
+  <tr><td><code>latestTerRate</code></td><td>DECIMAL(?,2)</td><td>&gt;= 0</td></tr>
+</table>
+
+<h4>5.2.7 Date Fields</h4>
+<p>前端传 <code>YYYY/MM/DD</code> 字符串。所有日期字段允许 NULL（除 <code>launchDate</code>）。</p>
+<div class="enum-list"><span>launchDate</span> <span>endOfIopDate</span> <span>latestTerDate</span></div>
+<div class="note"><strong>latestTerDate</strong> 前端用月份选择器，提交格式仍为 YYYY/MM/DD（day=01），只存月份信息。</div>
+
+<hr style="margin: 40px 0;">
+
+<h3 id="sec5-3">5.3 Data Types Summary (Frontend → Backend)</h3>
+
+<table>
+  <tr><th>前端类型</th><th>传值格式</th><th>后端列类型建议</th></tr>
+  <tr><td>String</td><td>普通字符串</td><td>VARCHAR(N)</td></tr>
+  <tr><td>Boolean</td><td><code>true</code> / <code>false</code>（JSON boolean）</td><td>BOOLEAN / TINYINT(1)</td></tr>
+  <tr><td>Integer</td><td>JSON number（如 <code>5</code>）</td><td>INTEGER</td></tr>
+  <tr><td>Decimal 2dp</td><td>JSON number（如 <code>1.50</code>）</td><td>DECIMAL(?,2)</td></tr>
+  <tr><td>Numeric</td><td>JSON number</td><td>DECIMAL(?,?)</td></tr>
+  <tr><td>Date</td><td>字符串 <code>"YYYY/MM/DD"</code></td><td>DATE 或 VARCHAR(10)</td></tr>
+  <tr><td>Composite Time+TZ</td><td>字符串 <code>"HH:mm CCC"</code></td><td>VARCHAR(8)</td></tr>
+  <tr><td>Multi-Select</td><td>逗号分隔字符串 <code>"A,B,C"</code></td><td>VARCHAR(N)</td></tr>
+  <tr><td>Array (regions)</td><td>JSON array of ints <code>[1,2,3]</code></td><td>JSON 或关联表</td></tr>
+</table>
+
+<div class="section-intro" style="margin-top: 40px;">
+  <strong>End of Original Document</strong><br>
+  Below is the change log for the 2026-06-10 update, listing what the frontend changed and what the backend needs to do.
+</div>
+
+<!-- ============================== 6. Change Log 2026-06-10 ============================== -->
+
+<h2 id="sec6" style="margin-top: 60px;">6. Change Log — 2026-06-10</h2>
+<p>This section summarizes the frontend changes already deployed and the corresponding backend actions required.</p>
+
+<h3 id="sec6-1">6.1 Frontend Changes (Already Done)</h3>
+
+<h4>6.1.1 Excel Import — Columns Removed</h4>
+<p>The following columns no longer have frontend import validation. Data in these columns will be ignored during import.</p>
+<table>
+  <tr><th>Excel Column</th><th>Notes</th></tr>
+  <tr><td><code>Business_Calendar</code></td><td>Form still has this field (Multi-Select). Import only removed.</td></tr>
+  <tr><td><code>Contract_note_delivery_day</code></td><td>Form still has this field (Input). Import only removed.</td></tr>
+  <tr><td><code>Valuation_delivery_time</code></td><td>Form still has this field (Input). Import only removed.</td></tr>
+  <tr><td><code>Pricing_Methodology</code></td><td>Form still has this field (Multi-Select). Import never had validation.</td></tr>
+  <tr><td><code>TER</code></td><td>Not in form. Fully removed from import.</td></tr>
+  <tr><td><code>To_Be_Discussed1</code></td><td>Template placeholder column.</td></tr>
+  <tr><td><code>To_Be_Discussed2</code></td><td>Template placeholder column.</td></tr>
+  <tr><td><code>Remove1</code></td><td>Template placeholder column.</td></tr>
+  <tr><td><code>Remove2</code></td><td>Template placeholder column.</td></tr>
+  <tr><td><code>Remove3</code></td><td>Template placeholder column.</td></tr>
+  <tr><td><code>Remove4</code></td><td>Template placeholder column.</td></tr>
+  <tr><td><em>Blank column</em></td><td>Empty column in template.</td></tr>
+</table>
+
+<h4>6.1.2 Excel Import — Columns Added</h4>
+<table>
+  <tr><th>Excel Column</th><th>Position</th><th>Validation</th></tr>
+  <tr><td><code>Sub_unit_rounding</code></td><td>After <code>Unit_Precision</code></td><td>Enum: <code>Round Up</code>, <code>Round Down</code></td></tr>
+  <tr><td><code>Red_unit_rounding</code></td><td>After <code>Sub_unit_rounding</code></td><td>Enum: <code>Round Up</code>, <code>Round Down</code></td></tr>
+</table>
+
+<h4>6.1.3 Form Changes</h4>
+<table>
+  <tr><th>Field</th><th>Before</th><th>After</th></tr>
+  <tr><td><code>unitPrecision</code></td><td>Select (options: 2, 3, 4)</td><td>Input (any non-negative integer)</td></tr>
+  <tr><td><code>navPrecision</code></td><td>Select (options: 0, 2, 4)</td><td>Input (any non-negative integer)</td></tr>
+  <tr><td><code>dealingCutOff</code></td><td>TimePicker + Timezone Select</td><td>Input (free text, no format validation)</td></tr>
+  <tr><td><code>subUnitRounding</code></td><td>—</td><td>Select: Round Up / Round Down (required)</td></tr>
+  <tr><td><code>redUnitRounding</code></td><td>—</td><td>Select: Round Up / Round Down (required)</td></tr>
+</table>
+
+<h4>6.1.4 Other Frontend Changes</h4>
+<table>
+  <tr><th>Change</th><th>Details</th></tr>
+  <tr><td>Date format — DD-MMM-YYYY</td><td><code>normalizeDate()</code> now accepts <code>DD-MMM-YYYY</code> format (e.g. <code>05-May-2025</code>). Applies to: <code>Launch_Date</code>, <code>End_of_IOP_Date</code>, <code>Latest_TER_Date</code>. Auto-normalized to <code>YYYY/MM/DD</code> before sending to backend.</td></tr>
+  <tr><td>Timezone — GMT added</td><td><code>GMT</code> added to timezone dropdown options.</td></tr>
+  <tr><td>Dash skip mechanism</td><td>In Excel import, a single <code>-</code> in any optional field is converted to <code>null</code> before sending to backend. Required fields still reject <code>-</code>. In the form, <code>-</code> is converted to empty string before validation (same effect as leaving it blank).</td></tr>
+  <tr><td>Login redirect fix</td><td>Admin login now redirects to the first accessible menu page instead of a non-existent analytics page.</td></tr>
+</table>
+
+<h3 id="sec6-2">6.2 Backend Actions Required</h3>
+
+<h4>6.2.1 Database Schema Changes</h4>
+<table>
+  <tr><th>#</th><th>Action</th><th>Details</th></tr>
+  <tr><td>1</td><td>Add column <code>sub_unit_rounding</code></td><td>VARCHAR(10), add after <code>unit_precision</code>. Values: <code>Round Up</code> or <code>Round Down</code>. Consider adding CHECK constraint. Recommend NOT NULL (frontend marks it as required).</td></tr>
+  <tr><td>2</td><td>Add column <code>red_unit_rounding</code></td><td>VARCHAR(10), add after <code>sub_unit_rounding</code>. Same as above.</td></tr>
+  <tr><td>3</td><td>Review <code>unit_precision</code> constraint</td><td>If there is a CHECK constraint limiting values to <code>2, 3, 4</code>, change to allow any non-negative integer (<code>>= 0</code>). Frontend now accepts free integer input.</td></tr>
+  <tr><td>4</td><td>Review <code>nav_precision</code> constraint</td><td>If there is a CHECK constraint limiting values to <code>0, 2, 4</code>, change to allow any non-negative integer (<code>>= 0</code>). Frontend now accepts free integer input.</td></tr>
+  <tr><td>5</td><td>Review <code>dealing_cut_off</code> format</td><td>If there is format validation (e.g. composite time <code>HH:mm CCC</code>), remove or relax it. Frontend now sends free text (e.g. <code>17:00HKT 3 BD before DD</code>).</td></tr>
+  <tr><td>6</td><td>Review timezone code whitelist</td><td>If backend validates timezone codes, add <code>GMT</code> to the allowed list.</td></tr>
+</table>
+
+<h4>6.2.2 Excel Template Update</h4>
+<table>
+  <tr><th>Action</th><th>Columns</th></tr>
+  <tr><td><strong>Remove these columns</strong></td><td><code>Business_Calendar</code>, <code>Contract_note_delivery_day</code>, <code>Valuation_delivery_time</code>, <code>Pricing_Methodology</code>, <code>TER</code>, <code>To_Be_Discussed1</code>, <code>To_Be_Discussed2</code>, <code>Remove1</code>, <code>Remove2</code>, <code>Remove3</code>, <code>Remove4</code>, and any blank columns</td></tr>
+  <tr><td><strong>Add these columns</strong></td><td><code>Sub_unit_rounding</code> (after <code>Unit_Precision</code>), <code>Red_unit_rounding</code> (after <code>Sub_unit_rounding</code>)</td></tr>
+</table>
+
+<h4>6.2.3 API / Logic Changes</h4>
+<table>
+  <tr><th>#</th><th>Action</th><th>Details</th></tr>
+  <tr><td>1</td><td>Accept <code>subUnitRounding</code> / <code>redUnitRounding</code> in API</td><td>Map frontend camelCase fields to database columns. Values: <code>Round Up</code> or <code>Round Down</code>.</td></tr>
+  <tr><td>2</td><td>Handle <code>null</code> values for optional fields</td><td>Frontend may send <code>null</code> for optional fields (when user enters <code>-</code> in Excel or leaves form blank). Backend should accept <code>null</code> without error.</td></tr>
+  <tr><td>3</td><td>Date format — accept <code>YYYY/MM/DD</code></td><td>Frontend normalizes all dates to <code>YYYY/MM/DD</code> before sending. If backend previously only accepted <code>YYYY-MM-DD</code>, update to accept <code>YYYY/MM/DD</code> or both.</td></tr>
+</table>
+
+<div class="section-intro" style="margin-top: 40px;">
+  <strong>End of Document</strong><br>
+  For questions or updates, contact the frontend team.
+</div>
+
+</div>
+</body>
+</html>

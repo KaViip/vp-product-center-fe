@@ -86,20 +86,6 @@ const distributionPolicyOptions = [
   { label: 'N/A', value: 'N/A' },
 ];
 
-// Unit Precision
-const unitPrecisionOptions = [
-  { label: '2', value: '2' },
-  { label: '3', value: '3' },
-  { label: '4', value: '4' },
-];
-
-// NAV Precision
-const navPrecisionOptions = [
-  { label: '0', value: '0' },
-  { label: '2', value: '2' },
-  { label: '4', value: '4' },
-];
-
 // Business Calendar (multi-select)
 const businessCalendarOptions = [
   { label: 'Hong Kong', value: 'Hong Kong' },
@@ -135,8 +121,14 @@ const pricingMethodologyOptions = [
   { label: 'Mark to Market', value: 'Mark to Market' },
 ];
 
+const roundingOptions = [
+  { label: 'Round Up', value: 'Round Up' },
+  { label: 'Round Down', value: 'Round Down' },
+];
+
 // Country options for time+country picker (HKG, IRL, CHN first, then alpha)
 const tzCountryOptions = [
+  { label: 'GMT - Greenwich Mean Time', value: 'GMT' },
   { label: 'HKG - Hong Kong', value: 'HKG' },
   { label: 'IRL - Ireland', value: 'IRL' },
   { label: 'CHN - China', value: 'CHN' },
@@ -237,21 +229,13 @@ const rules: Record<string, any[]> = {
   launchDate: [{ required: true, message: 'Launch Date is required' }],
   distributionPolicy: [{ required: true, message: 'Distribution Policy is required' }],
   hedged: [{ required: true, message: 'Hedged is required' }],
-  unitPrecision: [{ required: true, message: 'Unit Precision is required' }],
-  navPrecision: [{ required: true, message: 'NAV Precision is required' }],
+  unitPrecision: [{ required: true, message: 'Unit Precision is required' }, { validator: integerValidator }],
+  navPrecision: [{ required: true, message: 'NAV Precision is required' }, { validator: integerValidator }],
   businessDayDefinition: [{ required: true, message: 'Business Day Definition is required' }],
   businessCalendar: [{ required: true, message: 'Business Calendar is required' }],
   dealingFrequency: [{ required: true, message: 'Dealing Frequency is required' }],
   valuationFrequency: [{ required: true, message: 'Valuation Frequency is required' }],
-  dealingCutOff_time: [{
-    required: true,
-    validator: (_rule: any, value: any, callback: (error?: Error) => void) => {
-      const tz = formData.value.dealingCutOff_tz;
-      if (value && tz) callback();
-      else if (!value && !tz) callback(new Error('Dealing Cut-off is required'));
-      else callback(new Error('Please fill both time and timezone'));
-    },
-  }],
+  dealingCutOff: [{ required: true, message: 'Dealing Cut-off is required' }],
   valuationPoint_time: [{
     required: true,
     validator: (_rule: any, value: any, callback: (error?: Error) => void) => {
@@ -271,32 +255,32 @@ const rules: Record<string, any[]> = {
     },
   }],
   pricingMethodology: [{ required: true, message: 'Pricing Methodology is required' }],
-  subscriptionSettlement: [{ required: true, message: 'Subscription Settlement is required' }],
-  redemptionSettlement: [{ required: true, message: 'Redemption Settlement is required' }],
-  minimumInitialSubscription: [{ required: true, message: 'Min Initial Subscription is required' }],
-  minimumSubsequentSubscription: [{ required: true, message: 'Min Subsequent Subscription is required' }],
-  minimumRedemption: [{ required: true, message: 'Minimum Redemption is required' }],
+  subUnitRounding: [{ required: true, message: 'Sub Unit Rounding is required' }],
+  redUnitRounding: [{ required: true, message: 'Red Unit Rounding is required' }],
+  subscriptionSettlement: [{ required: true, message: 'Subscription Settlement is required' }, { validator: integerValidator }],
+  redemptionSettlement: [{ required: true, message: 'Redemption Settlement is required' }, { validator: integerValidator }],
+  minimumInitialSubscription: [{ required: true, message: 'Min Initial Subscription is required' }, { validator: numericValidator('Min Initial Subscription') }],
+  minimumSubsequentSubscription: [{ required: true, message: 'Min Subsequent Subscription is required' }, { validator: numericValidator('Min Subsequent Subscription') }],
+  minimumRedemption: [{ required: true, message: 'Minimum Redemption is required' }, { validator: numericValidator('Minimum Redemption') }],
   isinCode: [{ validator: isinValidator }],
   stockCode: [{ validator: stockCodeValidator }],
   sedol: [{ validator: sedolValidator }],
   cusip: [{ validator: cusipValidator }],
+  minimumHolding: [{ validator: numericValidator('Minimum Holding') }],
+  redemptionCharge: [{ validator: numericValidator('Redemption Charge') }],
+  contractNoteDeliveryDay: [{ validator: integerValidator }],
+  valuationDeliveryTime: [{ validator: integerValidator }],
   latestTerRate: [{ validator: decimal2Validator('Latest TER Rate') }],
   managementFee: [{ validator: decimal2Validator('Management Fee') }],
   performanceFee: [{ validator: decimal2Validator('Performance Fee') }],
-  subscriptionSettlementT: [{ validator: integerValidator }],
-  redemptionSettlementT: [{ validator: integerValidator }],
-  contractNoteDeliveryDayT: [{ validator: integerValidator }],
-  valuationDeliveryTimeT: [{ validator: integerValidator }],
 };
 
 // Re-validate composite time+tz fields when tz changes
 watch(() => [
-  formData.value.dealingCutOff_tz,
   formData.value.valuationPoint_tz,
   formData.value.cutoffTime_tz,
 ], () => {
   formRef.value?.validateFields([
-    'dealingCutOff_time',
     'valuationPoint_time',
     'cutoffTime_time',
   ]).catch(() => {});
@@ -367,7 +351,7 @@ function transformShareClassData(d: Record<string, any>) {
   }
 
   // Convert composite time+tz strings "HH:mm CCC" → separate _time (dayjs) and _tz (string)
-  const compositeTimeFields = ['dealingCutOff', 'valuationPoint', 'cutoffTime'];
+    const compositeTimeFields = ['valuationPoint', 'cutoffTime'];
   for (const key of compositeTimeFields) {
     const raw = d[key];
     if (raw && typeof raw === 'string') {
@@ -497,6 +481,12 @@ async function handleConfirm() {
 
     const submitData = cloneDeep(formData.value);
 
+    for (const key of Object.keys(submitData)) {
+      if (typeof submitData[key] === 'string' && submitData[key].trim() === '-') {
+        submitData[key] = '';
+      }
+    }
+
     // Backend expects comma-separated strings, not arrays
     if (Array.isArray(submitData.businessCalendar)) {
       submitData.businessCalendar = submitData.businessCalendar.join(',');
@@ -506,7 +496,7 @@ async function handleConfirm() {
     }
 
     // Composite time+tz fields: combine _time (dayjs) + _tz (string) → "HH:mm CCC"
-    const compositeTimeFields = ['dealingCutOff', 'valuationPoint', 'cutoffTime'];
+  const compositeTimeFields = ['valuationPoint', 'cutoffTime'];
     for (const key of compositeTimeFields) {
       const time = submitData[`${key}_time`];
       const tz = submitData[`${key}_tz`];
@@ -803,19 +793,19 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                     <Select v-model:value="formData.hedgingCurrency" :options="currencyOptions" show-search option-filter-prop="label" :disabled="!formData.hedged" />
                   </FormItem>
                 </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.unitPrecision')" name="unitPrecision">
-                    <Select v-model:value="formData.unitPrecision" :options="unitPrecisionOptions" />
-                  </FormItem>
-                </Col>
+                 <Col :span="12">
+                   <FormItem :label="$t('pages.productCenter.form.unitPrecision')" name="unitPrecision">
+                     <Input v-model:value="formData.unitPrecision" />
+                   </FormItem>
+                 </Col>
               </Row>
               <!-- 14. NAV Precision / Subscription Settlement(T+) -->
               <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.navPrecision')" name="navPrecision">
-                    <Select v-model:value="formData.navPrecision" :options="navPrecisionOptions" />
-                  </FormItem>
-                </Col>
+                 <Col :span="12">
+                   <FormItem :label="$t('pages.productCenter.form.navPrecision')" name="navPrecision">
+                     <Input v-model:value="formData.navPrecision" />
+                   </FormItem>
+                 </Col>
                 <Col :span="12">
                   <FormItem :label="$t('pages.productCenter.form.subscriptionSettlement')" name="subscriptionSettlement">
                     <Input v-model:value="formData.subscriptionSettlement" />
@@ -913,12 +903,9 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
               </Row>
                <Row :gutter="16">
                  <Col :span="12">
-                     <FormItem :label="$t('pages.productCenter.form.dealingCutOff')" name="dealingCutOff_time">
-                       <div style="display: flex; gap: 8px;">
-                         <TimePicker v-model:value="formData.dealingCutOff_time" format="HH:mm" :allow-clear="true" style="width: 110px" />
-                         <Select v-model:value="formData.dealingCutOff_tz" :options="tzCountryOptions" show-search option-filter-prop="label" style="flex: 1; min-width: 0" placeholder="TZ" />
-                      </div>
-                    </FormItem>
+                     <FormItem :label="$t('pages.productCenter.form.dealingCutOff')" name="dealingCutOff">
+                       <Input v-model:value="formData.dealingCutOff" />
+                     </FormItem>
                  </Col>
                  <Col :span="12">
                      <FormItem :label="$t('pages.productCenter.form.valuationPoint')" name="valuationPoint_time">
@@ -941,18 +928,30 @@ function handleAnchorClick(e: Event, link: { href: string; title: string }) {
                   </FormItem>
                 </Col>
               </Row>
-              <Row :gutter="16">
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.valuationDeliveryTime')">
-                    <Input v-model:value="formData.valuationDeliveryTime" />
-                  </FormItem>
-                </Col>
-                <Col :span="12">
-                  <FormItem :label="$t('pages.productCenter.form.securityLending')">
-                    <Select v-model:value="formData.securityLending" :options="yesNoOptions" allow-clear />
-                  </FormItem>
-                </Col>
-              </Row>
+               <Row :gutter="16">
+                 <Col :span="12">
+                   <FormItem :label="$t('pages.productCenter.form.valuationDeliveryTime')">
+                     <Input v-model:value="formData.valuationDeliveryTime" />
+                   </FormItem>
+                 </Col>
+                 <Col :span="12">
+                   <FormItem :label="$t('pages.productCenter.form.securityLending')">
+                     <Select v-model:value="formData.securityLending" :options="yesNoOptions" allow-clear />
+                   </FormItem>
+                 </Col>
+               </Row>
+               <Row :gutter="16">
+                 <Col :span="12">
+                   <FormItem :label="$t('pages.productCenter.form.subUnitRounding')" name="subUnitRounding">
+                     <Select v-model:value="formData.subUnitRounding" :options="roundingOptions" />
+                   </FormItem>
+                 </Col>
+                 <Col :span="12">
+                   <FormItem :label="$t('pages.productCenter.form.redUnitRounding')" name="redUnitRounding">
+                     <Select v-model:value="formData.redUnitRounding" :options="roundingOptions" />
+                   </FormItem>
+                 </Col>
+               </Row>
             </CollapsePanel>
             </Collapse>
           </Form>
