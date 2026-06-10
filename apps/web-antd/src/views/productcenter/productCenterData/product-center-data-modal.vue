@@ -457,6 +457,13 @@ const [Drawer, drawerApi] = useVbenDrawer({
 async function handleConfirm() {
   try {
     drawerApi.lock(true);
+
+    for (const key of Object.keys(formData.value)) {
+      if (typeof formData.value[key] === 'string' && formData.value[key].trim() === '-') {
+        formData.value[key] = '';
+      }
+    }
+
     const valid = await formRef.value?.validate();
     if (valid?.errorFields) {
       const firstField = valid.errorFields[0]?.name?.[0];
@@ -480,12 +487,6 @@ async function handleConfirm() {
     }
 
     const submitData = cloneDeep(formData.value);
-
-    for (const key of Object.keys(submitData)) {
-      if (typeof submitData[key] === 'string' && submitData[key].trim() === '-') {
-        submitData[key] = '';
-      }
-    }
 
     // Backend expects comma-separated strings, not arrays
     if (Array.isArray(submitData.businessCalendar)) {
