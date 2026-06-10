@@ -164,10 +164,6 @@ export function validateExcelData(
     for (const [column, rule] of Object.entries(rules)) {
       if (skipRequired && rule.type === 'required') continue;
       const value = (row[column] ?? '').toString();
-      if (value.trim() === '-') {
-        row[column] = null;
-        continue;
-      }
       const error = validateCell(value, column, rule);
       if (error) {
         errors.push({ row: rowNum, column, value, message: error });
@@ -176,13 +172,6 @@ export function validateExcelData(
         if (normalized) {
           row[column] = normalized;
         }
-      }
-    }
-
-    for (const key of Object.keys(row)) {
-      if (key === '_row' || rules[key]) continue;
-      if (row[key] != null && String(row[key]).trim() === '-') {
-        row[key] = null;
       }
     }
   }
