@@ -103,6 +103,7 @@ function validateCell(value: string, column: string, rule: ValidationRule): stri
           '^[A-Z0-9]{9}$': '17275R102',
           '^[A-Z0-9]{20}$': '20 alphanumeric characters (e.g. 549300VIRTXBZ81J0S95)',
           '^[A-Z0-9]{6}\\.[A-Z0-9]{5}\\.[A-Z0-9]{2}\\.[A-Z0-9]{2}$': 'XXXXXX.XXXXX.XX.XX (e.g. ABC123.DEF45.GH.67)',
+          '^[1-5]$': '1 – 5',
         };
         const example = examples[rule.pattern.source] || 'check format';
         return `'${trimmed}' is not valid. Expected format: ${example}`;
@@ -278,5 +279,5 @@ export const PRODUCT_TEAM_RULES: ValidationRuleMap = {
   'borrowing Limit': { type: 'integer' },
   'stop Loss Limit': { type: 'decimal2' },
   'stop Loss Alert': { type: 'decimal2' },
-  'risk Level': { type: 'integer' },
+  'risk Level': { type: 'regex', pattern: /^[1-5]$/ },
 };
