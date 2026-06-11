@@ -49,7 +49,7 @@
 
 <div class="meta">
   <strong>Project:</strong> Value Partners — Fund Product Center<br>
-  <strong>Date:</strong> 2026-06-10<br>
+  <strong>Date:</strong> 2026-06-11 (updated from 2026-06-10)<br>
   <strong>Modules:</strong> Product Team (Fund Masterdata) &amp; Operational Team (Share Class Data)<br>
   <strong>Scope:</strong> Form validation, Excel import validation, enum constraints, data format conventions
 </div>
@@ -161,7 +161,7 @@
   <strong>Parsing:</strong> <code>{ defval: '', raw: false, dateNF: 'yyyy/mm/dd' }</code> — all values as text (preserves leading zeros in codes).<br>
   <strong>Required validation:</strong> only enforced for <code>importMode === 'add data'</code>; skipped for update modes.<br>
   <strong>Date auto-normalize:</strong> passed dates are standardized to <code>YYYY/MM/DD</code> before sending to backend.<br>
-  <strong>Dash skip:</strong> a single <code>-</code> in any optional field is converted to <code>null</code> (skips validation). Required fields still reject <code>-</code>.
+  <strong>Dash skip:</strong> removed from Excel import. In the form only, a single <code>-</code> in any optional field is converted to empty string before validation.
 </div>
 
 <!-- ============================== 2. Product Team ============================== -->
@@ -293,7 +293,14 @@
   <tr><td>22</td><td><code>borrowing Limit</code></td><td>borrowingLimit</td><td>—</td><td>Non-negative integer</td></tr>
   <tr><td>23</td><td><code>stop Loss Limit</code></td><td>stopLossLimit</td><td>—</td><td>Non-negative, max 2dp</td></tr>
   <tr><td>24</td><td><code>stop Loss Alert</code></td><td>stopLossAlert</td><td>—</td><td>Non-negative, max 2dp</td></tr>
-  <tr><td>25</td><td><code>risk Level</code></td><td>riskLevel</td><td>—</td><td>Non-negative integer</td></tr>
+  <tr><td>25</td><td><code>risk Level</code></td><td>riskLevel</td><td>—</td><td>Regex: <code>/^[1-5]$/</code> (1 – 5 only)</td></tr>
+  <tr><td>26</td><td><code>domicile Jurisdiction</code></td><td>domicileJurisdiction</td><td>—</td><td>Enum (27 ISO 3166-1 Alpha-2 codes)</td></tr>
+  <tr><td>27</td><td><code>base Currency</code></td><td>baseCurrency</td><td>—</td><td>Enum (13 ISO 4217 currencies)</td></tr>
+  <tr><td>28</td><td><code>primary Regulator</code></td><td>primaryRegulator</td><td><span class="tag tag-req">Yes</span></td><td>Non-empty</td></tr>
+  <tr><td>29</td><td><code>fund Manager</code></td><td>fundManager</td><td><span class="tag tag-req">Yes</span></td><td>Non-empty</td></tr>
+  <tr><td>30</td><td><code>fund Manager LEI</code></td><td>fundManagerLei</td><td>—</td><td>Regex: <code>/^[A-Z0-9]{20}$/</code> (20 alphanumeric)</td></tr>
+  <tr><td>31</td><td><code>giin Number</code></td><td>giinNumber</td><td>—</td><td>Regex: <code>/^[A-Z0-9]{6}\.[A-Z0-9]{5}\.[A-Z0-9]{2}\.[A-Z0-9]{2}$/</code></td></tr>
+  <tr><td>32</td><td><code>lei Number</code></td><td>leiNumber</td><td>—</td><td>Regex: <code>/^[A-Z0-9]{20}$/</code> (20 alphanumeric)</td></tr>
 </table>
 
 <!-- ============================== 3. Operational Team ============================== -->
@@ -444,6 +451,13 @@
   <tr><td>29</td><td><code>Redemption_Charge</code></td><td>redemptionCharge</td><td>—</td><td>Non-negative number</td></tr>
   <tr><td>30</td><td><code>Subscription_Settlement</code></td><td>subscriptionSettlement</td><td>—</td><td>Non-negative integer</td></tr>
   <tr><td>31</td><td><code>Redemption_Settlement</code></td><td>redemptionSettlement</td><td>—</td><td>Non-negative integer</td></tr>
+  <tr><td>32</td><td><code>Hedging_Currency</code></td><td>hedgingCurrency</td><td>—</td><td>Enum (13 currencies, same as Class_Currency)</td></tr>
+  <tr><td>33</td><td><code>Cutoff_Time</code></td><td>cutoffTime</td><td>—</td><td>Composite time: <code>/^\d{2}:\d{2}\s+[A-Z]{3}$/</code></td></tr>
+  <tr><td>34</td><td><code>Dealing_Frequency</code></td><td>dealingFrequency</td><td>—</td><td>Enum: Daily, Weekly, Monthly, Quarterly, Yearly</td></tr>
+  <tr><td>35</td><td><code>Valuation_Frequency</code></td><td>valuationFrequency</td><td>—</td><td>Enum: Daily, Weekly, Monthly, Quarterly, Yearly</td></tr>
+  <tr><td>36</td><td><code>Pricing_Methodology</code></td><td>pricingMethodology</td><td>—</td><td>EnumList (comma-sep): Amortization, Cost, Mark to Market</td></tr>
+  <tr><td>37</td><td><code>Sub_unit_rounding</code></td><td>subUnitRounding</td><td>—</td><td>Enum: Round Up, Round Down</td></tr>
+  <tr><td>38</td><td><code>Red_unit_rounding</code></td><td>redUnitRounding</td><td>—</td><td>Enum: Round Up, Round Down</td></tr>
 </table>
 
 <!-- ============================== 4. Summary ============================== -->
@@ -457,12 +471,16 @@
   <tr><th>Field</th><th>Module</th><th>Form</th><th>Import</th><th>Gap</th></tr>
   <tr><td><code>unitPrecision</code></td><td>Operational</td><td>Input: integer</td><td>Integer (any)</td><td>Aligned.</td></tr>
   <tr><td><code>navPrecision</code></td><td>Operational</td><td>Input: integer</td><td>Integer (any)</td><td>Aligned.</td></tr>
-  <tr><td><code>riskLevel</code></td><td>Product</td><td>Select: 1-5</td><td>Integer (any)</td><td>Import more permissive. Acceptable.</td></tr>
+  <tr><td><code>riskLevel</code></td><td>Product</td><td>Select: 1-5</td><td>Regex: /^[1-5]$/</td><td>Aligned. Both restricted to 1-5.</td></tr>
   <tr><td><code>dealingCutOff</code></td><td>Operational</td><td>Input (free-text)</td><td>No validation</td><td>Aligned. Both accept any text.</td></tr>
+  <tr><td><code>hedgingCurrency</code></td><td>Operational</td><td>Select (13 currencies)</td><td>Enum (13 currencies)</td><td>Aligned.</td></tr>
+  <tr><td><code>cutoffTime</code></td><td>Operational</td><td>TimePicker + TZ Select</td><td>Composite time: HH:mm CCC</td><td>Aligned.</td></tr>
+  <tr><td><code>dealingFrequency</code></td><td>Operational</td><td>Select (5 values)</td><td>Enum (5 values)</td><td>Aligned.</td></tr>
+  <tr><td><code>valuationFrequency</code></td><td>Operational</td><td>Select (5 values)</td><td>Enum (5 values)</td><td>Aligned.</td></tr>
+  <tr><td><code>pricingMethodology</code></td><td>Operational</td><td>Multi-Select (3 values)</td><td>EnumList (3 values)</td><td>Aligned.</td></tr>
   <tr><td><code>businessCalendar</code></td><td>Operational</td><td>Multi-Select (8 values)</td><td>No validation</td><td>Import removed. Form-only.</td></tr>
   <tr><td><code>contractNoteDeliveryDay</code></td><td>Operational</td><td>Input (integer)</td><td>No validation</td><td>Import removed. Form-only.</td></tr>
   <tr><td><code>valuationDeliveryTime</code></td><td>Operational</td><td>Input (integer)</td><td>No validation</td><td>Import removed. Form-only.</td></tr>
-  <tr><td><code>ter</code></td><td>Operational</td><td>Not in form</td><td>No validation</td><td>Import removed. Field unused.</td></tr>
 </table>
 
 <h3 id="sec4-2">4.2 Backend Action Items</h3>
@@ -667,7 +685,6 @@
   <tr><td><code>Business_Calendar</code></td><td>Form still has this field (Multi-Select). Import only removed.</td></tr>
   <tr><td><code>Contract_note_delivery_day</code></td><td>Form still has this field (Input). Import only removed.</td></tr>
   <tr><td><code>Valuation_delivery_time</code></td><td>Form still has this field (Input). Import only removed.</td></tr>
-  <tr><td><code>Pricing_Methodology</code></td><td>Form still has this field (Multi-Select). Import never had validation.</td></tr>
   <tr><td><code>TER</code></td><td>Not in form. Fully removed from import.</td></tr>
   <tr><td><code>To_Be_Discussed1</code></td><td>Template placeholder column.</td></tr>
   <tr><td><code>To_Be_Discussed2</code></td><td>Template placeholder column.</td></tr>
@@ -679,10 +696,27 @@
 </table>
 
 <h4>6.1.2 Excel Import — Columns Added</h4>
+<p><strong>Operational Team:</strong></p>
 <table>
   <tr><th>Excel Column</th><th>Position</th><th>Validation</th></tr>
   <tr><td><code>Sub_unit_rounding</code></td><td>After <code>Unit_Precision</code></td><td>Enum: <code>Round Up</code>, <code>Round Down</code></td></tr>
   <tr><td><code>Red_unit_rounding</code></td><td>After <code>Sub_unit_rounding</code></td><td>Enum: <code>Round Up</code>, <code>Round Down</code></td></tr>
+  <tr><td><code>Hedging_Currency</code></td><td>After <code>Hedged</code></td><td>Enum (13 currencies, same as Class_Currency)</td></tr>
+  <tr><td><code>Cutoff_Time</code></td><td>After <code>Launch_Date</code></td><td>Composite time: <code>/^\d{2}:\d{2}\s+[A-Z]{3}$/</code></td></tr>
+  <tr><td><code>Dealing_Frequency</code></td><td>Dealing &amp; Valuation section</td><td>Enum: Daily, Weekly, Monthly, Quarterly, Yearly</td></tr>
+  <tr><td><code>Valuation_Frequency</code></td><td>Dealing &amp; Valuation section</td><td>Enum: Daily, Weekly, Monthly, Quarterly, Yearly</td></tr>
+  <tr><td><code>Pricing_Methodology</code></td><td>Dealing &amp; Valuation section</td><td>EnumList (comma-sep): Amortization, Cost, Mark to Market</td></tr>
+</table>
+<p><strong>Product Team:</strong></p>
+<table>
+  <tr><th>Excel Column</th><th>Validation</th></tr>
+  <tr><td><code>domicile Jurisdiction</code></td><td>Enum (27 ISO 3166-1 Alpha-2 codes)</td></tr>
+  <tr><td><code>base Currency</code></td><td>Enum (13 ISO 4217 currencies)</td></tr>
+  <tr><td><code>primary Regulator</code></td><td>Required (non-empty)</td></tr>
+  <tr><td><code>fund Manager</code></td><td>Required (non-empty)</td></tr>
+  <tr><td><code>fund Manager LEI</code></td><td>Regex: <code>/^[A-Z0-9]{20}$/</code></td></tr>
+  <tr><td><code>giin Number</code></td><td>Regex: <code>/^[A-Z0-9]{6}\.[A-Z0-9]{5}\.[A-Z0-9]{2}\.[A-Z0-9]{2}$/</code></td></tr>
+  <tr><td><code>lei Number</code></td><td>Regex: <code>/^[A-Z0-9]{20}$/</code></td></tr>
 </table>
 
 <h4>6.1.3 Form Changes</h4>
@@ -700,7 +734,10 @@
   <tr><th>Change</th><th>Details</th></tr>
   <tr><td>Date format — DD-MMM-YYYY</td><td><code>normalizeDate()</code> now accepts <code>DD-MMM-YYYY</code> format (e.g. <code>05-May-2025</code>). Applies to: <code>Launch_Date</code>, <code>End_of_IOP_Date</code>, <code>Latest_TER_Date</code>. Auto-normalized to <code>YYYY/MM/DD</code> before sending to backend.</td></tr>
   <tr><td>Timezone — GMT added</td><td><code>GMT</code> added to timezone dropdown options.</td></tr>
-  <tr><td>Dash skip mechanism</td><td>In Excel import, a single <code>-</code> in any optional field is converted to <code>null</code> before sending to backend. Required fields still reject <code>-</code>. In the form, <code>-</code> is converted to empty string before validation (same effect as leaving it blank).</td></tr>
+  <tr><td>Dash skip mechanism</td><td><strong>Removed from Excel import.</strong> A single <code>-</code> in any optional Excel field is no longer converted to <code>null</code>. Empty cells are treated as blank. In the form, <code>-</code> is still converted to empty string before validation.</td></tr>
+  <tr><td>LEI / GIIN error messages</td><td>Import validation error messages for LEI and GIIN now include format examples (e.g. <code>20 alphanumeric characters (e.g. 549300VIRTXBZ81J0S95)</code> and <code>XXXXXX.XXXXX.XX.XX</code>).</td></tr>
+  <tr><td>risk Level import validation</td><td>Changed from generic <code>integer</code> to <code>regex /^[1-5]$/</code>. Now rejects values outside 1–5 range (matches form Select and backend CHECK constraint).</td></tr>
+  <tr><td>Product Team import validations added</td><td>Added import validation for: <code>domicile Jurisdiction</code> (27 ISO codes), <code>base Currency</code> (13 currencies), <code>primary Regulator</code> (required), <code>fund Manager</code> (required), <code>fund Manager LEI</code> (regex 20 chars), <code>giin Number</code> (regex), <code>lei Number</code> (regex 20 chars).</td></tr>
   <tr><td>Login redirect fix</td><td>Admin login now redirects to the first accessible menu page instead of a non-existent analytics page.</td></tr>
 </table>
 
